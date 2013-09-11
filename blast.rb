@@ -2,25 +2,25 @@ require 'formula'
 
 class Blast < Formula
   homepage 'http://blast.ncbi.nlm.nih.gov/'
-  url 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.27/ncbi-blast-2.2.27+-src.tar.gz'
-  version '2.2.27'
-  sha1 '51529c9fada67e890b994213d26f4177fa3d23d8'
+  url 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.28/ncbi-blast-2.2.28+-src.tar.gz'
+  version '2.2.28'
+  sha1 '6941d2b83c410b2e2424266d8ee29ee7581c23d6'
 
-  fails_with :llvm do
-    build 5658
-    cause <<-EOS.undent
-      Compiler segfaults.
-    EOS
-  end
+  depends_on 'gnutls' => :optional
 
   option 'with-dll', "Create dynamic binaries instead of static"
+
+  def patches
+    # Support recent versions of gnutls
+    'http://www.ncbi.nlm.nih.gov/viewvc/v1/trunk/c%2B%2B/src/connect/ncbi_gnutls.c?view=patch&r1=57856&r2=57915'
+  end
 
   def install
     args = ["--prefix=#{prefix}"]
     args << "--with-dll" if build.include? 'with-dll'
 
     cd 'c++' do
-      system "./configure", *args
+      system './configure', '--without-debug', '--with-mt', *args
       system "make"
       system "make install"
     end
@@ -28,8 +28,8 @@ class Blast < Formula
 
   def caveats; <<-EOS.undent
     Using the option '--with-dll' will create dynamic binaries instead of
-    static. NCBI Blast static binaries are approximately 28-times larger
-    than dynamic binaries.
+    static. The NCBI Blast static installation is approximately 7 times larger
+    than the dynamic.
 
     Static binaries should be used for speed if the executable requires
     fast startup time, such as if another program is frequently restarting

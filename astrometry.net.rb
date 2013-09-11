@@ -2,8 +2,8 @@ require 'formula'
 
 class AstrometryNet < Formula
   homepage 'http://astrometry.net'
-  url 'http://astrometry.net/downloads/astrometry.net-0.42.tar.gz'
-  sha1 '95ae5e1f1379ef0a2745cd1b643825a03e080350'
+  url 'http://astrometry.net/downloads/astrometry.net-0.43.tar.gz'
+  sha1 'eef4cfe08b1366e9ee319cc9535a5657dec906d3'
 
   head 'http://astrometry.net/svn/trunk/src/astrometry', :using => :svn
 
@@ -20,6 +20,9 @@ class AstrometryNet < Formula
   # from pip
   depends_on 'pyfits' => :python
   depends_on 'numpy' => :python
+
+  # this formula includes python bindings
+  depends_on :python => :recommended
 
   option 'without-extras', "Don't try to build plotting code (actually it will still try, but homebrew won't halt the install if it fails)"
   option 'without-py', "Don't try to build python code"
@@ -39,7 +42,14 @@ class AstrometryNet < Formula
     if not build.include? 'without-py'
       system "make py"
     end
+
     system "make install"
+
+    if build.with? 'python':
+      system "find #{prefix} > /tmp/1"
+      system "mkdir -p #{prefix}/lib/python && mv #{prefix}/python #{prefix}/lib/"
+    end
+
   end
 
   def test

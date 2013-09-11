@@ -1,10 +1,10 @@
 require 'formula'
 
 class GmapGsnap < Formula
-  homepage 'http://research-pub.gene.com/gmap'
-  url 'http://research-pub.gene.com/gmap/src/gmap-gsnap-2012-07-20.v2.tar.gz'
-  sha1 'e53970e67134fb2e3e3f3c3b4ffe2c0e02471cc9'
-  version "2012-07-20.v2"
+  homepage 'http://research-pub.gene.com/gmap/'
+  url 'http://research-pub.gene.com/gmap/src/gmap-gsnap-2013-07-20.tar.gz'
+  sha1 '67dcf72a71798ec9f2814b33e4c92ad23a2b238e'
+  version '2013-07-20'
 
   depends_on "samtools"
 

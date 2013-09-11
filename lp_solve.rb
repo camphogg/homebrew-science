@@ -1,5 +1,9 @@
 require 'formula'
 
+def numpy_include_dir
+  "#{`python -c "import numpy.distutils.misc_util as u; print(u.get_numpy_include_dirs())[0]"`.strip}"
+end
+
 class NumpyHasHeaders < Requirement
   def satisfied?
     not Dir["#{numpy_include_dir}/numpy/*.h"].empty?
@@ -112,6 +116,10 @@ class LpSolve < Formula
     end
   end
 
+  def which_python
+    "python" + `python -c 'import sys;print(sys.version[:3])'`.strip
+  end
+
   def caveats; <<-EOS.undent
     For non-homebrew Python, you need to amend your PYTHONPATH like so:
       export PYTHONPATH=#{HOMEBREW_PREFIX}/lib/#{which_python}/site-packages:$PYTHONPATH
@@ -120,33 +128,23 @@ class LpSolve < Formula
     EOS
   end if build.include? 'python'
 
-  def test
-    mktemp do
-      input = <<-EOS.undent
-        max: 143 x + 60 y;
+  test do
+    input = <<-EOS.undent
+      max: 143 x + 60 y;
 
-        120 x + 210 y <= 15000;
-        110 x + 30 y <= 4000;
-        x + y <= 75;
-      EOS
-      Pathname.new('input.lp').write(input)
-      output = `#{bin}/lp_solve -S3 input.lp`
-      #puts output
-      match = output =~ /Value of objective function: 6315\.6250/
-      raise if match.nil?
-    end
-    if build.include? 'python'
-      system 'python', "#{HOMEBREW_PREFIX}/share/lp_solve/lpdemo.py"
-    end
+      120 x + 210 y <= 15000;
+      110 x + 30 y <= 4000;
+      x + y <= 75;
+    EOS
+    (testpath/'input.lp').write(input)
+    output = `#{bin}/lp_solve -S3 input.lp`
+    #puts output
+    match = output =~ /Value of objective function: 6315\.6250/
+    raise if match.nil?
+    # if build.include? 'python'
+    #   system 'python', "#{HOMEBREW_PREFIX}/share/lp_solve/lpdemo.py"
+    # end
   end
-end
-
-def which_python
-  "python" + `python -c 'import sys;print(sys.version[:3])'`.strip
-end
-
-def numpy_include_dir
-  "#{`python -c "import numpy.distutils.misc_util as u; print(u.get_numpy_include_dirs())[0]"`.strip}"
 end
 
 __END__
