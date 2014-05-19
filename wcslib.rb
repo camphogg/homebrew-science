@@ -1,7 +1,6 @@
 require "formula"
 
 class Wcslib < Formula
-  version '4.21'
   homepage "http://www.atnf.csiro.au/people/mcalabre/WCS/"
   url "ftp://ftp.atnf.csiro.au/pub/software/wcslib/wcslib-4.23.tar.bz2"
   sha1 "6b335277b4915c76d74b222f0e63a33e49f7d857"
