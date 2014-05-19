@@ -2,8 +2,9 @@ require 'formula'
 
 class Abyss < Formula
   homepage 'http://www.bcgsc.ca/platform/bioinfo/software/abyss'
-  url 'http://www.bcgsc.ca/platform/bioinfo/software/abyss/releases/1.3.7/abyss-1.3.7.tar.gz'
-  sha1 '3d0831b1b7fd0601ded7c2d01938a24b3fc1931a'
+  #doi '10.1101/gr.089532.108'
+  url 'https://github.com/bcgsc/abyss/releases/download/1.5.1/abyss-1.5.1.tar.gz'
+  sha1 '80ebb01d7ae3960e5841c741d5409e0fc6fdf83f'
 
   head do
     url 'https://github.com/bcgsc/abyss.git'

@@ -3,11 +3,12 @@ require 'formula'
 class Root < Formula
   homepage 'http://root.cern.ch'
   url 'ftp://root.cern.ch/root/root_v5.34.18.source.tar.gz'
+  mirror 'https://fossies.org/linux/misc/root_v5.34.18.source.tar.gz'
   version '5.34.18'
   sha1 'e24e9bf8b142f2780f6cec9503409d87e4b9f8da'
   head 'https://github.com/root-mirror/root.git', :branch => 'v5-34-00-patches'
 
-  option 'with-x11', "Use X11 for graphics backend instead of Cocoa"
+  option 'with-cocoa', "Use Cocoa for graphics backend instead of X11 (useful on Retina displays)"
   option 'with-qt', "Build with Qt graphics backend and GSI's Qt integration"
   depends_on 'xrootd' => :recommended
   depends_on 'fftw' => :optional
@@ -15,9 +16,13 @@ class Root < Formula
   depends_on :x11
   depends_on :python
 
-  def patches
-    # http://trac.macports.org/ticket/36777
-    { :p0 => "http://trac.macports.org/raw-attachment/ticket/36777/patch-builtin-afterimage-disabletiff.diff" } if build.without? 'x11'
+  if build.with? "cocoa"
+    patch :p0 do
+      url "http://trac.macports.org/raw-attachment/ticket/36777/patch-builtin-afterimage-disabletiff.diff"
+      sha1 "de9e7c3a6b04e15e8a8219e8396ae4a16c15d973"
+    end
+  else
+    patch :p1, :DATA
   end
 
   def install
@@ -31,7 +36,8 @@ class Root < Formula
 
     # Determine architecture
     arch = MacOS.prefer_64_bit? ? 'macosx64' : 'macosx'
-    cocoa_flag = (build.with? 'x11') ? "--disable-cocoa" : "--enable-cocoa"
+
+    cocoa_flag = (build.with? 'cocoa') ? "--enable-cocoa" : "--disable-cocoa"
 
     qt_flag = (build.with? 'qt') ? "--enable-qt" : "--disable-qt"
     qtgsi_flag = (build.with? 'qt') ? "--enable-qtgsi" : "--disable-qtgsi"
@@ -55,7 +61,7 @@ class Root < Formula
     # ROOT configure script does not search for Qt framework
     if build.with? 'qt'
       inreplace "config/Makefile.config" do |s|
-        s.gsub! /^QTLIBDIR .*/, "QTLIBDIR := -F #{HOMEBREW_PREFIX}/lib"
+	s.gsub! /^QTLIBDIR .*/, "QTLIBDIR := -F #{Formula["qt"].opt_lib}"
         s.gsub! /^QTLIB .*/, "QTLIB := -framework QtCore -framework QtGui -framework Qt3Support"
       end
     end
@@ -89,3 +95,19 @@ class Root < Formula
     EOS
   end
 end
+
+__END__
+# Consider removing this once
+# /opt/X11/bin/freetype-config --ftversion
+# is reporting version >=2.5.1
+--- a/graf2d/freetype/Module.mk
++++ b/graf2d/freetype/Module.mk
+@@ -8,7 +8,7 @@
+ ifneq ($(BUILTINFREETYPE),yes)
+ 
+ FREETYPELIBF    := $(shell freetype-config --libs)
+-FREETYPEINC     := $(shell freetype-config --cflags)
++FREETYPEINC     := $(subst -I,-isystem,$(shell freetype-config --cflags)) -Wp,-v
+ FREETYPELIB     := $(filter -l%,$(FREETYPELIBF))
+ FREETYPELDFLAGS := $(filter-out -l%,$(FREETYPELIBF))
+ FREETYPEDEP     :=

@@ -1,10 +1,11 @@
-require 'formula'
+require "formula"
 
 class UcscGenomeBrowser < Formula
-  homepage 'http://genome.ucsc.edu'
-  url 'http://hgdownload.cse.ucsc.edu/admin/jksrc.v296.zip'
-  sha1 '58717c403da4efaa3a83c49d31276bf1ac9898e3'
-  head 'git://genome-source.cse.ucsc.edu/kent.git'
+  homepage "http://genome.ucsc.edu"
+  url "http://hgdownload.cse.ucsc.edu/admin/jksrc.v299.zip"
+  mirror "https://science-annex.org/pub/ucsc-genome-browser/jksrc.v299.zip"
+  sha1 "2f983877e2104f87106a8a83941cff0a22810b3e"
+  head "git://genome-source.cse.ucsc.edu/kent.git"
 
   keg_only <<-EOF.undent
     The UCSC Genome Browser installs many commands, and some conflict
@@ -33,9 +34,9 @@ class UcscGenomeBrowser < Formula
         "SCRIPTS=#{prefix}/scripts",
         "CGI_BIN=#{prefix}/cgi-bin",
         "DOCUMENTROOT=#{prefix}/htdocs",
-        "PNGLIB=-L#{HOMEBREW_PREFIX}/lib -lpng",
+        "PNGLIB=-L#{Formula["libpng"].opt_lib} -lpng",
         "MYSQLLIBS=-lmysqlclient -lz",
-        "MYSQLINC=#{HOMEBREW_PREFIX}/include/mysql"
+        "MYSQLINC=#{Formula["mysql"].opt_include}/mysql"
     end
     mv "#{prefix}/cgi-bin-#{user}", prefix/'cgi-bin'
     mv "#{prefix}/htdocs-#{user}", prefix/'htdocs'

@@ -18,12 +18,16 @@ class Openni < Formula
   depends_on 'libusb'
   depends_on 'doxygen' => :build
 
-  def patches
-    # Fix for Mavericks (it's the same patch with different whitespaces)
-    if build.devel?
-      "https://github.com/OpenNI/OpenNI/pull/95.patch"
-    else
-      "https://github.com/OpenNI/OpenNI/pull/92.patch"
+  # Fix for Mavericks (it's the same patch with different whitespaces)
+  if build.stable?
+    patch do
+      url "https://github.com/OpenNI/OpenNI/pull/92.patch"
+      sha1 "8aa65057dfc29d01713c824bb903598d2f851bf5"
+    end
+  else
+    patch do
+      url "https://github.com/OpenNI/OpenNI/pull/95.patch"
+      sha1 "037b0b897ba3778ed45b70d258261d4493e97507"
     end
   end
 
@@ -49,7 +53,7 @@ class Openni < Formula
     doc.install 'Documentation'
 
     # Create and install a pkg-config file
-    (lib/"pkg-config/libopenni.pc").write <<-EOS.undent
+    (lib/"pkgconfig/libopenni.pc").write <<-EOS.undent
       prefix=#{prefix}
       exec_prefix=${prefix}
       libdir=${exec_prefix}/lib

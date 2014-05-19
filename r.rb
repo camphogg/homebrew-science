@@ -2,12 +2,13 @@ require 'formula'
 
 class R < Formula
   homepage 'http://www.r-project.org/'
-  url 'http://cran.rstudio.com/src/base/R-3/R-3.0.3.tar.gz'
-  mirror 'http://cran.r-project.org/src/base/R-3/R-3.0.3.tar.gz'
-  sha1 '82e83415d27a2fbbdcacb41c4aa14d8b36fdf470'
+  url 'http://cran.rstudio.com/src/base/R-3/R-3.1.0.tar.gz'
+  mirror 'http://cran.r-project.org/src/base/R-3/R-3.1.0.tar.gz'
+  sha1 'a9d13932c739cc12667c6a17fabd9361624a1708'
 
   head 'https://svn.r-project.org/R/trunk'
 
+  option "without-accelerate", "Build without the Accelerate framework (use Rblas)"
   option 'without-check', 'Skip build-time tests (not recommended)'
   option 'without-tcltk', 'Build without Tcl/Tk'
 
@@ -41,8 +42,13 @@ class R < Formula
       ENV.Og
     end
 
-    args << '--with-lapack' + ((build.with? 'openblas') ? '=-lopenblas' : '')
-    args << '--with-blas=-lopenblas' if build.with? 'openblas'
+    if build.with? "openblas"
+      args << "--with-blas=-L#{Formula["openblas"].opt_lib} -lopenblas" << "--with-lapack"
+    elsif build.with? "accelerate"
+      args << "--with-blas=-framework Accelerate" << "--with-lapack"
+      # Fall back to Rblas without-accelerate or -openblas
+    end
+
     args << '--without-tcltk' if build.without? 'tcltk'
     args << '--without-x' if build.without? 'x11'
 
