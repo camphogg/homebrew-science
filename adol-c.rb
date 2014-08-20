@@ -1,32 +1,39 @@
 require 'formula'
 
 class AdolC < Formula
-  homepage 'https://projects.coin-or.org/ADOL-C'
-  url 'http://www.coin-or.org/download/source/ADOL-C/ADOL-C-2.3.0.tgz'
-  sha1 'd9124ce0b199cb8b841a9a9ec10d1fb31ed11b49'
+  homepage "https://projects.coin-or.org/ADOL-C"
+  url "http://www.coin-or.org/download/source/ADOL-C/ADOL-C-2.5.2.tgz"
+  sha1 "6a17cb179dcbc59edc45c97b8928a2ebfa1e2c38"
 
   head 'https://projects.coin-or.org/svn/ADOL-C/trunk/', :using => :svn
 
-  depends_on 'colpack'
+  depends_on :autoconf => :build
+  depends_on :automake => :build
+  depends_on :libtool  => :build
+  depends_on "colpack" => [:recommended, 'with-libc++']
+
+  fails_with :llvm
+
+  fails_with :gcc do
+    build 5666
+    cause "C++ compilation error."
+  end
 
   def install
-    # Make our own realpath script
-    (buildpath/'realpath').write <<-EOS.undent
-      #!/usr/bin/python
-      import os,sys
-      print os.path.realpath(sys.argv[1])
-    EOS
-    system "chmod +x ./realpath"
+    ENV.cxx11 if ENV.compiler == :clang
 
-    # Configure may get automatically regenerated.  So patch configure.ac also.
+    # Configure may get automatically regenerated. So patch configure.ac.
     inreplace %w(configure configure.ac) do |s|
-      s.gsub! "readlink -f", "/#{buildpath}/realpath"
       s.gsub! "lib64", "lib"
     end
 
-    system "./configure", "--prefix=#{prefix}",
-                          "--enable-sparse",
-                          "--with-colpack=#{HOMEBREW_PREFIX}"
+    args =  ["--prefix=#{prefix}", "--enable-sparse"]
+    args << "--with-colpack=#{Formula["colpack"].opt_prefix}" if build.with? "colpack"
+    args << "--with-openmp-flag=-fopenmp" if ENV.compiler != :clang
+    args << "--enable-ulong" if MacOS.prefer_64_bit?
+
+    ENV.append_to_cflags   "-I#{buildpath}/ADOL-C/include/adolc"
+    system "./configure", *args
     system "make install"
     system "make test"
   end

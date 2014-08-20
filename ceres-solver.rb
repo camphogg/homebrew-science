@@ -1,9 +1,9 @@
 require 'formula'
 
 class CeresSolver < Formula
-  homepage 'http://code.google.com/p/ceres-solver/'
-  url 'https://ceres-solver.googlecode.com/files/ceres-solver-1.8.0.tar.gz'
-  sha1 '8a67268d995b8351bd5ee5acf1eebff910028e7e'
+  homepage 'http://ceres-solver.org/'
+  url 'http://ceres-solver.org/ceres-solver-1.9.0.tar.gz'
+  sha1 'f73ab69cfa1e19d40961503984bc7d6b601cb8a6'
   head 'https://ceres-solver.googlesource.com/ceres-solver.git'
 
   option 'without-tests', 'Do not build and run the tests (not recommended).'
@@ -14,8 +14,13 @@ class CeresSolver < Formula
   depends_on 'eigen'
   depends_on 'suite-sparse' => :recommended
 
+  def suite_sparse_options
+    Tab.for_formula(Formula["suite-sparse"])
+  end
+
   def install
     cmake_args = std_cmake_args + ['-DBUILD_SHARED_LIBS=ON']
+    cmake_args << "-DMETIS_LIBRARY=#{Formula["metis4"].opt_lib}/libmetis.dylib" if suite_sparse_options.with? "metis4"
     system "cmake", ".", *cmake_args
     system "make"
     system "make test" if build.with? 'tests'

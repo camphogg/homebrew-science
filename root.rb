@@ -2,28 +2,18 @@ require 'formula'
 
 class Root < Formula
   homepage 'http://root.cern.ch'
-  url 'ftp://root.cern.ch/root/root_v5.34.18.source.tar.gz'
-  mirror 'https://fossies.org/linux/misc/root_v5.34.18.source.tar.gz'
-  version '5.34.18'
-  sha1 'e24e9bf8b142f2780f6cec9503409d87e4b9f8da'
+  url 'ftp://root.cern.ch/root/root_v5.34.19.source.tar.gz'
+  mirror 'http://ftp.riken.jp/pub/ROOT/root_v5.34.19.source.tar.gz'
+  version '5.34.19'
+  sha1 '77d3c7c6e2a7fd797382f5992d0181eb55566cb4'
   head 'https://github.com/root-mirror/root.git', :branch => 'v5-34-00-patches'
 
-  option 'with-cocoa', "Use Cocoa for graphics backend instead of X11 (useful on Retina displays)"
   option 'with-qt', "Build with Qt graphics backend and GSI's Qt integration"
   depends_on 'xrootd' => :recommended
   depends_on 'fftw' => :optional
   depends_on 'qt' => [:optional, 'with-qt3support']
-  depends_on :x11
+  depends_on :x11 => :optional
   depends_on :python
-
-  if build.with? "cocoa"
-    patch :p0 do
-      url "http://trac.macports.org/raw-attachment/ticket/36777/patch-builtin-afterimage-disabletiff.diff"
-      sha1 "de9e7c3a6b04e15e8a8219e8396ae4a16c15d973"
-    end
-  else
-    patch :p1, :DATA
-  end
 
   def install
     # brew audit doesn't like non-executables in bin
@@ -37,31 +27,41 @@ class Root < Formula
     # Determine architecture
     arch = MacOS.prefer_64_bit? ? 'macosx64' : 'macosx'
 
-    cocoa_flag = (build.with? 'cocoa') ? "--enable-cocoa" : "--disable-cocoa"
-
-    qt_flag = (build.with? 'qt') ? "--enable-qt" : "--disable-qt"
-    qtgsi_flag = (build.with? 'qt') ? "--enable-qtgsi" : "--disable-qtgsi"
-
     # N.B. that it is absolutely essential to specify
     # the --etcdir flag to the configure script.  This is
     # due to a long-known issue with ROOT where it will
     # not display any graphical components if the directory
     # is not specified:
     # http://root.cern.ch/phpBB3/viewtopic.php?f=3&t=15072
-    system "./configure",
-           "#{arch}",
-           "--all",
-           "--enable-builtin-glew",
-           "#{cocoa_flag}",
-           "#{qt_flag}", "#{qtgsi_flag}",
-           "--prefix=#{prefix}",
-           "--etcdir=#{prefix}/etc/root",
-           "--mandir=#{man}"
+    args = %W[
+      #{arch}
+      --all
+      --enable-builtin-glew
+      --enable-builtin-freetype
+    ]
+
+    if build.with? 'x11'
+      args << "--disable-cocoa"
+      args << "--enable-x11"
+    end
+
+    if build.with? 'qt'
+      args << "--enable-qt"
+      args << "--enable-qtgsi"
+    end
+
+    args += %W[
+      --prefix=#{prefix}
+      --etcdir=#{prefix}/etc/root
+      --mandir=#{man}
+    ]
+
+    system "./configure", *args
 
     # ROOT configure script does not search for Qt framework
     if build.with? 'qt'
       inreplace "config/Makefile.config" do |s|
-	s.gsub! /^QTLIBDIR .*/, "QTLIBDIR := -F #{Formula["qt"].opt_lib}"
+        s.gsub! /^QTLIBDIR .*/, "QTLIBDIR := -F #{Formula["qt"].opt_lib}"
         s.gsub! /^QTLIB .*/, "QTLIB := -framework QtCore -framework QtGui -framework Qt3Support"
       end
     end
@@ -76,7 +76,7 @@ class Root < Formula
     mv Dir["#{bin}/*.*sh"], libexec
   end
 
-  def test
+  test do
     system "make -C #{prefix}/test/ hsimple"
     system "#{prefix}/test/hsimple"
   end
@@ -95,19 +95,3 @@ class Root < Formula
     EOS
   end
 end
-
-__END__
-# Consider removing this once
-# /opt/X11/bin/freetype-config --ftversion
-# is reporting version >=2.5.1
---- a/graf2d/freetype/Module.mk
-+++ b/graf2d/freetype/Module.mk
-@@ -8,7 +8,7 @@
- ifneq ($(BUILTINFREETYPE),yes)
- 
- FREETYPELIBF    := $(shell freetype-config --libs)
--FREETYPEINC     := $(shell freetype-config --cflags)
-+FREETYPEINC     := $(subst -I,-isystem,$(shell freetype-config --cflags)) -Wp,-v
- FREETYPELIB     := $(filter -l%,$(FREETYPELIBF))
- FREETYPELDFLAGS := $(filter-out -l%,$(FREETYPELIBF))
- FREETYPEDEP     :=

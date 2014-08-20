@@ -1,10 +1,9 @@
 require 'formula'
 
 class Openblas < Formula
-  homepage 'http://xianyi.github.io/OpenBLAS/'
-  url 'https://github.com/xianyi/OpenBLAS/archive/v0.2.9.rc2.tar.gz'
-  sha1 '60fbd30e94bb37e510fddd46bcfadfdb44cfff8c'
-  version '0.2.9-rc2'
+  homepage "http://www.openblas.net/"
+  url "https://github.com/xianyi/OpenBLAS/archive/v0.2.10.tar.gz"
+  sha1 "c4a5ca4cb9876a90193f81a0c38f4abccdf2944d"
   head "https://github.com/xianyi/OpenBLAS.git", :branch => "develop"
 
   depends_on :fortran

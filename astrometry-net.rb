@@ -29,8 +29,8 @@ class AstrometryNet < Formula
 
   def install
     ENV["INSTALL_DIR"] = "#{prefix}"
-    ENV["NETPBM_INC"] = "-I#{HOMEBREW_PREFIX}/include/netpbm"
-    ENV["NETPBM_LIB"] = "-L#{HOMEBREW_PREFIX}/lib -lnetpbm"
+    ENV["NETPBM_INC"] = "-I#{Formula["netpbm"].opt_include}/netpbm"
+    ENV["NETPBM_LIB"] = "-L#{Formula["netpbm"].opt_lib} -lnetpbm"
     ENV["SYSTEM_GSL"] = "yes"
 
     system "make"
@@ -40,7 +40,7 @@ class AstrometryNet < Formula
 
   end
 
-  def test
+  test do
     system "solve-field"
   end
 end

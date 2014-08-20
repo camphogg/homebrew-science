@@ -7,9 +7,8 @@ class Samtools < Formula
   sha1 'ff3f4cf40612d4c2ad26e6fcbfa5f8af84cbe881'
 
   devel do
-    version '0.2.0-rc6'
-    url "https://github.com/samtools/samtools/archive/#{version}.tar.gz"
-    sha1 '35118bcbcd7c438855d614d53ed5033b1944aea0'
+    url "https://github.com/samtools/samtools/archive/1.0.tar.gz"
+    sha1 "78bdac301a2a342a2cfac100b79fb5fa99808114"
     depends_on 'htslib'
   end
 
@@ -27,12 +26,10 @@ class Samtools < Formula
   def install
     if build.devel? || build.head?
       inreplace 'Makefile', 'include $(HTSDIR)/htslib.mk', ''
-      htslib = Formula["Htslib"].opt_prefix
+      htslib = Formula["htslib"].opt_prefix
       system 'make', "HTSDIR=#{htslib}/include", "HTSLIB=#{htslib}/lib/libhts.a"
-      system 'make', 'razip', "LDFLAGS=-L#{htslib}/lib", 'LDLIBS=-lhts -lz'
     else
       system 'make'
-      system 'make', 'razip'
       system 'make', '-C', 'bcftools' if build.with? 'bcftools'
     end
 
@@ -46,9 +43,9 @@ class Samtools < Formula
       end
     end
 
-    bin.install %w{samtools razip}
+    bin.install 'samtools'
     bin.install 'bcftools/bcftools' unless build.devel? || build.head? || build.without?('bcftools')
-    bin.install 'bcftools/vcfutils.pl' unless build.devel? || build.head?
+    bin.install 'bcftools/vcfutils.pl' unless build.devel? || build.head? || build.without?('bcftools')
     bin.install %w{misc/maq2sam-long misc/maq2sam-short misc/md5fa misc/md5sum-lite misc/wgsim}
     bin.install Dir['misc/*.pl']
     lib.install 'libbam.a'

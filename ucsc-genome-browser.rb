@@ -2,9 +2,10 @@ require "formula"
 
 class UcscGenomeBrowser < Formula
   homepage "http://genome.ucsc.edu"
-  url "http://hgdownload.cse.ucsc.edu/admin/jksrc.v299.zip"
-  mirror "https://science-annex.org/pub/ucsc-genome-browser/jksrc.v299.zip"
-  sha1 "2f983877e2104f87106a8a83941cff0a22810b3e"
+  #doi "10.1093/nar/gkq963"
+  url "http://hgdownload.cse.ucsc.edu/admin/jksrc.v303.zip"
+  mirror "https://science-annex.org/pub/ucsc-genome-browser/jksrc.v303.zip"
+  sha1 "ffa4e55640d7329f3eda8c2f57b33867b4e8640c"
   head "git://genome-source.cse.ucsc.edu/kent.git"
 
   keg_only <<-EOF.undent
@@ -21,14 +22,14 @@ class UcscGenomeBrowser < Formula
     user = `whoami`.chomp
     mkdir prefix/"cgi-bin-#{user}"
     mkdir prefix/"htdocs-#{user}"
-    cd 'src/lib' do
-      system 'make', "MACHTYPE=#{machtype}"
+    cd "src/lib" do
+      system "make", "MACHTYPE=#{machtype}"
     end
-    cd 'src/jkOwnLib' do
-      system 'make', "MACHTYPE=#{machtype}"
+    cd "src/jkOwnLib" do
+      system "make", "MACHTYPE=#{machtype}"
     end
-    cd 'src' do
-      system 'make',
+    cd "src" do
+      system "make",
         "MACHTYPE=#{machtype}",
         "BINDIR=#{bin}",
         "SCRIPTS=#{prefix}/scripts",
@@ -38,8 +39,8 @@ class UcscGenomeBrowser < Formula
         "MYSQLLIBS=-lmysqlclient -lz",
         "MYSQLINC=#{Formula["mysql"].opt_include}/mysql"
     end
-    mv "#{prefix}/cgi-bin-#{user}", prefix/'cgi-bin'
-    mv "#{prefix}/htdocs-#{user}", prefix/'htdocs'
+    mv "#{prefix}/cgi-bin-#{user}", prefix/"cgi-bin"
+    mv "#{prefix}/htdocs-#{user}", prefix/"htdocs"
   end
 
   # Todo: Best would be if this formula would put a complete working

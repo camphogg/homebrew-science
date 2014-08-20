@@ -22,13 +22,16 @@ class Blasr < Formula
     build 5666
     cause <<-EOS.undent
       error: invalid conversion
-      from ‘void (*)(H5::H5Object&, std::string, void*)’
-      to ‘void (*)(H5::H5Location&, std::string, void*)’
+      from 'void (*)(H5::H5Object&, std::string, void*)'
+      to 'void (*)(H5::H5Location&, std::string, void*)'
     EOS
   end
 
   def install
-    system 'make'
+    hdf5 = Formula["hdf5"]
+    system "make", "STATIC=",
+      "HDF5INCLUDEDIR=#{hdf5.opt_include}",
+      "HDF5LIBDIR=#{hdf5.opt_lib}"
     system 'make', 'install', 'PREFIX=' + prefix
   end
 

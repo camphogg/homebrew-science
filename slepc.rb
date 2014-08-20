@@ -11,15 +11,13 @@ class Slepc < Formula
   depends_on :x11  => MacOS::X11.installed? ? :recommended : :optional
 
   # Trick SLEPc into thinking we don't have a prefix install of PETSc.
-  def patches
-    DATA
-  end
+  patch :DATA
 
   def install
     ENV.deparallelize
     petsc_arch = 'arch-darwin-c-opt'
     ENV['SLEPC_DIR'] = Dir.getwd
-    ENV['PETSC_DIR'] = Formula["petsc"].prefix
+    ENV['PETSC_DIR'] = Formula["petsc"].opt_prefix
     ENV['PETSC_ARCH'] = petsc_arch
     system "./configure", "--prefix=#{prefix}/#{petsc_arch}"
     system "make PETSC_ARCH=#{petsc_arch}"

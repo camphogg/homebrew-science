@@ -17,20 +17,12 @@ class Wcstools < Formula
   sha1 '2c42eb314d422ccd9c3f1999ac2642e9de480b4c'
 
   def install
-    system "make all"
-    # There doesn't seem to be a Makefile install target, so DIY.
-    # Don't install the libwcs & libned includes directly in include/
-    # because the "fitsfile.h" (and maybe others) conflict with
-    # cfitsio.
-    #d = Dir['bin/*'].find_all{|item| item[-5,5] != '.dSYM'}
-    #print d
-    #print
-    #bin.install d
-    bin.install Dir['bin/*'].find_all{|item| item[-5,5] != '.dSYM'}
-    (lib + 'libwcs').install 'libwcs/libwcs.a'
-    (lib + 'libned').install 'libned/libned.a'
-    (include + 'libwcs').install Dir['libwcs/*.h']
-    (include + 'libned').install Dir['libned/*.h']
-    man1.install Dir['man/man1/*']
+    system "make", "-f", "Makefile.osx", "all"
+
+    prefix.install "bin"
+  end
+
+  test do
+    system "imhead 2>&1 | grep -q 'IMHEAD'"
   end
 end

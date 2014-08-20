@@ -8,8 +8,8 @@ end
 
 class Gmsh < Formula
   homepage 'http://geuz.org/gmsh'
-  url 'http://geuz.org/gmsh/src/gmsh-2.8.4-source.tgz'
-  sha1 'e96209c46874cb278e2028933871c7e7d60e662d'
+  url 'http://geuz.org/gmsh/src/gmsh-2.8.5-source.tgz'
+  sha1 '352671f95816440ddb2099478f3e9f189e40e27a'
 
   head 'https://geuz.org/svn/gmsh/trunk', :using => GmshSvnStrategy
 
@@ -25,6 +25,14 @@ class Gmsh < Formula
                              "-DGMSH_LIB=#{lib}",
                              "-DGMSH_DOC=#{share}/gmsh",
                              "-DGMSH_MAN=#{man}"]
+
+    # Make sure native file dialogs are used
+    args << "-DENABLE_NATIVE_FILE_CHOOSER=ON"
+
+    # Build a shared library such that others can link
+    args << "-DENABLE_BUILD_LIB=ON"
+    args << "-DENABLE_BUILD_SHARED=ON"
+
     # Todo: enable PETSc and SLEPc.
     args << "-DENABLE_PETSC=OFF"
     args << "-DENABLE_SLEPC=OFF"
@@ -36,7 +44,7 @@ class Gmsh < Formula
     end
   end
 
-  def test
+  test do
     system "#{bin}/gmsh", "#{share}/doc/gmsh/tutorial/t1.geo", "-parse_and_exit"
   end
 end

@@ -2,12 +2,21 @@ require 'formula'
 
 class Vcftools < Formula
   homepage 'http://vcftools.sourceforge.net/index.html'
-  url 'https://downloads.sourceforge.net/project/vcftools/vcftools_0.1.12a.tar.gz'
-  sha1 '66b982c67d2441f2b7fdbf2895f0749547852b13'
-  version '0.1.12a-1' # detect new release, not an alpha version
+  url 'https://downloads.sourceforge.net/project/vcftools/vcftools_0.1.12b.tar.gz'
+  sha1 'e90133d84c9dcab3ec130b5ed75cae6eaaa2568d'
+  version '0.1.12b-2' # detect new release, not an alpha/beta version
+
+  depends_on "homebrew/dupes/zlib" => :optional
 
   def install
-    system "make", "install", "PREFIX=#{prefix}", "CPP=#{ENV.cxx}"
+    args = %W[PREFIX=#{prefix} CPP=#{ENV.cxx}]
+
+    if build.with? "zlib"
+      zlib = Formula["zlib"]
+      args << "LIB=-lz -L#{zlib.opt_lib} -I#{zlib.opt_include}"
+    end
+
+    system "make", "install", *args
   end
 
   def caveats; <<-EOS.undent
@@ -17,7 +26,7 @@ class Vcftools < Formula
     EOS
   end
 
-  def test
+  test do
     system "#{bin}/vcftools"
   end
 end
