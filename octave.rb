@@ -7,7 +7,7 @@ class Octave < Formula
   sha1     "2951aeafe58d562672feb80dd8c3cfe0643a5087"
   head     "http://www.octave.org/hg/octave", :branch => "gui-release", :using => :hg
 
-  unless build.head?
+  stable do
     # Allows the arrow keys to page through command history.
     # See: https://savannah.gnu.org/bugs/?41337
     patch do
@@ -52,18 +52,24 @@ class Octave < Formula
     depends_on "texinfo"      => :build
     depends_on :tex           => :build
   end
-  if build.head?
+
+  head do
     depends_on "bison"        => :build
     depends_on "automake"     => :build
     depends_on "autoconf"     => :build
+    depends_on "qscintilla2"
+    depends_on "qt"
+    depends_on "fltk"
+    depends_on "fontconfig"
+    depends_on "freetype"
   end
 
   depends_on "pcre"
-  if build.with? "gui" or build.head?
+  if build.with? "gui"
     depends_on "qscintilla2"
     depends_on "qt"
   end
-  if build.with? "native-graphics" or build.head?
+  if build.with? "native-graphics"
     depends_on "fltk"
     depends_on "fontconfig"
     depends_on "freetype"
@@ -119,8 +125,8 @@ class Octave < Formula
       args << "--without-cholmod"
       args << "--without-umfpack"
     else
-      sparse = Tab.for_name("suite-sparse").used_options
-      ENV.append_to_cflags "-L#{Formula["metis4"].opt_lib} -lmetis" if sparse.include? "with-metis4"
+      sparse = Tab.for_name("suite-sparse")
+      ENV.append_to_cflags "-L#{Formula["metis4"].opt_lib} -lmetis" if sparse.with? "metis4"
     end
 
     args << "--without-zlib"     if build.without? "zlib"
@@ -140,8 +146,8 @@ class Octave < Formula
     system "make all"
     system "make check 2>&1 | tee make-check.log" if build.with? "check"
     system "make install"
-    prefix.install "make-check.log" if File.exists? "make-check.log"
-    prefix.install "test/fntests.log" if File.exists? "test/fntests.log"
+    prefix.install "make-check.log" if File.exist? "make-check.log"
+    prefix.install "test/fntests.log" if File.exist? "test/fntests.log"
   end
 
   def caveats
@@ -195,7 +201,7 @@ class Octave < Formula
     end
 
     logfile = "#{prefix}/make-check.log"
-    if File.exists? logfile
+    if File.exist? logfile
       logs = `grep 'libinterp/array/.*FAIL \\d' #{logfile}`
       unless logs.empty?
         s = s + <<-EOS.undent

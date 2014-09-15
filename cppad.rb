@@ -2,9 +2,9 @@ require 'formula'
 
 class Cppad < Formula
   homepage 'http://www.coin-or.org/CppAD'
-  url 'http://www.coin-or.org/download/source/CppAD/cppad-20140000.0.epl.tgz'
-  version '20140000'
-  sha1 '27ecae20785c95ac5af0f285b54be292aad75008'
+  url 'http://www.coin-or.org/download/source/CppAD/cppad-20140000.3.epl.tgz'
+  version '20140000.3'
+  sha1 'dfed23c8aab18ae780bb276b3222bcfdfb207353'
   head 'https://projects.coin-or.org/svn/CppAD/trunk', :using => :svn
 
   # Only one of --with-boost, --with-eigen and --with-std should be given.
@@ -26,7 +26,7 @@ class Cppad < Formula
 
   def install
     if ENV.compiler == :clang
-      opoo 'OpenMP support will not be enabled. Use --use-gcc if you require OpenMP.'
+      opoo 'OpenMP support will not be enabled. Use --cc=gcc-4.8 if you require OpenMP.'
     end
 
     cmake_args = ["-Dcmake_install_prefix=#{prefix}", "-Dcppad_documentation=YES"]
@@ -35,13 +35,13 @@ class Cppad < Formula
       cppad_testvector = 'boost'
     elsif build.with? 'eigen'
       cppad_testvector = 'eigen'
-      cmake_args << "-Deigen_prefix=#{Formula["eigen"].prefix}"
-      cmake_args << "-Dcppad_cxx_flags=-I#{Formula["eigen"].include}/eigen3"
+      cmake_args << "-Deigen_prefix=#{Formula["eigen"].opt_prefix}"
+      cmake_args << "-Dcppad_cxx_flags=-I#{Formula["eigen"].opt_include}/eigen3"
     elsif build.with? 'std'
       cppad_testvector = 'std'
     end
     cmake_args << "-Dcppad_testvector=#{cppad_testvector}"
-    cmake_args << "-Dadolc_prefix=#{Formula["adol-c"].prefix}" if build.with? 'adol-c'
+    cmake_args << "-Dadolc_prefix=#{Formula["adol-c"].opt_prefix}" if build.with? "adol-c"
 
     mkdir 'build' do
       system "cmake", "..", *cmake_args

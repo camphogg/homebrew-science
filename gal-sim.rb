@@ -8,7 +8,7 @@ class GalSim < Formula
 
   depends_on "scons" => :build
   depends_on "fftw"
-  depends_on "boost"
+  depends_on "boost" => 'with-python'
   depends_on "tmv-cpp"
 
   # pyfits should come from pip

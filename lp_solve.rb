@@ -44,10 +44,8 @@ class LpSolve < Formula
     version '5.5.2.0'
   end
 
-  def patches
-    # Prefer OS X's fast BLAS implementation (patch stolen from fink-project)
-    DATA
-  end
+  # Prefer OS X's fast BLAS implementation (patch stolen from fink-project)
+  patch :DATA
 
   def install
     # Thanks to superenv, we don't have to care if the ccc.osx build script
@@ -73,6 +71,8 @@ class LpSolve < Formula
     # Note, the demo does not build with lpsolve55. Upstream issue.
 
     include.install Dir['*.h']
+    include.install 'shared/commonlib.h', 'shared/myblas.h'
+    include.install Dir['bfp/bfp_LUSOL/LUSOL/lusol*.h']
 
     if build.include? 'python' then
       # In order to install into the Cellar, the dir must exist and be in the

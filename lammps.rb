@@ -72,7 +72,7 @@ class Lammps < Formula
 
       system "make", "-f", make_file
 
-      if File.exists? "Makefile.lammps"
+      if File.exist? "Makefile.lammps"
         # empty it to reduce chance of conflicts
         inreplace "Makefile.lammps" do |s|
           s.change_make_var! prefix_make_var+lmp_lib+"_SYSINC", ""
@@ -86,6 +86,11 @@ class Lammps < Formula
   def pyver
     IO.popen("python -c 'import sys; print sys.version[:3]'").read.strip
   end
+
+  # This fixes the python module to point to the absolute path of the lammps library
+  # without this the module cannot find the library when homebrew is installed in a
+  # custom directory.
+  patch :DATA
 
   def install
     ENV.j1      # not parallel safe (some packages have race conditions :meam:)
@@ -110,8 +115,9 @@ class Lammps < Formula
       ENV.append 'LDFLAGS', "-lblas -llapack"
     end
 
-    # Assuming gfortran library
-    ENV.append 'LDFLAGS', "-L#{Formula["gfortran"].opt_prefix}/gfortran/lib -lgfortran"
+    # Locate gfortran library
+    libgfortran = `$FC --print-file-name libgfortran.a`.chomp
+    ENV.append "LDFLAGS", "-L#{File.dirname libgfortran} -lgfortran"
 
     # build the lammps program and library
     cd "src" do
@@ -197,7 +203,7 @@ class Lammps < Formula
     "python" + `python -c 'import sys;print(sys.version[:3])'`.strip
   end
 
-  def test
+  test do
     # to prevent log files, move them to a temporary directory
     mktemp do
       system "lammps","-in","#{HOMEBREW_PREFIX}/share/lammps/bench/in.lj"
@@ -233,13 +239,6 @@ class Lammps < Formula
       export PYTHONPATH=#{HOMEBREW_PREFIX}/lib/python#{pyver}/site-packages:$PYTHONPATH
 
     EOS
-  end
-
-  # This fixes the python module to point to the absolute path of the lammps library
-  # without this the module cannot find the library when homebrew is installed in a
-  # custom directory.
-  def patches
-    DATA
   end
 end
 

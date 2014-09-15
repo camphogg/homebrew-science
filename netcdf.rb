@@ -21,12 +21,24 @@ class Netcdf < Formula
 
   resource 'cxx-compat' do
     url 'http://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-cxx-4.2.tar.gz'
+    mirror 'http://www.gfd-dennou.org/arch/netcdf/unidata-mirror/netcdf-cxx-4.2.tar.gz'
     sha1 'bab9b2d873acdddbdbf07ab35481cd0267a3363b'
   end
 
   resource 'fortran' do
     url 'http://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-fortran-4.2.tar.gz'
+    mirror 'http://www.gfd-dennou.org/arch/netcdf/unidata-mirror/netcdf-fortran-4.2.tar.gz'
     sha1 'f1887314455330f4057bc8eab432065f8f6f74ef'
+  end
+
+  # HDF5 1.8.13 removes symbols related to MPI POSIX VFD, leading to
+  # errors when linking hdf5 and netcdf5 such as "undefined reference to
+  # `_H5Pset_fapl_mpiposix`". This patch fixes those errors, and has been
+  # added upstream. It should be unnecessary once NetCDF releases a new
+  # stable version.
+  patch do
+    url 'https://github.com/Unidata/netcdf-c/commit/435d8a03ed28bb5ad63aff12cbc6ab91531b6bc8.diff'
+    sha1 '770ee66026e4625b80711174600fb8c038b48f5e'
   end
 
   def install

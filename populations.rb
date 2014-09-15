@@ -10,17 +10,15 @@ class Populations < Formula
   depends_on 'gettext'
   depends_on 'qt'
 
-  def patches
-    # Fix a compiler error.
-    DATA
-  end
+  # Fix a compiler error.
+  patch :DATA
 
   def install
     system 'cmake', '.', *std_cmake_args
     system 'make', 'install'
   end
 
-  def test
+  test do
     system "echo 0 | #{bin}/populations"
   end
 end

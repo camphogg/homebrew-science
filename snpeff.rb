@@ -2,14 +2,16 @@ require 'formula'
 
 class Snpeff < Formula
   homepage 'http://snpeff.sourceforge.net/'
-  url 'https://downloads.sourceforge.net/project/snpeff/snpEff_v3_5_core.zip'
-  version '3.5h'
-  sha1 '77a45dd11b3ea8cddfbb0615d5015de5f92146fb'
+  url 'https://downloads.sourceforge.net/project/snpeff/snpEff_v3_6_core.zip'
+  version '3.6c'
+  sha1 'f4848e977f0818e5f221e0b07231fe0735864dd5'
 
   def install
     inreplace "scripts/snpEff" do |s|
       s.gsub! /^jardir=.*/, "jardir=#{libexec}"
       s.gsub! "${jardir}/snpEff.config", "#{share}/snpEff.config"
+      # Fix bug in snpEff wrapper script. Fixed upstream can be removed on next release
+      s.gsub! '"$pass_args" != *-c*', '! "$pass_args" =~ "-c "'
     end
 
     bin.install "scripts/snpEff"
@@ -19,7 +21,7 @@ class Snpeff < Formula
 
   def caveats; <<-EOS.undent
       Download the human database using the command
-          snpEff download -v GRCh37.74
+          snpEff download -v GRCh37.75
       The databases will be installed in #{share}/data
     EOS
   end

@@ -2,11 +2,19 @@ require 'formula'
 
 class Stacks < Formula
   homepage 'http://creskolab.uoregon.edu/stacks/'
-  url 'http://creskolab.uoregon.edu/stacks/source/stacks-1.12.tar.gz'
-  sha1 'eb2c176c5605297dd795ae6f1ead81ba566a3688'
+  url 'http://creskolab.uoregon.edu/stacks/source/stacks-1.20.tar.gz'
+  sha1 'fad38ceb3eb8ab4d240385c769b45be52fb6ee2b'
+  #doi '10.1111/mec.12354'
 
   depends_on "google-sparsehash" => :recommended
   depends_on "samtools"          => :recommended
+
+  needs :cxx11
+
+  fails_with :clang do
+    build 503
+    cause "error: comparison between pointer and integer ('const char *' and 'int')"
+  end
 
   def install
     # OpenMP doesn't yet work on OS X with Apple-provided compilers.
