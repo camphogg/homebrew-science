@@ -5,6 +5,14 @@ class Arpack < Formula
   url 'http://forge.scilab.org/index.php/p/arpack-ng/downloads/get/arpack-ng_3.1.4.tar.gz'
   sha1 '1fb817346619b04d8fcdc958060cc0eab2c73c6f'
   head 'git://git.forge.scilab.org/arpack-ng.git'
+  revision 1
+
+  bottle do
+    root_url "https://downloads.sf.net/project/machomebrew/Bottles/science"
+    sha1 "cbcd37dbf0f4df4246a4907a229ec28550119b7f" => :yosemite
+    sha1 "9d088970dd26ec2d286cfff275b7fac56aa044d6" => :mavericks
+    sha1 "35aeeb9c44095e0c6af0add7454eb6532964d161" => :mountain_lion
+  end
 
   depends_on :fortran
   depends_on :mpi => [:optional, :f77]
@@ -22,7 +30,12 @@ class Arpack < Formula
       args << "--with-blas=-L#{Formula["veclibfort"].opt_lib} -lvecLibFort"
     end
 
-    ENV["MPILIBS"] = "-lmpi_usempi -lmpi_mpifh -lmpi" if build.with? :mpi
+    if build.with? :mpi
+      ENV['CC']  = "mpicc"
+      ENV['CXX'] = "mpic++"
+      ENV['F77'] = "mpif77"
+    end
+
     system "./configure", *args
     system "make"
     system "make", "install"

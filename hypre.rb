@@ -4,6 +4,15 @@ class Hypre < Formula
   homepage "http://computation.llnl.gov/casc/hypre/software.html"
   url "http://computation.llnl.gov/casc/hypre/download/hypre-2.9.0b.tar.gz"
   sha1 "aaf8354437be38aa2fbcc944ab64d464a5b39207"
+  revision 1
+
+  bottle do
+    root_url "https://downloads.sf.net/project/machomebrew/Bottles/science"
+    cellar :any
+    sha1 "add4e934ef8e5b0f0153f2f3c36c51772500b9e3" => :yosemite
+    sha1 "9084cd44b5b6a52bd54d9e44d470ef348bde27ba" => :mavericks
+    sha1 "04a20a9c0b4d781e574516489fab5125e9134d6a" => :mountain_lion
+  end
 
   depends_on :fortran => :recommended
   depends_on :mpi => [:cc, :cxx, :f90, :f77, :optional]

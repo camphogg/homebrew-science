@@ -11,7 +11,7 @@ class Openni2 < Formula
   option "with-docs", "Build documentation using javadoc (might fail with Java 1.8)"
 
   depends_on :python
-  depends_on "libusb" => (build.universal?) ? ["universal"] : []
+  depends_on "libusb"
   depends_on "doxygen" => :build if build.with? "docs"
 
   patch :DATA if build.without? "docs"
@@ -19,7 +19,7 @@ class Openni2 < Formula
   stable do
     patch do
       url "https://github.com/occipital/OpenNI2/pull/18.patch"
-      sha1 "e0be30b6b9296939306155580df1ac7912d3f949"
+      sha1 "4beb04a31a64677618801f0e95141807592442ef"
     end
   end
 

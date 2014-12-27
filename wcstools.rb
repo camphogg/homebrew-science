@@ -12,9 +12,9 @@ class TarIgnoreDuplicates < CurlDownloadStrategy
 end
 
 class Wcstools < Formula
-  homepage 'http://tdc-www.harvard.edu/wcstools/'
-  url 'http://tdc-www.harvard.edu/software/wcstools/wcstools-3.8.6.tar.gz', :using => TarIgnoreDuplicates
-  sha1 '2c42eb314d422ccd9c3f1999ac2642e9de480b4c'
+  homepage "http://tdc-www.harvard.edu/wcstools/"
+  url "http://tdc-www.harvard.edu/software/wcstools/wcstools-3.9.0.tar.gz"
+  sha1 "61cf419d1bb132f52dfa9d2e6cfe8b5258cef7a1"
 
   def install
     system "make", "-f", "Makefile.osx", "all"

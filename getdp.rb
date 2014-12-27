@@ -9,7 +9,7 @@ end
 class Getdp < Formula
   homepage "http://www.geuz.org/getdp/"
   url "http://www.geuz.org/getdp/src/getdp-2.4.4-source.tgz"
-  sha1 "8ee41ae9d8c0f97ed82125b9bb50f3f0e24008ec"
+  sha1 "e4c3a2a0d9281acdab2c6ba2c3c6ecd53fea4d0c"
 
   head 'https://geuz.org/svn/getdp/trunk', :using => GmshSvnStrategy
 
@@ -25,6 +25,10 @@ class Getdp < Formula
   depends_on "cmake" => :build
 
   def install
+    if not build.head? and (build.with? "petsc" or build.with? "slepc")
+      onoe "stable is incompatible with PETSc/SLEPc 3.5.2. Build with --HEAD."
+      exit 1
+    end
     args = std_cmake_args
     args << "-DENABLE_BUILD_SHARED=ON"
     args << "-DENABLE_ARPACK=OFF" if build.without? "arpack"
@@ -33,13 +37,13 @@ class Getdp < Formula
 
     if build.with? "petsc"
       ENV["PETSC_DIR"] = Formula["petsc"].opt_prefix
-      ENV["PETSC_ARCH"] = "arch-darwin-c-opt"
+      ENV["PETSC_ARCH"] = "real"
     else
       args << "-DENABLE_PETSC=OFF"
     end
 
     if build.with? "slepc"
-      ENV["SLEPC_DIR"] = Formula["slepc"].opt_prefix
+      ENV["SLEPC_DIR"] = "#{Formula['slepc'].opt_prefix}/real"
     else
       args << "-DENABLE_SLEPC=OFF"
     end

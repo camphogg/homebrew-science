@@ -5,6 +5,15 @@ class Mumps < Formula
   url 'http://mumps.enseeiht.fr/MUMPS_4.10.0.tar.gz'
   mirror 'http://graal.ens-lyon.fr/MUMPS/MUMPS_4.10.0.tar.gz'
   sha1 '904b1d816272d99f1f53913cbd4789a5be1838f7'
+  revision 2
+
+  bottle do
+    root_url "https://downloads.sf.net/project/machomebrew/Bottles/science"
+    cellar :any
+    sha1 "a07afadbb6ff4c345abf4afa091eebe9746ff8a3" => :yosemite
+    sha1 "438f48976a6ed660447f2686efd8b948df65557c" => :mavericks
+    sha1 "a275206c23234f5aaa548fcdb3fed8e6452544d2" => :mountain_lion
+  end
 
   depends_on 'scotch5' => :optional     # Scotch 6 support currently broken.
   depends_on 'openblas' => :optional

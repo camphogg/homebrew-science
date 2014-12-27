@@ -1,25 +1,31 @@
-require 'formula'
+require "formula"
 
 class Plink < Formula
-  url 'http://pngu.mgh.harvard.edu/~purcell/plink/dist/plink-1.07-src.zip'
-  homepage 'http://pngu.mgh.harvard.edu/~purcell/plink/'
-  sha1 'd41a2d014ebc02bf11e5235292b50fad6dedd407'
+  url "http://pngu.mgh.harvard.edu/~purcell/plink/dist/plink-1.07-src.zip"
+  homepage "http://pngu.mgh.harvard.edu/~purcell/plink/"
+  sha1 "d41a2d014ebc02bf11e5235292b50fad6dedd407"
 
   # allows plink to build with clang and new versions of gcc
   # borrowed from Debian; discussion at:
   # https://lists.debian.org/debian-mentors/2012/04/msg00410.html
   patch :DATA
 
+  # plink delays in some circumstances due to webcheck timeout
+  # build option to skip webcheck
+  option "without-webcheck", "Build without default version webcheck"
+
   def install
     ENV.deparallelize
+    inreplace "Makefile", "WEBCHECK = 1", "WEBCHECK =" if build.without? "webcheck"
+
     make_args = (OS.mac?) ? %W[SYS=MAC] : []
-    system 'make', *make_args
-    (share+'plink').install %w{test.map test.ped}
-    bin.install 'plink'
+    system "make", *make_args
+    (share+"plink").install %w{test.map test.ped}
+    bin.install "plink"
   end
 
   test do
-    system 'plink', '--file', prefix/'share/plink/test'
+    system "plink", "--file", prefix/"share/plink/test"
   end
 end
 __END__

@@ -5,6 +5,7 @@ class GraphTool < Formula
   url 'http://downloads.skewed.de/graph-tool/graph-tool-2.2.31.tar.bz2'
   sha1 '5e0b1c215ecd76191a82c745df0fac17e33bfb09'
   head 'https://github.com/count0/graph-tool.git'
+  revision 1
 
   option 'without-cairo', 'Build without cairo support'
 
@@ -15,19 +16,20 @@ class GraphTool < Formula
   depends_on 'cgal' => 'c++11'
   depends_on 'google-sparsehash' => ['c++11', :recommended]
   depends_on 'cairomm' => 'c++11' if build.with? 'cairo'
+  depends_on 'boost' => 'c++11'
 
-  if build.with? 'python3'
-    depends_on 'boost' => ['c++11', 'with-python3']
-    depends_on 'py3cairo' if build.with? 'cairo'
-    depends_on 'matplotlib' => 'with-python3'
-    depends_on 'numpy' => 'with-python3'
-    depends_on 'scipy' => 'with-python3'
-  else
-    depends_on 'boost' => ['c++11', 'with-python']
-    depends_on 'py2cairo' if build.with? 'cairo'
-    depends_on 'matplotlib'
-    depends_on 'numpy'
-    depends_on 'scipy'
+  if build.with? "python3"
+    depends_on "boost-python" => ["c++11", "with-python3"]
+    depends_on "py3cairo" if build.with? "cairo"
+    depends_on "matplotlib" => :python3
+    depends_on "numpy" => :python3
+    depends_on "scipy" => :python3
+  elsif build.with? "python"
+    depends_on "boost-python" => ["c++11", "with-python"]
+    depends_on "py2cairo" if build.with? "cairo"
+    depends_on "matplotlib" => :python
+    depends_on "numpy" => :python
+    depends_on "scipy" => :python
   end
 
   def install
@@ -63,10 +65,7 @@ class GraphTool < Formula
       v2 = g.add_vertex()
       e = g.add_edge(v1, v2)
     EOS
-
-    Language::Python.each_python(build) do |python, version|
-      system python, "test.py"
-    end
+    Language::Python.each_python(build) { |python, version| system python, "test.py" }
   end
 
 end

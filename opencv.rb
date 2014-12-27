@@ -4,6 +4,9 @@ class Opencv < Formula
   homepage 'http://opencv.org/'
   url 'https://github.com/Itseez/opencv/archive/2.4.9.tar.gz'
   sha1 'd16ced627db17f9864c681545f18f030c7a4cc0b'
+#  CUDA needs 2.4.10 (see #1228)
+#  url 'https://github.com/Itseez/opencv/archive/2.4.10.tar.gz'
+#  sha1 'a0c2d5944364fc4f26b6160b33c03082b1fa08c1'
   head 'https://github.com/Itseez/opencv.git'
 
   option "32-bit"
@@ -13,18 +16,22 @@ class Opencv < Formula
   option "with-tests", "Build with accuracy & performance tests"
   option "without-opencl", "Disable GPU code in OpenCV using OpenCL"
   option "with-cuda", "Build with CUDA support"
+  option "with-quicktime", "Use QuickTime for Video I/O insted of QTKit"
+  option "with-opengl", "Build with OpenGL support"
 
   option :cxx11
 
   depends_on :ant if build.with? "java"
   depends_on "cmake"      => :build
-  depends_on "eigen"      => :optional
+  depends_on "eigen"      => :recommended
+  depends_on "gstreamer"  => :optional
   depends_on "jasper"     => :optional
   depends_on "jpeg"
-  depends_on :libpng
+  depends_on "libpng"
   depends_on "libtiff"
+  depends_on "libdc1394"  => :optional
   depends_on "numpy"      => :python
-  depends_on "openexr"    => :optional
+  depends_on "openexr"    => :recommended
   depends_on "openni"     => :optional
   depends_on "pkg-config" => :build
   depends_on :python
@@ -42,6 +49,7 @@ class Opencv < Formula
     py_version = %x(python -c "import sys; print(sys.version)")[0..2]
 
     ENV.cxx11 if build.cxx11?
+    dylib = if OS.mac? then "dylib" else "so" end
     args = std_cmake_args + %W(
       -DCMAKE_OSX_DEPLOYMENT_TARGET=
       -DBUILD_ZLIB=OFF
@@ -51,8 +59,8 @@ class Opencv < Formula
       -DBUILD_JASPER=OFF
       -DBUILD_JPEG=OFF
       -DJPEG_INCLUDE_DIR=#{jpeg.opt_include}
-      -DJPEG_LIBRARY=#{jpeg.opt_lib}/libjpeg.dylib
-      -DPYTHON_LIBRARY=#{py_prefix}/lib/libpython#{py_version}.dylib
+      -DJPEG_LIBRARY=#{jpeg.opt_lib}/libjpeg.#{dylib}
+      -DPYTHON_LIBRARY=#{py_prefix}/lib/libpython#{py_version}.#{dylib}
       -DPYTHON_INCLUDE_DIR=#{py_prefix}/include/python#{py_version}
     )
 
@@ -62,11 +70,19 @@ class Opencv < Formula
 
     args << "-DBUILD_opencv_java=" + ((build.with? "java") ? "ON" : "OFF")
     args << "-DWITH_OPENEXR=" + ((build.with? "openexr") ? "ON" : "OFF")
+    args << "-DWITH_EIGEN=" + ((build.with? "eigen") ? "ON" : "OFF")
     args << "-DWITH_QT=" + ((build.with? "qt") ? "ON" : "OFF")
     args << "-DWITH_TBB=" + ((build.with? "tbb") ? "ON" : "OFF")
     args << "-DWITH_FFMPEG=" + ((build.with? "ffmpeg") ? "ON" : "OFF")
+    args << "-DWITH_GSTREAMER=" + ((build.with? "gstreamer") ? "ON" : "OFF")
+    args << "-DWITH_QUICKTIME=" + ((build.with? "quicktime") ? "ON" : "OFF")
+    args << "-DWITH_1394=" + ((build.with? "libdc1394") ? "ON" : "OFF")
+    args << "-DWITH_OPENGL=" + ((build.with? "opengl") ? "ON" : "OFF")
+    args << "-DWITH_JASPER=" + ((build.with? "jasper") ? "ON" : "OFF")
 
     if build.with? "cuda"
+      ENV["CUDA_NVCC_FLAGS"] = "-Xcompiler -stdlib=libstdc++; -Xlinker -stdlib=libstdc++"
+      inreplace "cmake/FindCUDA.cmake", "list(APPEND CUDA_LIBRARIES -Wl,-rpath \"-Wl,${_cuda_path_to_cudart}\")", "#list(APPEND CUDA"
       args << "-DWITH_CUDA=ON"
       args << "-DCMAKE_CXX_FLAGS=-stdlib=libstdc++"
     else

@@ -6,6 +6,7 @@ class Octave < Formula
   mirror   "http://ftp.gnu.org/gnu/octave/octave-3.8.1.tar.bz2"
   sha1     "2951aeafe58d562672feb80dd8c3cfe0643a5087"
   head     "http://www.octave.org/hg/octave", :branch => "gui-release", :using => :hg
+  revision 1
 
   stable do
     # Allows the arrow keys to page through command history.
@@ -13,6 +14,22 @@ class Octave < Formula
     patch do
       url "https://savannah.gnu.org/bugs/download.php?file_id=30734"
       sha1 "e8fb39b7ca1525d67e6d24f3c189b441b60fcdab"
+    end
+
+    # Allows clang 3.5 to compile with a recent libc++ release.
+    # See: https://savannah.gnu.org/bugs/?43298
+    patch do
+      url "https://gist.github.com/tchaikov/6ce5f697055b0756126a/raw/4fc94a1fa1d5b032f8586ce3ab0015b04351426f/octave-clang3.5-fix.patch"
+      sha1 "6e5c0d8f6b07803152c8a1caad39a113fc8b8d0a"
+    end
+  end
+
+  head do
+    # Allows clang 3.5 to compile with a recent libc++ release.
+    # See: https://savannah.gnu.org/bugs/?43298
+    patch do
+      url "https://gist.github.com/schoeps/ec25b19bf30f97d33cdb/raw/6f164415e5e0fb556c1cfc2b039985d25dfad872/octave-clang3.5-fix.patch"
+      sha1 "c3209b0bebd69ff5b9fa2d0463c8034d53f99225"
     end
   end
 
@@ -36,8 +53,6 @@ class Octave < Formula
   option "without-curl",           "Do not use cURL (urlread/urlwrite/@ftp)"
   option "without-fftw",           "Do not use FFTW (fft,ifft,fft2,etc.)"
   option "without-glpk",           "Do not use GLPK"
-  option "without-ghostscript",    "Do not use Ghostscript (PS/PDF image output)"
-  option "without-graphicsmagick", "Do not use GraphicsMagick++ (imread,imwrite)"
   option "without-hdf5",           "Do not use HDF5 (hdf5 data file support)"
   option "without-qhull",          "Do not use the Qhull library (delaunay,voronoi,etc.)"
   option "without-qrupdate",       "Do not use the QRupdate package (qrdelete,qrinsert,qrshift,qrupdate)"
@@ -48,6 +63,7 @@ class Octave < Formula
 
   depends_on "pkg-config"     => :build
   depends_on "gnu-sed"        => :build
+
   if build.with? "docs"
     depends_on "texinfo"      => :build
     depends_on :tex           => :build
@@ -77,26 +93,28 @@ class Octave < Formula
   depends_on "llvm"           if build.with? "jit"
   depends_on "curl"           if build.with? "curl" and MacOS.version == :leopard
 
-  depends_on "gnuplot"        => :recommended
+  depends_on "gnuplot"       => [:recommended, build.with?("gui") ? "qt" : ""]
   depends_on "suite-sparse"   => :recommended
   depends_on "readline"       => :recommended
   depends_on "arpack"         => :recommended
   depends_on "fftw"           => :recommended
   depends_on "glpk"           => :recommended
   depends_on "gl2ps"          => :recommended
-  depends_on "graphicsmagick" => :recommended
-  depends_on "ghostscript"    => :recommended
+  depends_on "graphicsmagick" => :recommended  # imread/imwrite
   depends_on "hdf5"           => :recommended
   depends_on "qhull"          => :recommended
   depends_on "qrupdate"       => :recommended
-  depends_on "pstoedit"       => :recommended
   depends_on "epstool"        => :recommended
+
+  depends_on "ghostscript"    => :recommended  # ps/pdf image output
+  depends_on "pstoedit"       if build.with? "ghostscript"
 
   depends_on "openblas"       => :optional
 
   def install
     ENV.m64 if MacOS.prefer_64_bit?
     ENV.append_to_cflags "-D_REENTRANT"
+    ENV.append "LDFLAGS", "-L#{Formula["readline"].opt_lib} -lreadline" if build.with? "readline"
     ENV["JAVA_HOME"] = `/usr/libexec/java_home`.chomp!
 
     args = [ "--prefix=#{prefix}" ]
@@ -142,6 +160,13 @@ class Octave < Formula
     # can cause linking problems.
     inreplace "src/mkoctfile.in.cc", /%OCTAVE_CONF_OCT(AVE)?_LINK_(DEPS|OPTS)%/, '""'
 
+    if build.with? "gnuplot" and build.with? "gui"
+      # ~/.octaverc takes precedence over site octaverc
+      open("scripts/startup/local-rcfile", "a") do |file|
+        file.write "setenv('GNUTERM','#{build.with?("gui") ? "qt" : ""}')"
+      end
+    end
+
     system "./configure", *args
     system "make all"
     system "make check 2>&1 | tee make-check.log" if build.with? "check"
@@ -156,13 +181,17 @@ class Octave < Formula
     if build.with? "gnuplot"
       s = s + <<-EOS.undent
 
-        To use the gnuplot plotting engine, you must set the environment
-        variable GNUTERM. Valid choices include:
-            GNUTERM=x11   # X windows must be installed
-            GNUTERM=qt    # gnuplot must have been compiled with Qt support
-            GNUTERM=aqua  # if you are using Aquaterm
-        You may also set this variable from within Octave with the command
-            setenv('GNUTERM','qt') % or 'x11', or 'aqua'
+        gnuplot's Qt terminal is supported by default with the Octave GUI.
+        Use other gnuplot graphics terminals by setting the environment variable
+        GNUTERM in ~/.octaverc, and building gnuplot with the matching options.
+
+          setenv('GNUTERM','qt')    # Default graphics terminal with Octave GUI
+          setenv('GNUTERM','x11')   # Requires XQuartz; install gnuplot --with-x
+          setenv('GNUTERM','wxt')   # wxWidgets/pango; install gnuplot --wx
+          setenv('GNUTERM','aqua')  # Requires AquaTerm; install gnuplot --with-aquaterm
+
+          You may also set this variable from within Octave.
+
       EOS
     end
 

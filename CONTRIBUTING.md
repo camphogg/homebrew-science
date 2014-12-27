@@ -8,21 +8,21 @@ First of all, thank you for contributing to [Homebrew/science](https://github.co
 <a name="issues"/>
 ## Issues
 
-#### First, please read the [Troubleshooting Checklist](https://github.com/Homebrew/homebrew/wiki/troubleshooting).
+#### First, please read the [Troubleshooting Checklist](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting).
 
-See also Homebrew's [FAQ](https://github.com/Homebrew/homebrew/wiki/FAQ) and [Common Issues](https://github.com/Homebrew/homebrew/wiki/Common-Issues).
+See also Homebrew's [FAQ](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/FAQ.md#faq) and [README](https://github.com/Homebrew/homebrew/tree/master/share/doc/homebrew#readme).
 
 #### New Issues
 
 * Search [open](https://github.com/Homebrew/homebrew-science/issues?state=open) and [closed](https://github.com/Homebrew/homebrew-science/issues?page=1&state=closed) issues before submitting a new issue. Duplicates will be closed.
 * Strictly one formula per issue unless your issue is about different formulae interacting negatively.
 * Give the full `brew` command that you used and that caused the error to emerge.
-* **If a formula fails to brew, always [gist](https://gist.github.com) the full logs and post links in the issue. One may be automatically generated with `brew gist-logs --config --doctor <formula>`.**
+* **If a formula fails to brew, always [gist](https://gist.github.com) the full logs with `brew gist-logs <formula>`.**
 
 <a name="formula"/>
 ## Formula Guidelines
 
-Please first read Homebrew's [Formula Cookbook](https://github.com/Homebrew/homebrew/wiki/Formula-Cookbook) and [Acceptable Formulae](https://github.com/Homebrew/homebrew/wiki/Acceptable-Formulae). This section lists additional guidelines that should be followed in Homebrew/science.
+Please first read Homebrew's [Formula Cookbook](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Formula-Cookbook.md) and [Acceptable Formulae](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Acceptable-Formulae.md). This section lists additional guidelines that should be followed in Homebrew/science.
 
 #### Tests
 

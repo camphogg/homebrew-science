@@ -7,8 +7,8 @@ class Sga < Formula
   sha1 '36d5a23a393c968120988dd94bad9d561b0e0c4e'
   head 'https://github.com/jts/sga.git'
 
-  depends_on :autoconf => :build
-  depends_on :automake => :build
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
   # Only header files are used, so :build is appropriate
   depends_on 'google-sparsehash' => :build
   depends_on 'bamtools'
@@ -21,6 +21,7 @@ class Sga < Formula
                             "--with-bamtools=#{Formula["bamtools"].opt_prefix}",
                             "--with-sparsehash=#{Formula["google-sparsehash"].opt_prefix}"
       system "make install"
+      bin.install Dir["bin/*"] - Dir["bin/Makefile*"]
     end
   end
 

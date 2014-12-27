@@ -6,14 +6,16 @@ class Nextflow < Formula
 
   depends_on :java => "1.7"
 
-  version "0.9.0"
-  url "http://www.nextflow.io/releases/v0.9.0/nextflow"
-  sha1 "b4fde5c4fa81a080f9302c90924b8a0292252873"
+  version "0.10.3"
+  url "http://www.nextflow.io/releases/v0.10.3/nextflow"
+  sha1 "d13888b89421f54065ba64fff87a47613554727d"
 
   def install
-    chmod 0755, "nextflow"
-    system "./nextflow", "-download"
     bin.install "nextflow"
+  end
+
+  def post_install
+    system "#{bin}/nextflow", "-download"
   end
 
   test do
