@@ -2,7 +2,7 @@ require "formula"
 
 class Wcslib < Formula
   homepage "http://www.atnf.csiro.au/people/mcalabre/WCS/"
-  url "ftp://ftp.atnf.csiro.au/pub/software/wcslib/wcslib-4.23.tar.bz2"
+  url "ftp://ftp.atnf.csiro.au/pub/software/wcslib/wcslib-4.24.tar.bz2"
   sha1 "6b335277b4915c76d74b222f0e63a33e49f7d857"
 
   option "with-pgsbox", "Build PGSBOX, a general curvilinear axis drawing routine for PGPLOT"
