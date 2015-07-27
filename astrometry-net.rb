@@ -2,8 +2,8 @@ require "formula"
 
 class AstrometryNet < Formula
   homepage "http://astrometry.net"
-  url "http://astrometry.net/downloads/astrometry.net-0.50.tar.gz"
-  sha1 "fcf6332b603e1af8f25ce7d6996b5a4b0eeaa687"
+  url "http://astrometry.net/downloads/astrometry.net-0.56.tar.gz"
+  sha1 "7d9bf05398944e0e266e60fe5eaf59791186cb74"
 
   head "https://github.com/dstndstn/astrometry.net.git"
 
