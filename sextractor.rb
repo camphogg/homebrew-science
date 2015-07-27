@@ -38,3 +38,4 @@ class Sextractor < Formula
     system "make", "install"
   end
 end
+

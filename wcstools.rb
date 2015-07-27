@@ -1,4 +1,15 @@
-require "formula"
+require 'formula'
+
+# The wcstools-3.8.6 tarball seems to include a "Man" directory, and a
+# "man -> Man" symlink.  On a typical cases-insensitive HFS+ Mac
+# volume this causes trouble.  Tell "tar" not to extract the second
+# "man".
+class TarIgnoreDuplicates < CurlDownloadStrategy
+  def stage
+    safe_system '/usr/bin/tar', 'xkf', @tarball_path, '--exclude', '*/man'
+    chdir
+  end
+end
 
 class Wcstools < Formula
   homepage "http://tdc-www.harvard.edu/wcstools/"
