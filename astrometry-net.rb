@@ -3,7 +3,7 @@ require "formula"
 class AstrometryNet < Formula
   homepage "http://astrometry.net"
   url "http://astrometry.net/downloads/astrometry.net-0.56.tar.gz"
-  sha1 "7d9bf05398944e0e266e60fe5eaf59791186cb74"
+  sha256 "7f15e9b1c978fa5dd28638e2bcd0063e3cd0b6f348a75b9df7812ee300229010"
 
   head "https://github.com/dstndstn/astrometry.net.git"
 
