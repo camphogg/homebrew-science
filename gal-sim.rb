@@ -30,8 +30,8 @@ class GalSim < Formula
       end
       args << "WITH_OPENMP=true"
     end
-    scons *args
-    scons "install", "PREFIX=#{prefix}", "PYPREFIX=#{lib}/python#{pyver}", "EXTRA_INCLUDE_PATH=#{HOMEBREW_PREFIX}/include", "EXTRA_LIB_PATH=#{HOMEBREW_PREFIX}/lib", "EXTRA_PATH=#{HOMEBREW_PREFIX}/bin"
+    scons "EXTRA_INCLUDE_PATH=#{HOMEBREW_PREFIX}/include", "EXTRA_LIB_PATH=#{HOMEBREW_PREFIX}/lib", "EXTRA_PATH=#{HOMEBREW_PREFIX}/bin", *args
+    scons "install", "PREFIX=#{prefix}", "PYPREFIX=#{lib}/python#{pyver}"
   end
 
   def caveats; <<-EOS.undent
