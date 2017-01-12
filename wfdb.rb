@@ -1,14 +1,15 @@
 class Wfdb < Formula
-  desc "a software library for working with physiologic signals"
+  desc "A software library for working with physiologic signals"
   homepage "http://physionet.org/physiotools/"
   url "https://github.com/bemoody/wfdb/archive/10.5.24.tar.gz"
   sha256 "be3be34cd1c2c0eaaae56a9987de13f49a3c53bf1539ce7db58f885dc6e34b7b"
   head "https://github.com/bemoody/wfdb.git"
 
   bottle do
-    sha256 "90a6785716be809f80a3d269b0d849b7b047a5b6979b15c82a843f09e980bbf8" => :yosemite
-    sha256 "1bb573712810085ef699519126707d1236b92cdada363a4966f63bbf318d94cb" => :mavericks
-    sha256 "0b8a7209b37e2c64f265cdc8bd7708d70997a3304b0098eadb479063ff719324" => :mountain_lion
+    revision 1
+    sha256 "c33ed3f0cf3d7a1fd01e4906c29300657709231bdd8b036e01ec2c4bb7853716" => :yosemite
+    sha256 "76a857947309a59644fef27374218e1e0f587412802f3f15c58550d70304a45c" => :mavericks
+    sha256 "cb0b49a7d841be2c4600339aabb48ee02b605c77197d873b7054b794c0cd3c90" => :mountain_lion
   end
 
   def install
@@ -28,23 +29,23 @@ class Wfdb < Formula
 
     system "make", "install"
 
-    (share/"wfdb").install "examples", bin/"setwfdb", bin/"cshsetwfdb"
+    pkgshare.install "examples", bin/"setwfdb", bin/"cshsetwfdb"
 
     # For some reason the configure script doesn't install the man pages properly
     # even though '--mandir' is used.
-    share.install prefix/"man" if stable?
+    share.install prefix/"man" if build.stable?
   end
 
   def caveats; <<-EOS.undent
     WFDB Example programs have been installed to:
-      #{share}/wfdb/examples
+      #{pkgshare}/examples
     EOS
   end
 
   test do
     cflags = `#{bin/"wfdb-config"} --cflags`.chomp
     libs = `#{bin/"wfdb-config"} --libs`.chomp
-    system ENV.cc, cflags, "-o", "wfdbversion", share/"wfdb/examples/wfdbversion.c", *libs.split
+    system ENV.cc, cflags, "-o", "wfdbversion", pkgshare/"examples/wfdbversion.c", *libs.split
     system "./wfdbversion"
   end
 end

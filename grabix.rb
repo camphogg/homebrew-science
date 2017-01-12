@@ -1,4 +1,5 @@
 class Grabix < Formula
+  desc "Tool for random access into BGZF files"
   homepage "https://github.com/arq5x/grabix"
   # tag "bioinformatics"
   url "https://github.com/arq5x/grabix/archive/0.1.6.tar.gz"
@@ -7,19 +8,21 @@ class Grabix < Formula
 
   bottle do
     cellar :any
-    sha256 "136a6e742f0b3fbfff7577c90747556cd5848ecbefb2665f883e87be1e757bb6" => :yosemite
-    sha256 "fc98a1091a2983421a8dcd76db93197c7f8abeb14c766af0c1a8097537a5ac2f" => :mavericks
-    sha256 "3e53adfbd78ca26832fc597f910a1be9590176f6a67228592064495bde14205c" => :mountain_lion
+    revision 1
+    sha256 "25b161ba3f364c3d92d5b6ffa116e4ea6ee11bff9a6778394ae00b6e33b26b46" => :yosemite
+    sha256 "ba46405a755b4bca6d0819315c674b6b955f7f968a9e9ef64b2b8cacb24d537a" => :mavericks
+    sha256 "c64ddc603685144a212d5a9034f5e012035e9e133191a5b5fda4443fd36ade58" => :mountain_lion
+    sha256 "3b66be2f5fec289232cd4fdd7beef197c1d67f8e48b9cf4cf1d4fd5adaadfd40" => :x86_64_linux
   end
 
   def install
     system "make"
     bin.install "grabix"
     doc.install "README.md"
-    share.install "simrep.chr1.bed"
+    pkgshare.install "simrep.chr1.bed"
   end
 
   test do
-    assert_equal `#{bin}/grabix check #{share}/simrep.chr1.bed`.chomp, "no"
+    assert_equal `#{bin}/grabix check #{pkgshare}/simrep.chr1.bed`.chomp, "no"
   end
 end

@@ -1,14 +1,17 @@
 class Fastqc < Formula
+  desc "Quality control tool for high throughput sequence data"
   homepage "http://www.bioinformatics.babraham.ac.uk/projects/fastqc/"
   # tag "bioinformatics"
 
-  url "http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.3.zip"
-  sha256 "ed2e8e6793bcedbd749d65a38dd8419be841e4653319e5fdd1e0e2b063b60ffb"
+  url "http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.5.zip"
+  sha256 "dd7a5ad80ceed2588cf6d6ffe35e0f161c0d9977ed08355f5e4d9473282cbd66"
 
   bottle do
-    sha256 "2a26ea4c25aa06444d2c311ebe03fcf3246b34a681e4b2183125993cc0854125" => :yosemite
-    sha256 "f291937b9522f7bc6451edbf744567fdf4ec7bd97f010fc8fbc413e01e7ab566" => :mavericks
-    sha256 "2599dd06f32828921f8607b9f46afcc25ca9f7dc16d72e858216fc24940cf952" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "19e697374ecfde749c3d8ee4c7a8a6cff4b080bd6c5964345922880312f3afa1" => :el_capitan
+    sha256 "978abf5981b17859e6370f24dbff84e7572b7e7f6c9ec2942f1c17c742c5ad9f" => :yosemite
+    sha256 "274ad6885a1c7d3bdb496c253f03bd29a1ac4341ee766e2180c4ef41db3b4210" => :mavericks
+    sha256 "3d3db346d39306991f675ddf8dbeeb665bc8b59513bbc10fd9882441cce70a3f" => :x86_64_linux
   end
 
   depends_on :java

@@ -1,13 +1,14 @@
 class Hyphy < Formula
+  desc "Hypothesis testing with phylogenies"
   homepage "http://www.hyphy.org/"
-  url "https://github.com/veg/hyphy/archive/2.2.4.tar.gz"
-  sha256 "09bc43973d83118ade168177ccebfd393cffa110a96da9b52905d3a4a99afa18"
+  url "https://github.com/veg/hyphy/archive/2.2.7.tar.gz"
+  sha256 "8c84340665b126742b85ed8d54354455ffc97ebd3cc689658120d7f5791adf13"
   head "https://github.com/veg/hyphy.git"
 
   bottle do
-    sha256 "304df11448ff772a079ceb130b0612187571cd8dbf429f9d85518ef08cf4188a" => :yosemite
-    sha256 "6c8eb43061e74cf4a7f05c88ca703e0703793daf4d3f040e9fd620d3e8ac1396" => :mavericks
-    sha256 "614db017773d9ea1c82ec1345f323dcb11316103ea0e10c5e7fa38a328f4b700" => :mountain_lion
+    sha256 "b19ac75cbe0ce6ca2eb4ebcfbe8cf9cda8f65fb230beb57eef2c8d77d75655ec" => :sierra
+    sha256 "74b0628be9dddccc04b1a33c80ac25512fcc27e5f713eb51c7175a4a1a65096f" => :el_capitan
+    sha256 "7a1525ce1e42fc359320dec513d9397b7d02190b9ce8bc0f892796494ca58db3" => :yosemite
   end
 
   option "with-opencl", "Build a version with OpenCL GPU/CPU acceleration"
@@ -16,7 +17,7 @@ class Hyphy < Formula
 
   depends_on "openssl"
   depends_on "cmake" => :build
-  depends_on :mpi => :optional
+  depends_on mpi: :optional
 
   fails_with :clang do
     build 77
@@ -39,7 +40,7 @@ class Hyphy < Formula
   end
 
   def caveats; <<-EOS.undent
-    The help has been installed to #{HOMEBREW_PREFIX}/share/hyphy.
+    The help has been installed to #{doc}/hyphy.
     EOS
   end
 

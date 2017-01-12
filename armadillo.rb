@@ -1,12 +1,14 @@
 class Armadillo < Formula
+  desc "C++ linear algebra library"
   homepage "http://arma.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/arma/armadillo-5.200.1.tar.gz"
-  sha256 "3673fc7cbeefca826108efe7c36e21322f259809f874c161ca284a114fb7f693"
+  url "https://downloads.sourceforge.net/project/arma/armadillo-7.600.2.tar.xz"
+  sha256 "6790d5e6b41fcac6733632a9c3775239806d00178886226dec3f986a884f4c2d"
 
   bottle do
-    sha256 "b7ba1ac68d71bc8e91e2460d8f24174cd45df10488310f5625b7697c07f0c25a" => :yosemite
-    sha256 "4972dd99d18c8fd9336b6ffc4434c70b6cd5a5c52224c0764eaee2c546e7440e" => :mavericks
-    sha256 "cdbd4f24faf7d05b5abb7230ba4df222d5aeb853b69fb3596999e7a5b1e7f0c5" => :mountain_lion
+    cellar :any
+    sha256 "9c3b2f5bcc7da2c6af90f8da2fd81f511d6a9700dcfea01376c9af3c8e36805b" => :sierra
+    sha256 "4ef4b851eb2b2eccb783972f8388bb4f107a4ece77f7c3d1460b75dad7a476c4" => :el_capitan
+    sha256 "7330c877d626a03fc2a3d8ca407846eea5f724f3fa0122b60eaf7a659afbff3f" => :yosemite
   end
 
   option "with-hdf5", "Enable the ability to save and load matrices stored in the HDF5 format"
@@ -21,6 +23,11 @@ class Armadillo < Formula
 
   def install
     ENV.cxx11 if build.cxx11?
+
+    if build.with? "hdf5"
+      inreplace "CMakeLists.txt", "project(armadillo CXX)",
+                                  "project(armadillo CXX)\nENABLE_LANGUAGE(C)"
+    end
 
     args = std_cmake_args
     args << "-DDETECT_HDF5=ON" if build.with? "hdf5"

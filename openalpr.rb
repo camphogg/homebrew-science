@@ -1,46 +1,37 @@
 class Openalpr < Formula
-  homepage "https://www.github.com/openalpr/openalpr"
-  url "https://github.com/openalpr/openalpr/archive/v1.2.0.tar.gz"
-  sha256 "ff8d7741c84b555d2569dd3ceb524e1d70fbd0b25769c5075079e977609de18d"
-
+  desc "Automatic License Plate Recognition library"
+  homepage "https://github.com/openalpr/openalpr"
+  url "https://github.com/openalpr/openalpr/archive/v2.3.0.tar.gz"
+  sha256 "1cfcaab6f06e9984186ee19633a949158c0e2aacf9264127e2f86bd97641d6b9"
   head "https://github.com/openalpr/openalpr.git", :branch => "master"
+
+  bottle do
+    sha256 "88834bb81c3d4c937f6875223e98e26490854f3310f7ac1524f313c6e9ed3e71" => :el_capitan
+    sha256 "962168ab7bf72ed14060f4c36a493251b180332b8c8b4e898dd9b1c3956faa0f" => :yosemite
+    sha256 "b4b365cd4d4200b1acc3c388d7ffee809544c05863751751852e23f56ff6d8dd" => :mavericks
+  end
 
   option "without-daemon", "Do not include the alpr daemon (alprd)"
 
   depends_on "cmake" => :build
   depends_on "jpeg"
+  depends_on "leptonica"
   depends_on "libtiff"
   depends_on "tesseract"
   depends_on "opencv"
 
   if build.with? "daemon"
     depends_on "log4cplus"
-    depends_on "beanstalk"
-  end
-
-  stable do
-    # newer versions do not depend on ossp-uuid
-    depends_on "ossp-uuid"
-
-    # A partial backport of this pull request:
-    # https://github.com/openalpr/openalpr/pull/55
-    patch :p1 do
-      url "https://gist.githubusercontent.com/twelve17/460c57fbe732fd59dc6c/raw/b910f3f47f231408499d34f9e67ccbe96c5f5449/openalpr_1.2_cmakelists.patch"
-      sha256 "2718353d0349017f2167cec32b819db4bd76c0827c9346af549dd7b5e7deee5e"
-    end
-  end
-
-  bottle do
-    sha256 "ab144e27d4d0456b938169ca16590a2ac72b477dff6de05eb02220c431f19b49" => :yosemite
-    sha256 "40878f54d0fd1eeb1c2ea07534b52b6c782a5cc3a3223add2453ed7bfc4f9bd7" => :mavericks
-    sha256 "3a311bd4c4ac6fd12ad981289f9c4299eff01b156ead0dcece4109af4e86547e" => :mountain_lion
+    depends_on "beanstalkd"
   end
 
   def install
     mkdir "src/build" do
       args = std_cmake_args
 
-      args << "-DCMAKE_MACOSX_RPATH=true" if build.head?
+      # v2.2.0 require CMAKE_MACOSX_RPATH
+      args << "-DCMAKE_MACOSX_RPATH=true"
+      args << "-DCMAKE_INSTALL_SYSCONFDIR=#{etc}"
 
       if build.without? "daemon"
         if build.head?
@@ -50,13 +41,15 @@ class Openalpr < Formula
         end
       end
 
+      args << "-DCMAKE_INSTALL_SYSCONFDIR:PATH=#{etc}"
+
       system "cmake", "..", *args
       system "make", "install"
     end
   end
 
   test do
-    actual = `#{bin}/alpr #{HOMEBREW_PREFIX}/Library/Homebrew/test/fixtures/test.jpg`
-    assert_equal "No license plates found.\n", actual, "output from reading test JPG image"
+    output = shell_output("#{bin}/alpr #{test_fixtures("test.jpg")}")
+    assert_equal "No license plates found.", output.chomp
   end
 end

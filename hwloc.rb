@@ -1,14 +1,14 @@
 class Hwloc < Formula
-  homepage "http://www.open-mpi.org/projects/hwloc/"
   desc "Portable abstraction of the hierarchical topology of modern architectures"
-  url "http://www.open-mpi.org/software/hwloc/v1.10/downloads/hwloc-1.10.1.tar.bz2"
-  sha256 "35ce13a9a0737d2de1c6facb5c3c0438f7c83b45d6ce652e05ba000f6f2e514a"
+  homepage "http://www.open-mpi.org/projects/hwloc/"
+  url "http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-1.11.4.tar.bz2"
+  sha256 "fdc59d06c1ddedb0fa41039bb84cb406f0570b6e66223c13a60077831d36e038"
 
   bottle do
-    revision 1
-    sha256 "2314fd97617643387585b8ee4bdf85a3320466ab3037f6c550b04dbe07640e8f" => :yosemite
-    sha256 "76e34bac6990a4caaf56c8eddf595573c9128ec6071d5c4fdabb74a8bf5d35ba" => :mavericks
-    sha256 "d940c936bf0da987756ff3b01f425f5bce06718e2ea8aba28d865e44ebad7617" => :mountain_lion
+    cellar :any
+    sha256 "8df975fd83e75442392f6822cb80a3a61d3b85c250e53ca19cf24d40e625bf21" => :el_capitan
+    sha256 "2c2b7d3c47b372ef1e849aa53d628cb8110a983c7667ff248c91e1ab45287075" => :yosemite
+    sha256 "d87e0c400c344cf0e5013ff739ad0676c63ad4dc6a17f566554761430cc965fc" => :mavericks
   end
 
   head do
@@ -18,22 +18,28 @@ class Hwloc < Formula
     depends_on "libtool" => :build
   end
 
+  option :universal
+
   depends_on "pkg-config" => :build
   depends_on "cairo" => :optional
 
   def install
+    ENV.universal_binary if build.universal?
+
     system "./autogen.sh" if build.head?
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+                          "--enable-shared",
+                          "--prefix=#{prefix}",
+                          "--without-x"
     system "make", "install"
 
-    (share/"hwloc").install "tests"
+    pkgshare.install "tests"
   end
 
   test do
     system ENV.cc, "-I#{include}", "-L#{lib}", "-lhwloc",
-           share/"hwloc/tests/hwloc_groups.c", "-o", "test"
+           pkgshare/"tests/hwloc_groups.c", "-o", "test"
     system "./test"
   end
 end

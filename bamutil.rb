@@ -1,15 +1,17 @@
 class Bamutil < Formula
+  desc "Collection of tools to work with SAM/BAM files."
   homepage "http://genome.sph.umich.edu/wiki/BamUtil"
   # tag "bioinformatics"
-  url "http://genome.sph.umich.edu/w/images/5/5e/BamUtilLibStatGen.1.0.12.tar.gz"
-  sha1 "55fb13337c71e1bcd3301bac5636d62b13cd2388"
+  url "http://genome.sph.umich.edu/w/images/7/70/BamUtilLibStatGen.1.0.13.tgz"
+  sha256 "16c1d01c37d1f98b98c144f3dd0fda6068c1902f06bd0989f36ce425eb0c592b"
   head "https://github.com/statgen/bamUtil.git"
 
   bottle do
-    cellar :any
-    sha1 "3e59cc21fe42f8399875c07f4797f6eab76fc5c5" => :yosemite
-    sha1 "18fd138775828456a819567b8b57e97999d8cfb9" => :mavericks
-    sha1 "ea3f2e30e44016b1adeff118bb6a627df2a4b905" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "fe2cef19aab52f2edf598ce2fae36d72b8d4c506e3ca3740a30c085c1f801618" => :yosemite
+    sha256 "3446b278dabe53013db787888815423b9b52afb11f92243b12299f4ee0dfe39f" => :mavericks
+    sha256 "2ac9a6a23b1af9afe1c03eab6630a92cfabd0c3127155c8c3bc7865cde8c3eb4" => :mountain_lion
+    sha256 "c9e090d4767a73db7dd4907c85faff1cb84cb25fa39decb93cfb21cb64e1354c" => :x86_64_linux
   end
 
   def install

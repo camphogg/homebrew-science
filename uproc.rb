@@ -1,32 +1,40 @@
-require "formula"
-
 class Uproc < Formula
+  desc "Ultra-fast protein sequence classification"
   homepage "http://uproc.gobics.de/"
+  url "https://github.com/gobics/uproc/archive/1.2.0.tar.gz"
+  sha256 "ceda51784fdce81791e5f669b08a20c415af476ac1ce29a59b596f1181de4f8e"
   head "https://github.com/gobics/uproc.git"
+  # doi "10.1093/bioinformatics/btu843"
+  # tag "bioinformatics"
+
   bottle do
-    cellar :any
-    sha1 "e85ca47439010ba2bbed0676569516018647b12d" => :yosemite
-    sha1 "a6d9496f7271755e9104ad7fa4af59476b982815" => :mavericks
-    sha1 "6216fa194d8413b905d58b94993abb2eac531b48" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "ae84e01f8936f83e8393a6b5ca4eb7ff669c6604ea27b2e5f34b47a92dc44aa4" => :x86_64_linux
   end
-
-  #tag "bioinformatics"
-
-  url "http://uproc.gobics.de/downloads/uproc/uproc-1.1.2.tar.gz"
-  sha1 "32acdf691001e93d3a00e5351fb876c6b71779a7"
 
   needs :openmp # => :recommended
 
+  depends_on "doxygen" => :build
+  depends_on "automake" => :build
+  depends_on "autoconf" => :build
+  depends_on "libtool" => :build
+
   def install
+    system "autoreconf", "-fvi"
     system "./configure",
-      "--disable-debug",
       "--disable-dependency-tracking",
       "--disable-silent-rules",
+      "--with-sysroot=#{HOMEBREW_PREFIX}",
       "--prefix=#{prefix}"
+
+    # Patch for bug related to tar -o option: https://github.com/gobics/uproc/issues/12
+    inreplace "libuproc/docs/Makefile", "chozf", "chzf"
+
     system "make", "install"
   end
 
   test do
     system "#{bin}/uproc-dna", "--version"
+    system "#{bin}/uproc-prot", "--version"
   end
 end

@@ -1,15 +1,15 @@
 class Gaemr < Formula
   homepage "http://www.broadinstitute.org/software/gaemr/"
-  #tag "bioinformatics"
+  # tag "bioinformatics"
 
   url "http://www.broadinstitute.org/software/gaemr/wp-content/uploads/2012/12/GAEMR-1.0.1.tar.gz"
-  sha1 "3747204b177eb32bfc2a0adc239d920320a2ff09"
+  sha256 "cab1818e33b8ce9db2b25268206d73b5883f6c40843c258a72daba79e841d70a"
 
   bottle do
     cellar :any
-    sha1 "f00e97db2e69268acafc58e44b8840e011ef788b" => :yosemite
-    sha1 "8a6d07f2d64bf496a851b03663f238d0ccdce379" => :mavericks
-    sha1 "3212881a78c9a4ac17c7f5d462c5c44e60323f13" => :mountain_lion
+    sha256 "95b6230d77b727f963437e3066b2c024054fea6087f145c946c8bcb47316999b" => :yosemite
+    sha256 "afb3ea09dea99f67b72f3395ad81dc3b369cb7c0b2ef29dafe9127b22585b36e" => :mavericks
+    sha256 "15139afc47141dfd4df15b9ad8f75b6801624b26fadd63be6b5bbd61b7657fda" => :mountain_lion
   end
 
   def install

@@ -1,32 +1,35 @@
 class Mlpack < Formula
+  desc "Scalable C++ machine learning library"
   homepage "http://www.mlpack.org"
   # doi "arXiv:1210.6293"
-  url "http://www.mlpack.org/files/mlpack-1.0.12.tar.gz"
-  sha256 "f47abfc2ab75f1d7f4c73a3368c4428223f025cc6fbc6703735df6a2734a838c"
+  url "http://www.mlpack.org/files/mlpack-2.1.1.tar.gz"
+  sha256 "c2249bbab5686bb8658300ebcf814b81ac7b8050a10f1a517ba5530c58dbac31"
 
   bottle do
     cellar :any
-    sha256 "38230ff4a36fe2aae5eaaeef91078aed3ae03d8c95799f8ddbf1dddeac67e815" => :yosemite
-    sha256 "3a644c1c52c1bc935844768791fd76c27af995ca0c79a3a2bbf7833ed6e1d16e" => :mavericks
-    sha256 "9b8fd8ca8c7c001a73a83796a3e200d445861c4f3aa1a9cba7c5bfa9f023cc96" => :mountain_lion
+    sha256 "b31b8e23801b08d312e126aa300b646845b0d248385ecf07b5d2adf3ed41b7b4" => :sierra
+    sha256 "dc3e140af614270909914f882222bf36a62b3590a5b3617dbc6a071d74760118" => :el_capitan
+    sha256 "50fbfc3abe3ebedfd66a2bb8ac66d9ce154cd5a17c29b048f8700f2853d8cbdd" => :yosemite
   end
 
   needs :cxx11
   cxx11dep = MacOS.version < :mavericks ? ["c++11"] : []
 
-  depends_on "cmake" => :build
-  depends_on "libxml2"
-  depends_on "armadillo" => ["with-hdf5"] + cxx11dep
-  depends_on "boost" => cxx11dep
-  depends_on "txt2man" => :optional
+  deprecated_option "with-check" => "with-test"
 
   option "with-debug", "Compile with debug options"
   option "with-profile", "Compile with profile options"
-  option "with-check", "Run build-time tests"
+  option "with-test", "Run build-time tests"
+
+  depends_on "cmake" => :build
+  depends_on "pkg-config" => :run
+  depends_on "libxml2"
+  depends_on "armadillo" => ["with-hdf5"] + cxx11dep
+  depends_on "boost" => cxx11dep
 
   def install
     ENV.cxx11
-    dylib = OS.mac? ?  "dylib" : "so"
+    dylib = OS.mac? ? "dylib" : "so"
     cmake_args = std_cmake_args
     cmake_args << "-DDEBUG=" + ((build.with? "debug") ? "ON" : "OFF")
     cmake_args << "-DPROFILE=" + ((build.with? "profile") ? "ON" : "OFF")
@@ -41,13 +44,14 @@ class Mlpack < Formula
     end
 
     doc.install Dir["doc/*"]
-    (share / "mlpack").install "src/mlpack/tests"  # Includes test data.
+    pkgshare.install "src/mlpack/tests" # Includes test data.
   end
 
   test do
+    ENV.cxx11
     cd testpath do
-      system "#{bin}/allknn",
-        "-r", "#{share}/mlpack/tests/data/GroupLens100k.csv",
+      system "#{bin}/mlpack_knn",
+        "-r", "#{pkgshare}/tests/data/GroupLens100k.csv",
         "-n", "neighbors.csv",
         "-d", "distances.csv",
         "-k", "5", "-v"
@@ -65,9 +69,11 @@ class Mlpack < Formula
         Log::Warn << "A false alarm!" << std::endl;
       }
       EOS
-    system ENV.cxx, "-stdlib=libc++", "test.cpp",
-           "-I#{include}", "-I#{Formula["libxml2"].opt_include}/libxml2",
-           "-L#{lib}", "-lmlpack", "-o", "test"
+    cxx_with_flags = ENV.cxx.split + ["test.cpp", "-I#{include}",
+                                      "-I#{Formula["libxml2"].opt_include}/libxml2",
+                                      "-L#{lib}", "-lmlpack",
+                                      "-o", "test"]
+    system *cxx_with_flags
     system "./test", "--verbose"
   end
 end

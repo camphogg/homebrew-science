@@ -1,16 +1,18 @@
 class Clark < Formula
+  desc "Fast, accurate and versatile kmer based classification system"
   homepage "http://clark.cs.ucr.edu/"
   # tag "bioinformatics"
   # doi "10.1186/s12864-015-1419-2"
 
-  url "http://clark.cs.ucr.edu/Download/CLARKV1.1.2.tar.gz"
-  sha256 "d97936a6c3c9215f659296a665c662de3f9406dcc957f8f58b313edd2c52f371"
+  url "http://clark.cs.ucr.edu/Download/CLARKV1.2.3.tar.gz"
+  sha256 "3223daa518a3f5c9f08af6f1a8cca669286672f87197c0c7f2e03504c44b37da"
 
   bottle do
     cellar :any
-    sha256 "a0f1ca3b707728175ca5c3774ca3c6ea55d4455f44ca36705b5fa2f60b11a53b" => :yosemite
-    sha256 "1e34d4ff84565b78abf776ca99c3384b0349bb4f5b48f493821e6760beacac26" => :mavericks
-    sha256 "3bc269e1bc75327c298c1f0b6d21741f9895e3755405d65b7352eba1b8547f3e" => :mountain_lion
+    sha256 "1ef50d25121c19b6567f3e5112897a08887189672bf408abeb24979fdbd061b5" => :el_capitan
+    sha256 "361ed1106de564e044f96ce1ca82dd894c684ddf7ff58e417533cf567d71fa14" => :yosemite
+    sha256 "52acdda74cbcec8a4815d998136784d8769c7c1e7efc7eeb2eab8a44552cbf98" => :mavericks
+    sha256 "c7a4f65621a89f894109a50dda5c9614e64808fc30e6d449b8831f44a3be96bf" => :x86_64_linux
   end
 
   needs :openmp
@@ -18,10 +20,17 @@ class Clark < Formula
   def install
     system "sh", "install.sh"
     bin.install Dir["exe/*"]
-    doc.install "README.txt", "LICENSE_GNU_GPL.txt"
+    doc.install "README.txt", "LICENSE_GNU_GPL.txt", "CHANGELOG"
+    pkgshare.install Dir["*.sh"]
+  end
+
+  def caveats
+    <<-EOS.undent
+    Additional helper scripts are installed in #{pkgshare}
+    EOS
   end
 
   test do
-    assert_match "k-spectrum", shell_output("CLARK 2>&1", 255)
+    assert_match "k-spectrum", shell_output("#{bin}/CLARK 2>&1", 255)
   end
 end

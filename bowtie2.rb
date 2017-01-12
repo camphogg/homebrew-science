@@ -1,33 +1,39 @@
 class Bowtie2 < Formula
-  homepage "http://bowtie-bio.sourceforge.net/bowtie2/index.shtml"
+  desc "Fast and sensitive gapped read aligner"
+  homepage "http://bowtie-bio.sf.net/bowtie2"
   # doi "10.1038/nmeth.1923"
   # tag "bioinformatics"
+
+  url "https://github.com/BenLangmead/bowtie2/archive/v2.2.9.tar.gz"
+  sha256 "af940f77fc36aabea90d3d865724fd7ec7e250788d2d2f793c45c713d16ae5ee"
+
   head "https://github.com/BenLangmead/bowtie2.git"
-  url "https://github.com/BenLangmead/bowtie2/archive/v2.2.5.tar.gz"
-  sha256 "fbbd630596d066f84c925d08db854d448b9780d672702e13bd76648133ac92e2"
 
   bottle do
     cellar :any
-    sha256 "67239a1075d5116d7833b0a04b18c9efed3f4fb27510a9dfc0546d52afce0a63" => :yosemite
-    sha256 "0c84c5e5505dc7ef83c7da6ba691948cebf2c9cd68a0b051dd67e347908f9eea" => :mavericks
-    sha256 "fd0bda8aec4d0d9a1f9b433d465fed2c026d1b88ea44688315fbde892d9d64a9" => :mountain_lion
+    sha256 "254b08af1e191eba7525e0d625d6391443cae89d141279e4c1bda02fa0c6d7e5" => :el_capitan
+    sha256 "3a913e85383cd500052dcf9fef4441f8033c094c5bf794701d3d0022436c9852" => :yosemite
+    sha256 "5d30d880ba01131c885898ae8a58a57f876a4701f453d33d545e75b5fc3016c6" => :mavericks
+    sha256 "20ff4f35289b2ed6f3c4a010980880e7d06d1d6e0900644d60e033a98376ee44" => :x86_64_linux
   end
 
+  option "without-tbb", "Build without using Intel Thread Building Blocks (TBB)"
+
+  depends_on "tbb" => :recommended
+
   def install
-    system "make"
-    bin.install %W[bowtie2
-                   bowtie2-align-l bowtie2-align-s
-                   bowtie2-build   bowtie2-build-l   bowtie2-build-s
-                   bowtie2-inspect bowtie2-inspect-l bowtie2-inspect-s]
-
-    doc.install %W[AUTHORS LICENSE MANUAL
-                   NEWS README TUTORIAL VERSION]
-
-    share.install %W[example scripts]
+    if build.with? "tbb"
+      system "make", "install", "WITH_TBB=1",
+             "EXTRA_FLAGS=-L #{HOMEBREW_PREFIX}/lib",
+             "INC=-I #{HOMEBREW_PREFIX}/include", "prefix=#{prefix}"
+    else
+      system "make", "install", "prefix=#{prefix}"
+    end
+    pkgshare.install "example", "scripts"
   end
 
   test do
-    system "bowtie2-build", "#{share}/example/reference/lambda_virus.fa", "lambda_virus"
+    system "bowtie2-build", "#{pkgshare}/example/reference/lambda_virus.fa", "lambda_virus"
     assert File.exist?("lambda_virus.1.bt2")
   end
 end

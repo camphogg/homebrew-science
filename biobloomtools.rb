@@ -4,8 +4,17 @@ class Biobloomtools < Formula
   # doi "10.1093/bioinformatics/btu558"
   # tag "bioinformatics"
 
-  url "https://github.com/bcgsc/biobloom/releases/download/2.0.12/biobloomtools-2.0.12.tar.gz"
-  sha256 "13053036ca4a23032a7fb201bf22862187e4d8f584c3b1f6440d829210954a3e"
+  url "https://github.com/bcgsc/biobloom/releases/download/2.0.13/biobloomtools-2.0.13.tar.gz"
+  sha256 "7b4aeef70feb3fc31db2f4695159523272eadd8787b33c2902e2970a7d569ba3"
+  revision 1
+
+  bottle do
+    cellar :any
+    sha256 "ed8ee8bd6bb5248e5b22fda73cfcc938c65a30e4a99dc61b2a04427497506565" => :sierra
+    sha256 "d7d05e645f14ab8ec5ea2027258be5fe2efb5396acca583c7a2616a6b8aa131f" => :el_capitan
+    sha256 "27200effe2f895332b0fb0e35681652364df2999393d3fc427517fc21bd429e0" => :yosemite
+    sha256 "fa9992d8cb709770d8684a2b0bc8b35cb208a3f9a2e8d128f3d078ec929fec80" => :x86_64_linux
+  end
 
   head do
     url "https://github.com/bcgsc/biobloom.git"
@@ -13,14 +22,10 @@ class Biobloomtools < Formula
     depends_on "automake" => :build
   end
 
-  bottle do
-    cellar :any
-    sha256 "68c125cd6e5e02b1eb2aa79e40ca6e82c2bb2ed8764f6d11445463fb460032d4" => :yosemite
-    sha256 "fcf60aca3e3326a1a422535190de56d2c8dc1d26af1cd1320f642485db7fe64c" => :mavericks
-    sha256 "0730a556dc8b5cbc99f653ab8eeb4de922875ca3b23113b9103cf42406ec6a43" => :mountain_lion
-  end
-
   depends_on "boost" => :build
+  depends_on "gcc"
+
+  needs :openmp
 
   def install
     system "./autogen.sh" if build.head?
@@ -30,7 +35,6 @@ class Biobloomtools < Formula
       "--disable-silent-rules",
       "--prefix=#{prefix}"
     system "make", "install"
-    doc.install "README.html", "README.md"
   end
 
   test do

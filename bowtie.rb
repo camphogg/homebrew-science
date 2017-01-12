@@ -6,28 +6,38 @@ class Bowtie < Formula
 
   url "https://github.com/BenLangmead/bowtie/archive/v1.1.2.tar.gz"
   sha256 "717145f12d599e9b3672981f5444fbbdb8e02bfde2a80eba577e28baa4125ba7"
+  revision 1
   head "https://github.com/BenLangmead/bowtie.git"
 
   bottle do
-    cellar :any
-    sha256 "5a6d33f6249513718c44a77c2cba1ce6b94eb6fffc897b988c6c2944e0c5726b" => :yosemite
-    sha256 "6ad165cc8526e5c601de52f75706f1dbc9f028b004751df1de2a49165d221db7" => :mavericks
-    sha256 "04b8e3cb0a30b88f9771546b41b76a926a04c4be02bab0392ea62b41361c3817" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "3ca85697662a314603274a984ae8b407216f89de01c0b6b95103ab8ba923c904" => :el_capitan
+    sha256 "3a0c43fe5cd607245ebee54771d404c0ca61b3145ba3c658e4644ed752bd585f" => :yosemite
+    sha256 "d631a95fc614fcddf0c3b6ed940e773e19038156cce4d886f60349c20f980b31" => :mavericks
+    sha256 "daa8a6c051d309add874342e2358c3427db7c21915eb9b7e204a829a08f9d527" => :x86_64_linux
+  end
+
+  # Upstream PR that fixes stdout when building with clang on OS X. gcc
+  # doesn't need the patch, but it seems to do no harm. Resolves test
+  # failure for both this formula and Trinity.
+  patch do
+    url "https://github.com/BenLangmead/bowtie/pull/25.patch"
+    sha256 "8c92549b7fde12ca2493f3454fb6a1df0c42b5a9eb2dbcf24418ac04fc5125d4"
   end
 
   def install
     system "make", "install", "prefix=#{prefix}"
 
     doc.install "MANUAL", "NEWS", "TUTORIAL"
-    (share/"bowtie").install "scripts", "genomes", "indexes", "reads"
+    pkgshare.install "scripts", "genomes", "indexes", "reads"
 
-    inreplace share/"bowtie/scripts/test/simple_tests.pl" do |s|
+    inreplace pkgshare/"scripts/test/simple_tests.pl" do |s|
       s.gsub! "$bowtie = \"\"", "$bowtie = \"#{bin}/bowtie\""
       s.gsub! "$bowtie_build = \"\"", "$bowtie_build = \"#{bin}/bowtie-build\""
     end
   end
 
   test do
-    system "perl", share/"bowtie/scripts/test/simple_tests.pl"
+    system "perl", pkgshare/"scripts/test/simple_tests.pl"
   end
 end

@@ -1,16 +1,14 @@
-require 'formula'
-
 class Hopdm < Formula
-  homepage 'http://www.maths.ed.ac.uk/~gondzio/software/hopdm.html'
-  url 'http://dl.dropbox.com/u/72178/dist/hopdm-2.13.tar.gz'
-  sha1 '5d4df64f1a03251c0c22f9d292c26da2f2cea1eb'
-  revision 2
+  homepage "http://www.maths.ed.ac.uk/~gondzio/software/hopdm.html"
+  url "http://dl.dropbox.com/u/72178/dist/hopdm-2.13.tar.gz"
+  sha256 "84f1a265612fb96ee2ee1a645dbef2deeb66b798c5909e9c26670341814817fe"
+  revision 3
 
   bottle do
     cellar :any
-    sha256 "92d3028eccabb89f9e49b738d7efad65bdfdc8a9fe30440313b796b3757e6788" => :yosemite
-    sha256 "641edf265659632e619cfea730170f62260cb38fbc84957a903ebf0abb2993c7" => :mavericks
-    sha256 "4cf0172f203b065d9bf79cc2f2277fa485e249607ad0f5b97d85f6cc730b1857" => :mountain_lion
+    sha256 "a6fa19ffd74910c61fdac2244397d8f3dfa5e5eaf11b131a340cb683b2c59ff3" => :el_capitan
+    sha256 "0166c1b332eff3c80b4fb77a110bb66478f997d484582d21c0ea11c6a5d98020" => :yosemite
+    sha256 "65c8c7ce0860bdd980d1e6280c3ea9a630c8acb5ff70c16632b4be4f69b56579" => :mavericks
   end
 
   depends_on :fortran
@@ -18,18 +16,18 @@ class Hopdm < Formula
   patch :DATA
 
   def install
-    inreplace 'makefile' do |s|
-      s.remove_make_var! 'FC'
-      s.change_make_var! 'LIBS', '-Wl,-framework -Wl,Accelerate'
-      s.remove_make_var! 'FFLAGS'
-      s.remove_make_var! 'LDFLAGS'
-      s.remove_make_var! 'CC'
-      s.remove_make_var! 'CFLAGS'
-      s.remove_make_var! 'COBJS'
+    inreplace "makefile" do |s|
+      s.remove_make_var! "FC"
+      s.change_make_var! "LIBS", "-Wl,-framework -Wl,Accelerate"
+      s.remove_make_var! "FFLAGS"
+      s.remove_make_var! "LDFLAGS"
+      s.remove_make_var! "CC"
+      s.remove_make_var! "CFLAGS"
+      s.remove_make_var! "COBJS"
     end
 
-    system 'make'
-    bin.install 'hopdm'
+    system "make"
+    bin.install "hopdm"
   end
 end
 

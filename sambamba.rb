@@ -1,15 +1,17 @@
 class Sambamba < Formula
+  desc "Tools for working with SAM/BAM data"
   homepage "https://lomereiter.github.io/sambamba"
+  url "https://github.com/lomereiter/sambamba.git",
+    :tag => "v0.6.5",
+    :revision => "22fef748d96a8ee53e5b458e177dbc3457a7cbeb"
+  head "https://github.com/lomereiter/sambamba.git"
   # doi "10.1093/bioinformatics/btv098"
   # tag "bioinformatics"
 
-  url "https://github.com/lomereiter/sambamba.git", :tag => "v0.5.4", :revision => "66dd706d81e59fa70a36f030e47d9967fa3a46a8"
-  head "https://github.com/lomereiter/sambamba.git"
-
   bottle do
-    sha256 "7808ae09115da280d9af4e1e90b6fc057694b6ba57f01c5878fce5f060d39d81" => :yosemite
-    sha256 "4158109cf2555474458a0a91aa18308d72beeb4789eb8d1f2aa9b2a4386585ab" => :mavericks
-    sha256 "b73d62e18346aee00e18b859ef6458814ff1fb5e3cee1593d772422c3bce731e" => :mountain_lion
+    sha256 "18d33a5ff6dad35ac79bc360f23623ccc910f28b41073e9e1dcd92538f454615" => :sierra
+    sha256 "93eb5f7159b8c271985705abf7894dd4651bfa13063aca2f593a4518fdcdf101" => :el_capitan
+    sha256 "1d69b9413a45c367c404393ce6ad4881382479c8dd14e3451744dd7fb0a9b666" => :yosemite
   end
 
   depends_on "ldc" => :build
@@ -18,13 +20,12 @@ class Sambamba < Formula
     ENV.deparallelize
     system "make", "sambamba-ldmd2-64"
     bin.install "build/sambamba"
-    (libexec/"share").install "BioD/test/data/ex1_header.bam"
+    doc.install "README.md"
+    pkgshare.install "BioD/test/data/ex1_header.bam"
   end
 
   test do
-    cd libexec/"share" do
-      system "#{bin}/sambamba", "sort", "-t2", "-n", "ex1_header.bam", "-o", "ex1_header.nsorted.bam", "-m", "200K"
-      assert File.exist?("ex1_header.nsorted.bam")
-    end
+    system *%W[#{bin}/sambamba sort -t2 -n #{pkgshare}/ex1_header.bam -o ex1_header.nsorted.bam -m 200K]
+    assert File.exist?("ex1_header.nsorted.bam")
   end
 end

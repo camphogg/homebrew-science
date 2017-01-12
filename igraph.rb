@@ -1,13 +1,16 @@
 class Igraph < Formula
+  desc "Network analysis package"
   homepage "http://igraph.org"
   url "http://igraph.org/nightly/get/c/igraph-0.7.1.tar.gz"
   sha256 "d978030e27369bf698f3816ab70aa9141e9baf81c56cc4f55efbe5489b46b0df"
+  revision 3
 
   bottle do
     cellar :any
-    sha256 "a0e438be157ccc4ad4658a40a5c28f468ffc865a8f4d7cde4869df655799d481" => :yosemite
-    sha256 "020801feed2868e70736ce34946f00934d324774ed9de4dc28dcaa994b2ec0df" => :mavericks
-    sha256 "b9110e6a58fe00a5aae8648d04d530fba303c3a9fc7daecac8b817bd6c18e799" => :mountain_lion
+    sha256 "d5aa04fb769a88612b34f290a3023136150dc4a8ec4e6f379f716505ea254cb6" => :el_capitan
+    sha256 "149b2be62efcee21ff30db00796d2742758ba21cccb3f0d0b834e1635b961061" => :yosemite
+    sha256 "1ce6615a2d2cbbc2fd509caa8ecc805755c81a70a237b4c485ba75da9b7997e0" => :mavericks
+    sha256 "a34161eba244911b357d823be94dee50f3e594c09e92c5d2bade26590a1e8e09" => :x86_64_linux
   end
 
   option :universal
@@ -30,6 +33,15 @@ class Igraph < Formula
     extra_opts << ((build.with? "glpk") ? "--with-external-glpk" : "--disable-glpk")
     extra_opts << "--disable-gmp" if build.without? "gmp"
     extra_opts += ["--with-external-arpack", "--disable-tls"] if build.with? "arpack"
+
+    # Make llvm happy. Check if still needed when Xcode > 7.3 is released.
+    # Prevents "ld: section __DATA/__thread_bss extends beyond end of file"
+    # See upstream LLVM issue https://llvm.org/bugs/show_bug.cgi?id=27059
+    # igraph has decided to lower BN_MAXSIZE to 128 as a workaround:
+    # https://github.com/igraph/igraph/issues/938
+    # https://github.com/igraph/igraph/commit/0387a58419552aa69be2ac6aaa2f77ad8d6e9add
+    # https://github.com/igraph/igraph/commit/01a547188b651c318d6a058079ad51c2908b5782
+    inreplace "src/bignum.h", "BN_MAXSIZE 512", "BN_MAXSIZE 128"
 
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",

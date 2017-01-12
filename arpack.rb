@@ -1,48 +1,73 @@
 class Arpack < Formula
-  homepage "http://forge.scilab.org/index.php/p/arpack-ng"
-  url "http://forge.scilab.org/index.php/p/arpack-ng/downloads/get/arpack-ng_3.1.4.tar.gz"
-  sha1 "1fb817346619b04d8fcdc958060cc0eab2c73c6f"
-  head "git://git.forge.scilab.org/arpack-ng.git"
-  revision 2
+  desc "Routines to solve large scale eigenvalue problems"
+  homepage "https://github.com/opencollab/arpack-ng"
+  url "https://github.com/opencollab/arpack-ng/archive/3.4.0.tar.gz"
+  sha256 "69e9fa08bacb2475e636da05a6c222b17c67f1ebeab3793762062248dd9d842f"
+  head "https://github.com/opencollab/arpack-ng.git"
 
   bottle do
-    sha256 "6279a2b0072b0e362d50d218fde6b0ec6ce0dd841e7c143f0045ea0b60601f34" => :yosemite
-    sha256 "13e906401589f1964d9847e6e291b03f55bf8de7b25968d6ca31124482a8ff6e" => :mavericks
-    sha256 "a17839b8ec3e0599361674bc2211cff6705e04661cab093f80ea4edea2b757b0" => :mountain_lion
+    rebuild 1
+    sha256 "1dc2e654743752805c212f8c624b4392891176ff216d633daf4d44a97128a0dc" => :sierra
+    sha256 "ece580b9a167720f57d13c16fa452ff1583eda615fbcacfd25afe03c801565b5" => :el_capitan
+    sha256 "37882bb51410da6602c2660f894de3adcbf7b1c24d82b73c25aafe9a9776fbbd" => :yosemite
   end
+
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
 
   depends_on :fortran
   depends_on :mpi => [:optional, :f77]
-  depends_on "openblas" => :optional
+  depends_on "openblas" => OS.mac? ? :optional : :recommended
   depends_on "veclibfort" if build.without?("openblas") && OS.mac?
 
   def install
     ENV.m64 if MacOS.prefer_64_bit?
 
-    cc_args = (build.with? :mpi) ? ["F77=#{ENV["MPIF77"]}"] : []
-    args = cc_args + ["--disable-dependency-tracking", "--prefix=#{libexec}"]
-    args << "--enable-mpi" if build.with? :mpi
-    if build.with? "openblas"
-      args << "--with-blas=-L#{Formula["openblas"].opt_lib} -lopenblas"
-    elsif OS.mac?
-      args << "--with-blas=-L#{Formula["veclibfort"].opt_lib} -lvecLibFort"
-    else
-      args << "--with-blas=-lblas -llapack"
+    args = []
+
+    if build.with? "mpi"
+      args << "F77=#{ENV["MPIF77"]}"
+      args << "--enable-mpi"
     end
 
+    blas_val = if build.with? "openblas"
+      "-L#{Formula["openblas"].opt_lib} -lopenblas"
+    elsif OS.mac?
+      "-L#{Formula["veclibfort"].opt_lib} -lvecLibFort"
+    else
+      "--with-blas=-lblas -llapack"
+    end
+
+    args += %W[
+      --disable-dependency-tracking
+      --prefix=#{libexec}
+      --with-blas=#{blas_val}
+    ]
+
+    system "./bootstrap"
     system "./configure", *args
     system "make"
+    system "make", "check"
     system "make", "install"
+
     lib.install_symlink Dir["#{libexec}/lib/*"].select { |f| File.file?(f) }
-    (lib / "pkgconfig").install_symlink Dir["#{libexec}/lib/pkgconfig/*"]
-    (libexec / "share").install "TESTS/testA.mtx"
+    (lib/"pkgconfig").install_symlink Dir["#{libexec}/lib/pkgconfig/*"]
+    (libexec/"share").install "TESTS/testA.mtx"
+    if build.with? "mpi"
+      (libexec/"bin").install (buildpath/"PARPACK/EXAMPLES/MPI").children
+    end
   end
 
   test do
-    cd libexec/"share" do
-      ["dnsimp", "bug_1323"].each do |slv|
-        system "#{libexec}/bin/#{slv}"  # Reads testA.mtx
+    if build.with? "mpi"
+      cp_r (libexec/"bin").children, testpath
+      %w[pcndrv1 pdndrv1 pdndrv3 pdsdrv1
+         psndrv1 psndrv3 pssdrv1 pzndrv1].each do |slv|
+        system "mpirun", "-np", "4", slv
       end
+    else
+      true
     end
   end
 end

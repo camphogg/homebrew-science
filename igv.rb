@@ -1,30 +1,27 @@
 class Igv < Formula
   desc "Interactive Genomics Viewer"
-  homepage "http://www.broadinstitute.org/software/igv"
+  homepage "https://www.broadinstitute.org/software/igv"
   # tag "bioinformatics"
   # doi "10.1093/bib/bbs017"
-  url "http://www.broadinstitute.org/igv/projects/downloads/IGV_2.3.57.zip"
-  sha256 "88950118fee35d6ecd71708bb4ec272519ca632f8778f4cbce677487ce28ba39"
+  url "https://www.broadinstitute.org/igv/projects/downloads/IGV_2.3.90.zip"
+  sha256 "f37c1725acfd58f438e1b0804381cb571cb20b389a7ddbad251eab5add2a246d"
   head "https://github.com/broadinstitute/IGV.git"
 
-  bottle do
-    cellar :any
-    sha256 "e1f244ca417e6bb05f395eb8c0c02ac7b3e15afd5e30aa8f702af4a8e5c51841" => :yosemite
-    sha256 "6dd6238c4ccf6100e676dbca9d7577662784a5ed9f21c57f272b52fe8d6feb50" => :mavericks
-    sha256 "373652f5ace3c2a936036edb92b464172f25c17be244b04fb951065c4e5813dc" => :mountain_lion
-  end
+  bottle :unneeded
 
   depends_on :java
 
   def install
-    inreplace "igv.sh", /^prefix=.*/, "prefix=#{libexec}"
-    libexec.install Dir["igv.sh", "*.jar"]
-    bin.install_symlink libexec/"igv.sh" => "igv"
+    inreplace "igv.sh", /^prefix=.*/, "prefix=#{prefix}"
+    prefix.install Dir["igv.sh", "*.jar"]
+    bin.install_symlink prefix/"igv.sh" => "igv"
     doc.install "readme.txt"
   end
 
   test do
+    ENV.append "_JAVA_OPTIONS", "-Duser.home=#{testpath}/java_cache"
     (testpath/"script").write "exit"
-    assert_match "IGV", `#{bin}/igv -b script`
+    # This command returns 0 on Circle and Travis but 1 on BrewTestBot.
+    assert_match "Version", `#{bin}/igv -b script`
   end
 end

@@ -1,30 +1,35 @@
 class Root6 < Formula
-  desc "An object oriented framework for large scale data analysis"
-  homepage "http://root.cern.ch"
-  version "6.04.00"
-  url "http://root.cern.ch/download/root_v#{version}.source.tar.gz"
-  mirror "https://fossies.org/linux/misc/root_v#{version}.source.tar.gz"
-  sha256 "c5fa1e5706f2f5f4e134c78926ed9cfcfe543aff3d39c41762911668a9eebeea"
+  # in order to update, simply change version number and update sha256
+  version_number = "6.08.02"
+  desc "Object oriented framework for large scale data analysis"
+  homepage "https://root.cern.ch"
+  url "https://root.cern.ch/download/root_v#{version_number}.source.tar.gz"
+  mirror "https://fossies.org/linux/misc/root_v#{version_number}.source.tar.gz"
+  version version_number
+  sha256 "131c50a81e72a1cd2b2825c66dbe3916c23b28006e84f5a028baed4c72d86014"
+
   head "http://root.cern.ch/git/root.git"
 
   bottle do
-    revision 1
-    sha256 "c5141ef686d0538128fe2d8f426177a6567b3aa122604c094b11044a6567962e" => :yosemite
-    sha256 "094df33fc9e3baa291633a6011e214691e52032ca29f06f3d03ad7f47cd7b245" => :mavericks
-    sha256 "9b7dd452d68b5f2182212777393bf9ca0362fb70dd4f6774efc51e784fcaab8b" => :mountain_lion
+    sha256 "2a6cc29e06d90e1bbca848b06844263ba692e3edc482c279cfcdfb2073a6e5f2" => :sierra
+    sha256 "5de820b6d8d37d36962bc57a4f8f0ce4febd06c0bb7ad5bfadf59e5f0d6847f4" => :el_capitan
+    sha256 "da8baf9db5a25c18edbc634794cbca3b773fe22b517ab1a734ff4d5bb1ae2253" => :yosemite
   end
 
   depends_on "cmake" => :build
   depends_on "xrootd" => :optional
-  depends_on "openssl" => :optional
-  depends_on :python => :recommended
+  depends_on "fftw" => :optional
+  depends_on "openssl" => :recommended # use homebrew's openssl
+  depends_on :python => :recommended # make sure we install pyroot
   depends_on :x11 => :recommended if OS.linux?
-
+  depends_on :fortran => :recommended # enabled by default since 6.08.00
+  depends_on "gsl" => :recommended
+  # root5 obviously conflicts, simply need `brew unlink root`
   conflicts_with "root"
-
+  # cling also takes advantage
   needs :cxx11
 
-  def cmake_opt(opt, pkg = opt)
+  def config_opt(opt, pkg = opt)
     "-D#{opt}=#{(build.with? pkg) ? "ON" : "OFF"}"
   end
 
@@ -37,42 +42,36 @@ class Root6 < Formula
                   "man/man1/setup-pq2.1", "README/INSTALL", "README/README"],
       /bin.thisroot/, "libexec/thisroot"
 
-    # Prevent collision with brewed freetype
-    inreplace "graf2d/freetype/CMakeLists.txt", /install\(/, "#install("
-    # xrootd: Workaround for
-    # TXNetFile.cxx:64:10: fatal error: 'XpdSysPthread.h' file not found
-    # this seems to be related to homebrew superenv
-    inreplace "net/netx/CMakeLists.txt",
-      /include_directories\(/, "\\0${CMAKE_SOURCE_DIR}/proof/proofd/inc "
+    # ROOT does the following things by default that `brew audit` doesn't like:
+    #  1. Installs libraries to lib/
+    #  2. Installs documentation to man/
+    # Homebrew expects:
+    #  1. Libraries in lib/<some_folder>
+    #  2. Documentation in share/man
+    # so we set some flags to match what Homebrew expects
+    args = %W[
+      -Dgnuinstall=ON
+      -DCMAKE_INSTALL_ELISPDIR=#{share}/emacs/site-lisp/#{name}
+      -Dbuiltin_freetype=ON
+      -Droofit=ON
+      -Dminuit2=ON
+      #{config_opt("python")}
+      #{config_opt("ssl", "openssl")}
+      #{config_opt("xrootd")}
+      #{config_opt("mathmore", "gsl")}
+      #{config_opt("fortran")}
+      #{config_opt("fftw3", "fftw")}
+    ]
 
-    mkdir "cmake-build" do
-      system "cmake", "..", "-Dgnuinstall=ON", "-Dbuiltin_freetype=ON",
-        "-Droofit=ON",  # build with RooFit
-        "-Dminuit2=ON", # build with Minuit2
-        cmake_opt("python"),
-        cmake_opt("ssl", "openssl"),
-        cmake_opt("xrootd"),
-        *std_cmake_args
+    # ROOT forbids running CMake in the root of the source directory,
+    # so run in a subdirectory (there's already one called `build`)
+    mkdir "build_dir" do
+      system "cmake", "..", *(std_cmake_args + args)
       system "make", "install"
     end
 
     libexec.mkpath
     mv Dir["#{bin}/*.*sh"], libexec
-  end
-
-  test do
-    (testpath/"test.C").write <<-EOS.undent
-      #include <iostream>
-      void test() {
-        std::cout << "Hello, world!" << std::endl;
-      }
-    EOS
-    (testpath/"test.bash").write <<-EOS.undent
-      . #{libexec}/thisroot.sh
-      root -l -b -n -q test.C
-    EOS
-    assert_equal "\nProcessing test.C...\nHello, world!\n",
-      `/bin/bash test.bash`
   end
 
   def caveats; <<-EOS.undent
@@ -89,5 +88,20 @@ class Root6 < Formula
     For csh/tcsh users:
       source `brew --prefix root6`/libexec/thisroot.csh
     EOS
+  end
+
+  test do
+    (testpath/"test.C").write <<-EOS.undent
+      #include <iostream>
+      void test() {
+        std::cout << "Hello, world!" << std::endl;
+      }
+    EOS
+    (testpath/"test.bash").write <<-EOS.undent
+      . #{libexec}/thisroot.sh
+      root -l -b -n -q test.C
+    EOS
+    assert_equal "\nProcessing test.C...\nHello, world!\n",
+      `/bin/bash test.bash`
   end
 end

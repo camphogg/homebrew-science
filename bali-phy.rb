@@ -3,13 +3,14 @@ class BaliPhy < Formula
   homepage "http://www.bali-phy.org/"
   url "http://www.bali-phy.org/bali-phy-2.3.7.tar.gz"
   sha256 "3120f9b448d308889093aa26a5941866c2841078e5eb9f1af1e2a6cbb134356a"
+  revision 1
 
   head "https://github.com/bredelings/BAli-Phy.git"
 
   bottle do
-    sha256 "f7c749a68d0a025187e919ecdd27501553040fb9a55c0a7fa512f0cb381b2619" => :yosemite
-    sha256 "779f83c020cde81bbd698b5b1851f22673f178d82250402dbeddca28d817d631" => :mavericks
-    sha256 "a3273e59ff3e2b71d0e5bf67fa319bc7aeb12c2432b2ee8617e8b99c1a478437" => :mountain_lion
+    sha256 "45db51cef110e5f82812996be15c5965ab03e3467a66145ccfbeab27fc382ef8" => :el_capitan
+    sha256 "0716809b2b3dcfb1a6597c7a5ad1be30c83ddb04f142600453382f7313f3e7b7" => :yosemite
+    sha256 "65e7717165ba2f21993c6a182d38bd3f16e957e9f823ddc757b818aae5d6c7eb" => :mavericks
   end
 
   depends_on "pkg-config" => :build
@@ -40,7 +41,7 @@ class BaliPhy < Formula
   end
 
   test do
-    system "#{bin}/bali-phy", "#{share}/bali-phy/examples/Sequences/5S-rRNA/5d.fasta", "--iter=150"
+    system "#{bin}/bali-phy", "#{pkgshare}/examples/Sequences/5S-rRNA/5d.fasta", "--iter=150"
     system "#{bin}/bp-analyze.pl", "5d-1"
   end
 end

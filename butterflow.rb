@@ -1,24 +1,24 @@
 class Butterflow < Formula
-  desc "Makes fluid slowmo and motion interpolated videos"
+  desc "Makes fluid slow motion and motion interpolated videos"
   homepage "https://github.com/dthpham/butterflow"
-  url "http://srv.dthpham.me/butterflow-0.1.9.tar.gz"
-  sha256 "9f62960bb1a58c7fd7b67e7260d32a51e95ef5c7ff9f0811307463c1f1f338cf"
-  revision 1
+  url "http://srv.dthpham.me/butterflow/butterflow-0.2.1.tar.gz"
+  sha256 "66cd8964854eae5b5b66b031e2f038d87a38c9052d19793820d55e1fe6338ffe"
 
   bottle do
     cellar :any
-    sha256 "c3424c90e217cee45c461747545da5a4999967bbfed7f977312808ed7f6c79db" => :yosemite
-    sha256 "0b5be6c1f6ff5df7659b213ba250784bfd53d4f1ef5c4fa03f5221c21497a80b" => :mavericks
+    sha256 "1c881f24932b1297bd1a0688e95a1378be35af0caaa5c466d8819ca1ed2b2797" => :el_capitan
+    sha256 "285236c600d5ba279d86e99d58f3b51c1919d2cec4b7ccddea403de3dd812d7d" => :yosemite
+    sha256 "1045fcdbe901d48b104163413a08b5092041b14b0249523dda553b48ba051bd0" => :mavericks
   end
 
-  # To satisfy OpenCL 1.1 requirement
+  # To satisfy OpenCL 1.2 requirement
   depends_on :macos => :mavericks
 
-  depends_on "pkg-config" => :build
-  depends_on "ffmpeg" => ["with-libvorbis", "with-libass"]
-  depends_on "opencv" => "with-ffmpeg"
+  depends_on "ffmpeg"
+  depends_on "opencv" => ["with-ffmpeg", "with-opengl"]
 
   def install
+    ENV.prepend_path "PYTHONPATH", Formula["numpy"].opt_lib/"python2.7/site-packages"
     ENV.prepend_path "PYTHONPATH", Formula["opencv"].opt_lib/"python2.7/site-packages"
     ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python2.7/site-packages"
     system "python", *Language::Python.setup_install_args(libexec)

@@ -1,16 +1,14 @@
-require "formula"
-
 class Lis < Formula
   homepage "http://www.ssisc.org/lis"
   url "http://www.ssisc.org/lis/dl/lis-1.4.34.tar.gz"
-  sha1 "60b08e4428c8f02e545b07817efef212dd2fb9df"
-  revision 1
+  sha256 "e25fb5ef0c52fa0c66efab626da7d1a4b4082776173ffce632a034ab73a4d292"
+  revision 3
 
   bottle do
     cellar :any
-    sha1 "0c3ee087d95296e10436630068382a1f584c74b8" => :yosemite
-    sha1 "bee267db184712cd22f6c581d55bfa73ca26c79d" => :mavericks
-    sha1 "60b431fbda6503a65506ee04f7adf091e0302338" => :mountain_lion
+    sha256 "931659dd58dd7555990bcf001bb7ef906560ea35a315b25d40be553bb096014b" => :el_capitan
+    sha256 "669a7ae326c8cb8a78358d632653503bc74eef6eaaa0d56521024708206f5317" => :yosemite
+    sha256 "3b5cf44e575fd9a4cba5184597444c3b0d8f75839b9ee91753840e8a36a1dc44" => :mavericks
   end
 
   option "without-check", "Skip build-time checks (not recommended)"

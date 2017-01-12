@@ -1,24 +1,28 @@
 class Express < Formula
+  desc "Streaming quantification for sequencing"
   homepage "http://bio.math.berkeley.edu/eXpress/"
-  head "https://github.com/adarob/eXpress.git"
-  bottle do
-    cellar :any
-    sha1 "1ab122db4fa3af3e8e9d93e49702c1a1aa75a249" => :yosemite
-    sha1 "3e17818affce1700e88a1d0934be13d76e4241ae" => :mavericks
-    sha1 "6d648767ea1dd5fc3eb45ded0389b8c9eb4ad8b3" => :mountain_lion
-  end
-
-  #doi "10.1038/nmeth.2251"
-  #tag "bioinformatics"
-
   url "http://bio.math.berkeley.edu/eXpress/downloads/express-1.5.1/express-1.5.1-src.tgz"
-  sha1 "173f5b340f69d50096271a0199716d0acbbaf446"
+  sha256 "0c5840a42da830fd8701dda8eef13f4792248bab4e56d665a0e2ca075aff2c0f"
+  revision 5
+  head "https://github.com/adarob/eXpress.git"
+
+  # doi "10.1038/nmeth.2251"
+  # tag "bioinformatics"
+
+  bottle :disable, "Work around 'Illegal instruction: 4' during CI" if OS.mac?
 
   depends_on "bamtools"
   depends_on "boost"
   depends_on "cmake" => :build
+  depends_on "protobuf" => :recommended
+  depends_on "gperftools" => :recommended
 
   def install
+    inreplace "CMakeLists.txt", "set(Boost_USE_STATIC_LIBS ON)", ""
+
+    # Fix undefined reference to `deflate'
+    inreplace "src/CMakeLists.txt", 'libbamtools.a"', 'libbamtools.a" "-lz"'
+
     mkdir "bamtools"
     ln_s Formula["bamtools"].include/"bamtools", "bamtools/include"
     ln_s Formula["bamtools"].lib, "bamtools/"
@@ -27,6 +31,6 @@ class Express < Formula
   end
 
   test do
-    system "#{bin}/express 2>&1 |grep express"
+    assert_match version.to_s, shell_output("#{bin}/express 2>&1", 1)
   end
 end

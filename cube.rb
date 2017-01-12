@@ -1,34 +1,34 @@
-require "formula"
-
 class Cube < Formula
+  desc "Performance report explorer for Scalasca and Score-P"
   homepage "http://apps.fz-juelich.de/scalasca/"
-  url "http://apps.fz-juelich.de/scalasca/releases/cube/4.2/dist/cube-4.2.2.tar.gz"
-  sha1 "88597c2df082bdc4eeadd6a9dad791b5894c6daa"
+  url "http://apps.fz-juelich.de/scalasca/releases/cube/4.3/dist/cube-4.3.4.tar.gz"
+  sha256 "34c55fc5d0c84942c0845a7324d84cde09f3bc1b3fae6a0f9556f7ea0e201065"
 
-  depends_on "qt" => :recommended
+  bottle do
+    sha256 "f4752655005bcf04a3faebe0173c571e4ca8128fd579db1d4b1eb5967cbbf874" => :sierra
+    sha256 "b468ee3261ea60adaa54d628034d413b6157a98230a4c30cbff3d11d23a6b568" => :el_capitan
+    sha256 "13c046ba780a2450ab4bf055f5cf70e98a3128ca2e79a55ca364dbc5519bdce9" => :yosemite
+  end
 
-  fails_with :clang do
-    build 600
-    cause <<-EOS.undent
-      Undefined symbols for architecture x86_64:
-      "cube::Cube::def_mirror(std::string const&)", referenced from:
-      MainWidget::readFile(QString) in cube-MainWidget.o
-    EOS
-  end if build.with? "qt"
+  depends_on "qt5"
+  depends_on "cmake" => :build
 
   def install
     ENV.deparallelize
-
     system "./configure",
       "--disable-debug",
       "--disable-dependency-tracking",
       "--disable-silent-rules",
-      "--prefix=#{prefix}"
+      "--prefix=#{prefix}",
+      "--with-nocross-compiler-suite=clang",
+      "--with-qt-specs=macx-clang",
+      'CXXFLAGS="-stdlib=libc++"',
+      'LDFLAGS="-stdlib=libc++"'
     system "make"
     system "make", "install"
   end
 
   test do
-    system "#{bin}/cube-config --version"
+    system "#{bin}/cube-config", "--version"
   end
 end

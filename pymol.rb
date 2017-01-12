@@ -1,23 +1,21 @@
 class Pymol < Formula
+  desc "OpenGL based molecular visualization system"
   homepage "http://pymol.org"
-  url "https://downloads.sourceforge.net/project/pymol/pymol/1.7/pymol-v1.7.6.0.tar.bz2"
-  sha256 "cf142732b5206ea65ebcc0cc162f9d3c88ecacc701ac41d1a5e9b38972700395"
+  url "https://downloads.sourceforge.net/project/pymol/pymol/1.8/pymol-v1.8.2.1.tar.bz2"
+  sha256 "fc5d33d7e36364567462cee19b9b132530a83cbab3fafcf373f2a17f127b3f4e"
   head "https://svn.code.sf.net/p/pymol/code/trunk/pymol"
 
   bottle do
     cellar :any
-    sha256 "f9508e972a15a881b346222545ad9a63f1ba838066fe72ca57ddf366965c80fa" => :yosemite
-    sha256 "e9813a889011afcdfd61ecaf5b581e5408461b6d14028e646406bf706270d7ae" => :mavericks
-    sha256 "d0348d18fdbb87c697ef2d68ab6849421bef34406181048b2011cb0bad1787b8" => :mountain_lion
+    sha256 "0fa0705a99781f94a1178110e8398caa2c5f47a1c3618c966cd558fe5c0e53bb" => :el_capitan
+    sha256 "8fc26c4981fb1b503c22d2513d926a15ef7c33abe4a8b1d53cf546c5b7e9c3b6" => :yosemite
+    sha256 "417e7c64a6a55057c3e2aa396be60e6c8b305f7ec83d2fa2ad845a4590ca4f14" => :mavericks
   end
 
   depends_on "glew"
   depends_on "python" => "with-tcl-tk"
   depends_on "homebrew/dupes/tcl-tk" => ["with-threads", "with-x11"]
   depends_on :x11
-
-  # Fix outdated X11 path: https://sourceforge.net/p/pymol/patches/10/
-  patch :DATA
 
   def install
     ENV.append_to_cflags "-Qunused-arguments" if MacOS.version < :mavericks
@@ -30,10 +28,6 @@ class Pymol < Formula
     bin.install libexec/"bin/pymol"
   end
 
-  test do
-    system bin/"pymol", libexec/"lib/python2.7/site-packages/pymol/pymol_path/data/demo/pept.pdb"
-  end
-
   def caveats; <<-EOS.undent
     On some Macs, the graphics drivers do not properly support stereo
     graphics. This will cause visual glitches and shaking that stay
@@ -42,18 +36,8 @@ class Pymol < Formula
       pymol -M
     EOS
   end
-end
-__END__
-diff --git a/modules/pymol/__init__.py b/modules/pymol/__init__.py
-index 792d273..3d335fd 100644
---- a/modules/pymol/__init__.py
-+++ b/modules/pymol/__init__.py
-@@ -391,7 +391,7 @@ def prime_pymol():
 
-     # legacy X11 launching on OSX
-     if sys.platform == 'darwin' and invocation.options.external_gui == 1:
--        xdpyinfo = "/usr/X11R6/bin/xdpyinfo"
-+        xdpyinfo = "/opt/X11/bin/xdpyinfo"
-         if not os.path.exists(xdpyinfo) or \
-                 os.system(xdpyinfo + " >/dev/null 2>&1"):
-             # launch X11 (if needed)
+  test do
+    system bin/"pymol", libexec/"lib/python2.7/site-packages/pymol/pymol_path/data/demo/pept.pdb"
+  end
+end

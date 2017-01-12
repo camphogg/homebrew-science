@@ -1,39 +1,54 @@
 class Kat < Formula
+  desc "K-mer Analysis Toolkit (KAT) analyses k-mer spectra"
   homepage "https://github.com/TGAC/KAT"
+  url "https://github.com/TGAC/KAT/releases/download/Release-2.1.1/kat-2.1.1.tar.gz"
+  sha256 "bcb86a01bdd2aa01cc64c6d2f2a33fff1a71961867e45a21de8de303e6f3440d"
   # tag "bioinformatics"
-  url "https://github.com/TGAC/KAT/releases/download/Release-1.0.7/kat-1.0.7.tar.gz"
-  sha256 "89f6e55a9462f774028f0047dfa5db1d8a26a9e53e766bec12af3a9d8a720eeb"
-
-  head do
-    url "https://github.com/TGAC/KAT.git"
-    depends_on "automake" => :build
-    depends_on "autoconf" => :build
-  end
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "e014fb1e638d216189d91ba15bec71db04a253c3cc205e74a86dc6be1ceec6a0" => :yosemite
-    sha256 "d953de44bead07fbae63d87a61d2f0444a0fb18eadb8fde8f834b766172e1b61" => :mavericks
-    sha256 "e3058870b4be5dba2c7e5ca94925cd5d586afa77327d056839ce74c1e07d9f4a" => :mountain_lion
+    sha256 "5978032303b587966edf2b86340039148df15681137a9da0d0958089d86bf81b" => :el_capitan
+    sha256 "1d5c0781c5f127c2a5e00a903b26ab0e7c58877a41290c70f2960554b9acf49a" => :yosemite
+    sha256 "0d5f2252b25b92a9443349633098c5405cd1e4d6413e6eeb79b393e61d56ccf8" => :mavericks
+    sha256 "bebc195a4bae51ca61606997d493924863455380068e4bd8145a5f06d067dff1" => :x86_64_linux
   end
+
+  head do
+    url "https://github.com/TGAC/KAT.git"
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+  end
+
+  option "with-docs", "Build documentation"
+
+  needs :cxx11
 
   depends_on "pkg-config" => :build
   depends_on "boost"
   depends_on "gnuplot"
-  depends_on "jellyfish-1.1"
-  depends_on "seqan"
+  depends_on "matplotlib" => :python
+  depends_on "numpy" => :python
+  depends_on "scipy" => :python
+  depends_on "sphinx-doc" => :python if build.with? "docs"
 
   def install
-    ENV.libstdcxx if ENV.compiler == :clang && MacOS.version >= :mavericks
+    ENV.cxx11
+
     system "./autogen.sh" if build.head?
 
-    inreplace "configure", "1.1.11", Formula["jellyfish-1.1"].version
     system "./configure",
       "--disable-debug",
       "--disable-dependency-tracking",
       "--disable-silent-rules",
       "--prefix=#{prefix}",
-      "--with-jellyfish=#{Formula["jellyfish-1.1"].prefix}"
+      "--with-boost=#{Formula["boost"].prefix}"
+
+    if build.with? "docs"
+      system "make", "man"
+      system "make", "html"
+    end
+    system "make"
     system "make", "install"
   end
 

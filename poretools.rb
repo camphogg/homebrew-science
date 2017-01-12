@@ -1,80 +1,88 @@
 class Poretools < Formula
+  include Language::Python::Virtualenv
+
   desc "Tools for working with nanopore sequencing data"
-  homepage "http://poretools.readthedocs.org/"
-  url "https://github.com/arq5x/poretools/archive/v0.5.1.tar.gz"
-  sha256 "7cd55a8f30290992dcf8d7792401e7f21efadfde02b3f4604d6680d2f8300479"
+  homepage "https://poretools.readthedocs.org"
+  # doi "10.1093/bioinformatics/btu555"
+  # tag "bioinformatics"
+
+  url "https://github.com/arq5x/poretools/archive/v0.6.0.tar.gz"
+  sha256 "64d22ac045bf4b424bd709abb07fcdb6ef4d198a76213183de166a307646b9fa"
+  revision 2
   head "https://github.com/arq5x/poretools.git"
 
   bottle do
-    cellar :any
-    sha256 "45451e7b15182743417c26ca8a185b3e190bf6737f88bd073b05ecfa2f223ec3" => :yosemite
-    sha256 "0d13e263e393ef97ed3bc06aeaa73c2c27097ae9c75d517a2acc288ecbaf91ad" => :mavericks
-    sha256 "b1ce68410088646e5d23177d6706851c9d1c288dd75c94f8e9b74e680fc3b1e5" => :mountain_lion
+    sha256 "d1e8388dd9419c71899751d28df408ab2b8d52c89265c39fbbe16de3c3c177ef" => :sierra
+    sha256 "3b5b248fe3129928e97bee412a989d7b2ae1efa047d80548d217052bbbdbb5f7" => :el_capitan
+    sha256 "018bae2017a0c54bf9c50d12101a83a401713f67b24df63a894fc9bf94a0b53d" => :yosemite
   end
 
+  depends_on "pkg-config" => :build # for h5py
+  depends_on "freetype" # for matplotlib
   depends_on "hdf5"
-  depends_on "r"
+  depends_on :fortran # for scipy
   depends_on :python if MacOS.version <= :snow_leopard
-  depends_on "openssl"
 
-  resource "rpy2" do
-    url "https://pypi.python.org/packages/source/r/rpy2/rpy2-2.5.6.tar.gz"
-    sha256 "d0d584c435b5ed376925a95a4525dbe87de7fa9260117e9f208029e0c919ad06"
-  end
+  cxxstdlib_check :skip
 
   resource "Cython" do
-    url "http://cython.org/release/Cython-0.22.tar.gz"
-    sha256 "14307e7a69af9a0d0e0024d446af7e51cc0e3e4d0dfb10d36ba837e5e5844015"
+    url "https://files.pythonhosted.org/packages/c6/fe/97319581905de40f1be7015a0ea1bd336a756f6249914b148a17eefa75dc/Cython-0.24.1.tar.gz"
+    sha256 "84808fda00508757928e1feadcf41c9f78e9a9b7167b6649ab0933b76f75e7b9"
+  end
+
+  resource "Cycler" do
+    url "https://files.pythonhosted.org/packages/c2/4b/137dea450d6e1e3d474e1d873cd1d4f7d3beed7e0dc973b06e8e10d32488/cycler-0.10.0.tar.gz"
+    sha256 "cd7b2d1018258d7247a71425e9f26463dfb444d411c39569972f4ce586b0c9d8"
   end
 
   resource "h5py" do
-    url "https://pypi.python.org/packages/source/h/h5py/h5py-2.5.0.tar.gz#md5=6e4301b5ad5da0d51b0a1e5ac19e3b74"
-    sha256 "9833df8a679e108b561670b245bcf9f3a827b10ccb3a5fa1341523852cfac2f6"
+    url "https://files.pythonhosted.org/packages/22/82/64dada5382a60471f85f16eb7d01cc1a9620aea855cd665609adf6fdbb0d/h5py-2.6.0.tar.gz"
+    sha256 "b2afc35430d5e4c3435c996e4f4ea2aba1ea5610e2d2f46c9cae9f785e33c435"
+  end
+
+  resource "matplotlib" do
+    url "https://files.pythonhosted.org/packages/15/89/240b4ebcd63bcdde9aa522fbd2e13f0af3347bea443cb8ad111e3b4c6f3a/matplotlib-1.5.2.tar.gz"
+    sha256 "8875d763c9e0d0ae01fefd5ebbe2b22bde5f080037f9467126d5dbee31785913"
+  end
+
+  resource "numpy" do
+    url "https://files.pythonhosted.org/packages/e0/4c/515d7c4ac424ff38cc919f7099bf293dd064ba9a600e1e3835b3edefdb18/numpy-1.11.1.tar.gz"
+    sha256 "dc4082c43979cc856a2bf352a8297ea109ccb3244d783ae067eb2ee5b0d577cd"
+  end
+
+  resource "pandas" do
+    url "https://files.pythonhosted.org/packages/11/09/e66eb844daba8680ddff26335d5b4fead77f60f957678243549a8dd4830d/pandas-0.18.1.tar.gz"
+    sha256 "d2e483692c7915916dffd1b83256ea9761b4224c8d45646ceddf48b977ee77b2"
+  end
+
+  resource "pyparsing" do
+    url "https://files.pythonhosted.org/packages/65/25/1bb68622ca70abc145ac9c9bcd0e837fccd2889d79cee641aa8604d18a11/pyparsing-2.1.8.tar.gz"
+    sha256 "03a4869b9f3493807ee1f1cb405e6d576a1a2ca4d81a982677c0c1ad6177c56b"
+  end
+
+  resource "python-dateutil" do
+    url "https://files.pythonhosted.org/packages/3e/f5/aad82824b369332a676a90a8c0d1e608b17e740bbb6aeeebca726f17b902/python-dateutil-2.5.3.tar.gz"
+    sha256 "1408fdb07c6a1fa9997567ce3fcee6a337b39a503d80699e0f213de4aa4b32ed"
+  end
+
+  resource "pytz" do
+    url "https://files.pythonhosted.org/packages/f7/c7/08e54702c74baf9d8f92d0bc331ecabf6d66a56f6d36370f0a672fc6a535/pytz-2016.6.1.tar.bz2"
+    sha256 "b5aff44126cf828537581e534cc94299b223b945a2bb3b5434d37bf8c7f3a10c"
+  end
+
+  resource "scipy" do
+    url "https://files.pythonhosted.org/packages/01/a1/dce70d47377d662aa4b0895df8431aee92cea6faefaab9dae21b0f901ded/scipy-0.18.0.tar.gz"
+    sha256 "f01784fb1c2bc246d4211f2482ecf4369db5abaecb9d5afb9d94f6c59663286a"
+  end
+
+  resource "seaborn" do
+    url "https://files.pythonhosted.org/packages/ed/dc/f168ff9db34f8c03c568987b4f81603cd3df40dd8043722d526026381a91/seaborn-0.7.1.tar.gz"
+    sha256 "fa274344b1ee72f723bab751c40a5c671801d47a29ee9b5e69fcf63a18ce5c5d"
   end
 
   resource "six" do
-    url "https://pypi.python.org/packages/source/s/six/six-1.9.0.tar.gz#md5=476881ef4012262dfc8adc645ee786c4"
-    sha256 "e24052411fc4fbd1f672635537c3fc2330d9481b18c0317695b46259512c91d5"
-  end
-
-  resource "watchdog" do
-    url "https://pypi.python.org/packages/source/w/watchdog/watchdog-0.8.3.tar.gz"
-    sha256 "7e65882adb7746039b6f3876ee174952f8eaaa34491ba34333ddf1fe35de4162"
-  end
-
-  resource "pathtools" do
-    url "https://pypi.python.org/packages/source/p/pathtools/pathtools-0.1.2.tar.gz"
-    sha256 "7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0"
-  end
-
-  resource "argh" do
-    url "https://pypi.python.org/packages/source/a/argh/argh-0.26.1.tar.gz"
-    sha256 "06a7442cb9130fb8806fe336000fcf20edf1f2f8ad205e7b62cec118505510db"
-  end
-
-  resource "PyYAML" do
-    url "https://pypi.python.org/packages/source/P/PyYAML/PyYAML-3.11.tar.gz#md5=f50e08ef0fe55178479d3a618efe21db"
-    sha256 "c36c938a872e5ff494938b33b14aaa156cb439ec67548fcab3535bb78b0846e8"
-  end
-
-  resource "singledispatch" do
-    url "https://pypi.python.org/packages/source/s/singledispatch/singledispatch-3.4.0.3.tar.gz#md5=af2fc6a3d6cc5a02d0bf54d909785fcb"
-    sha256 "5b06af87df13818d14f08a028e42f566640aef80805c3b50c5056b086e3c2b9c"
-  end
-
-  resource "codetools" do
-    url "http://cran.r-project.org/src/contrib/codetools_0.2-11.tar.gz"
-    sha256 "b02e8b17ea9173b73c20e84fbd36c420d5a79bb56a6b9d0d45c22a7d540f54d5"
-  end
-
-  resource "MASS" do
-    url "http://cran.r-project.org/src/contrib/MASS_7.3-40.tar.gz"
-    sha256 "9e0c937162cb485511ce77c8519a21558370c20f3c6dc34493b895cb355cb516"
-  end
-
-  resource "ggplot2" do
-    url "http://cran.r-project.org/src/contrib/ggplot2_1.0.1.tar.gz"
-    sha256 "40248e6b31307787e44e45d806e7a33095844a9bbe864cc7583dd311b19c241d"
+    url "https://files.pythonhosted.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz"
+    sha256 "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a"
   end
 
   resource "test" do
@@ -82,57 +90,40 @@ class Poretools < Formula
     sha256 "76b00286acba1f65c76a3869bc60e099190ce48d0a5822606ce222e80529e523"
   end
 
+  def resources
+    front_load = [resource("six"), resource("numpy")]
+    front_load + (super - front_load - [resource("Cython"), resource("test")])
+  end
+
   def install
-    ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python2.7/site-packages"
-    ENV.prepend_create_path "R_LIBS", libexec/"vendor/R/library"
-    ENV.prepend_create_path "PATH", libexec/"vendor/bin"
+    ENV.delete("SDKROOT")
+    ENV["HDF5_DIR"] = Formula["hdf5"].opt_prefix
 
-    respy = %w[rpy2 Cython h5py six watchdog pathtools argh PyYAML singledispatch]
-    resr = %w[codetools MASS ggplot2]
-
-    # install python dependencies
-    respy.each do |rp|
-      resource(rp).stage do
-        system "python", *Language::Python.setup_install_args(libexec/"vendor")
-      end
+    resource("Cython").stage do
+      system "python", *Language::Python.setup_install_args(buildpath/"cython")
     end
 
-    # install devtools
-    system "R", "-q", "-e", "install.packages('devtools', lib='" + libexec/"vendor/R/library" + "', repos='http://cran.r-project.org')"
+    ENV.prepend_create_path "PATH", buildpath/"cython/bin"
+    ENV.prepend_create_path "PYTHONPATH", buildpath/"cython/lib/python2.7/site-packages"
 
-    # install r dependencies
-    ENV.prepend "LDFLAGS", "-L" + Formula["openssl"].lib
-    ENV.prepend "CPPFLAGS", "-I" + Formula["openssl"].include
-    resr.each do |rr|
-      resource(rr).stage do
-        system "R", "-q", "-e", "library(devtools); install(pkg='.', lib='" + libexec/"vendor/R/library" + "')"
-      end
-    end
+    virtualenv_install_with_resources
 
-    # install poretools
-    ENV.prepend_create_path "PYTHONPATH", libexec+"lib/python2.7/site-packages"
-    system "python", *Language::Python.setup_install_args(libexec)
-
-    libexec.install Dir[libexec/"bin/*"]
-    libexec.env_script_all_files(libexec+"bin", :PYTHONPATH => ENV["PYTHONPATH"])
-    (bin/"poretools").write_env_script(libexec+"bin/poretools", :R_LIBS => ENV["R_LIBS"], :PYTHONPATH => ENV["PYTHONPATH"])
-
-    resource("test").stage { (share/"test_data").install Dir["*"] }
+    (pkgshare/"test_data").install resource("test")
   end
 
   test do
     result = <<-EOS.undent
-    total reads	297
-    total base pairs	260131
-    mean	875.86
-    median	795
-    min	325
-    max	3602
-    N25	965
-    N50	830
-    N75	741
+      total reads	297
+      total base pairs	260131
+      mean	875.86
+      median	795
+      min	325
+      max	3602
+      N25	965
+      N50	830
+      N75	741
     EOS
-
-    assert_equal result, shell_output("#{bin}/poretools stats #{share}/test_data/")
+    output = shell_output("#{bin}/poretools stats #{pkgshare}/test_data")
+    assert_equal result, output
   end
 end

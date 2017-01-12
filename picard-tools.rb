@@ -1,18 +1,18 @@
 class PicardTools < Formula
-  homepage "http://broadinstitute.github.io/picard/"
+  desc "Tools for manipulating HTS data and formats"
+  homepage "https://broadinstitute.github.io/picard/"
+  url "https://github.com/broadinstitute/picard/releases/download/2.5.0/picard-tools-2.5.0.zip"
+  sha256 "22614ecf3d65e1471b2cda7e2e3afccd158f0ae133d47ccc9238403e86fbdb74"
+  # head "https://github.com/broadinstitute/picard.git"
   # tag "bioinformatics"
 
-  url "https://github.com/broadinstitute/picard/releases/download/1.128/picard-tools-1.128.zip"
-  sha1 "af24555cf6c673ab95a042fae322a189bee05326"
-
   bottle do
-    cellar :any
-    sha1 "69f0e158f58319b32cf81c13d4c1b3c08ac1364c" => :yosemite
-    sha1 "04d7d6625c93622d98849f1b2f8cdb1a96d5839d" => :mavericks
-    sha1 "0e07a4f03c0ddeb224d4a9436974da90baf3ca2e" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "51aabb5a819f82a4d56cf451afc55040e2cd3cf9c196c1215ab994a9f06f5cf9" => :el_capitan
+    sha256 "19cea4eb5ded78e93e8705c4c7d589097961ad1b1d81ccadd0aea872b6aac67e" => :yosemite
+    sha256 "1c822259698184eacf37bbc89e7b0f93b85fca499a1be1db7426255ba33a959b" => :mavericks
+    sha256 "4076d3da6231562d8ef56d5c481dc8d17f6d97bcf306a928de1e5abece1e2a7c" => :x86_64_linux
   end
-
-  # head "https://github.com/broadinstitute/picard.git"
 
   depends_on :java
 
@@ -20,7 +20,6 @@ class PicardTools < Formula
     java = share/"java"
     java.install Dir["*.jar"]
     bin.write_jar_script java/"picard.jar", "picard"
-    lib.install "libIntelDeflater.so" if OS.linux?
   end
 
   def caveats
@@ -31,7 +30,7 @@ class PicardTools < Formula
   end
 
   test do
-    system "java -jar #{share}/java/picard.jar -h 2>&1 |grep Picard"
-    system "#{bin}/picard -h 2>&1 |grep Picard"
+    assert_match "USAGE", shell_output("java -jar #{share}/java/picard.jar -h 2>&1", 1)
+    assert_match "USAGE", shell_output("#{bin}/picard -h 2>&1", 1)
   end
 end

@@ -1,14 +1,18 @@
 class Dsk < Formula
   desc "Low memory k-mer counting software"
   homepage "http://minia.genouest.org/dsk/"
-  url "http://gatb-tools.gforge.inria.fr/versions/src/dsk-2.0.5-Source.tar.gz"
-  sha256 "65e37d39d68db972f64ff65dc9948943732b240fb7854908f716de436ea0d069"
+  # doi "10.1093/bioinformatics/btt020"
+  # tag "bioinformatics"
+
+  url "http://gatb-tools.gforge.inria.fr/versions/src/dsk-2.1.0-Source.tar.gz"
+  sha256 "08b35e5aff5d17eb35a61b06ba7f440ae8a5a4197b72fb0a465b5ea4dd7becd0"
 
   bottle do
-    cellar :any
-    sha256 "8c755f6f6caaa56a85af63ce40ca20e2c3006d5ba378f5d8b1150d1822748192" => :yosemite
-    sha256 "9a528fc1925499203f2feb91ba8458d6fef1a2416c3bf1445e96611f98041e29" => :mavericks
-    sha256 "39b7f548c8170a07b94cc987ccdc9212a31d9341b9954c22963fa4a7ee7b9343" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "e5d10fdaa56b3a05c43550d8b72fcfa9b0f19c6117920b0536fd2392cdb0207c" => :el_capitan
+    sha256 "e3540a5467facb3c8a5b1f8ad369c3c9655bd891233cd04d13bd446e9da86e9e" => :yosemite
+    sha256 "3f6fbaf148c7d5d333dde9879331036ed9ad8afa5df9f19eb33f65ca15875408" => :mavericks
+    sha256 "8124115dabd9703d155bfc43c2cb8cac133621e1b62e70535144adb4b72ed162" => :x86_64_linux
   end
 
   depends_on "cmake" => :build

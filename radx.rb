@@ -1,23 +1,30 @@
-require "formula"
-
 class Radx < Formula
-  homepage "http://www.ral.ucar.edu/projects/titan/docs/radial_formats/radx.html"
-  url "ftp://ftp.rap.ucar.edu/pub/titan/radx/radx-20141123.src.tgz"
-  mirror "ftp://ftp.rap.ucar.edu/pub/titan/radx/previous_releases/radx-20141123.src.tgz"
-  version "20141123"
-  sha1 "3b3899e8f927f8107d8c84596d7713ad5db2dcb5"
+  desc "Software package for radial radar data"
+  homepage "https://www.ral.ucar.edu/projects/titan/docs/radial_formats/radx.html"
+  url "https://www.eol.ucar.edu/system/files/software/radx/all-oss/radx-20160809.src_.tgz"
+  version "20160809"
+  sha256 "a071146df16b8abf926d35be4bc7d06b9204feeba8bbc8772858a7805bc5b92a"
+  revision 2
 
   bottle do
     cellar :any
-    sha1 "f84eca449e63c907234ae112883e561d4f994976" => :yosemite
-    sha1 "ed656da3a3ef58c7d8c4a087f50a30e9051c7f1f" => :mavericks
-    sha1 "e79d52832b66700b4e0b73fee0320da29313ee56" => :mountain_lion
+    sha256 "4b46d8576a9f3dffd1cfb25ad236db996290a62ec19ad41b06562638031c58b1" => :sierra
+    sha256 "2818bc7758febf6ae381077ff21c3ea7cbafaa4a835aca6440dbad3a7476d686" => :el_capitan
+    sha256 "321a724468daf88007486b781445771d0e413f617ff40ef6eb6b85d849baf63c" => :yosemite
+    sha256 "9aa201c5d1d02874841a78662c0f02bc674420b1e326535750a2902ff5ccd41a" => :x86_64_linux
   end
 
   depends_on "hdf5"
   depends_on "udunits"
   depends_on "netcdf" => "with-cxx-compat"
   depends_on "fftw"
+
+  # Prevents build failure on Mac OS X 10.8 and below
+  # FIXME: Remove when it gets fixed upstream (reported)
+  patch do
+    url "https://gist.githubusercontent.com/tomyun/ee3a910e07c9ccc4610e/raw/3b151798488c5dc7091506a25ac704dad6687e97/radx-fix-sockutil-mac.diff"
+    sha256 "19d55b7beb985a6facc75a02a92739c3a4208797eea2cbd0f2353a86c7aa90db"
+  end
 
   def install
     system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"

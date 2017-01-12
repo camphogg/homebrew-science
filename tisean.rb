@@ -1,16 +1,15 @@
-require "formula"
-
 class Tisean < Formula
+  desc "Nonlinear time series analysis"
   homepage "http://www.mpipks-dresden.mpg.de/~tisean/"
   url "http://www.mpipks-dresden.mpg.de/~tisean/TISEAN_3.0.1.tar.gz"
-  sha1 "7fe71899b063abe1b3d9aae88f153988495d623b"
-  revision 2
+  sha256 "cd6662505a2e411218f5d34ccb8bf206a6148b6c79b1cc8e4fa4dc11dfd00534"
+  revision 3
 
   bottle do
     cellar :any
-    sha256 "7f371b4adb10c1f3b9ac5899aecda52d05f5667941aa419422b8874305bfea67" => :yosemite
-    sha256 "0e67267ae5ee08fe0855d670577e02585884f6851bf8f1fa3f1d469d32f0a197" => :mavericks
-    sha256 "205942c3e368a65fdf3d255fef32bc8933fec2ba7266d93eec7b618937fdb299" => :mountain_lion
+    sha256 "5bef9892b02cb98343b500548005d7b0b7e4e67a71d9368f0a88281d561489d8" => :el_capitan
+    sha256 "6a71e792bf200692d7c69b2032ec58585508db09327413bae51ae79b541e38d8" => :yosemite
+    sha256 "af6b8c14ff739f4972b03a3053a3d221371a37434b09ffdd64e18b37bf265247" => :mavericks
   end
 
   option "without-prefixed-binaries", "Do not prefix binaries with `tisean-`"
@@ -29,7 +28,7 @@ class Tisean < Formula
           "compare", "upo", "upoembed", "cluster", "choose", "rms", "notch",
           "autocor", "spectrum", "wiener1", "wiener2", "surrogates",
           "endtoend", "timerev", "events", "intervals", "spikespec",
-          "spikeauto", "henon", "ikeda", "lorenz", "ar-run", "xrecur"]
+          "spikeauto", "henon", "ikeda", "lorenz", "ar-run", "xrecur"].freeze
 
   def install
     system "./configure", "--prefix=#{prefix}"
@@ -41,7 +40,7 @@ class Tisean < Formula
     system "make"
     system "make", "install"
     if build.with? "prefixed-binaries"
-      Tisean::BINS.each { |item| system "mv #{bin}/#{item} #{bin}/tisean-#{item}" }
+      Tisean::BINS.each { |item| mv "#{bin}/#{item}", "#{bin}/tisean-#{item}" }
     end
   end
 
@@ -55,6 +54,6 @@ class Tisean < Formula
 
   test do
     pfx = build.with?("prefixed-binaries") ? "tisean-" : ""
-    Tisean::BINS.each { |item| system "#{bin}/#{pfx}#{item} -h" }
+    Tisean::BINS.each { |item| system "#{bin}/#{pfx}#{item}", "-h" }
   end
 end

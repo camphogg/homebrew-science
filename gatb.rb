@@ -1,15 +1,18 @@
 class Gatb < Formula
+  desc "Genome Analysis Toolbox for de Bruijn graphs"
   homepage "https://gatb.inria.fr/"
   # doi "10.1093/bioinformatics/btu406"
   # tag "bioinformatics"
 
-  url "http://gatb-core.gforge.inria.fr/versions/src/gatb-core-1.0.7-Source.tar.gz"
-  version "1.0.7"
-  sha256 "790803a7a2819566bc89ee24598f9e8c4e114d7d65dc5f87d1d5b8c319f78876"
+  url "http://gatb-core.gforge.inria.fr/versions/src/gatb-core-1.1.0-Source.tar.gz"
+  version "1.1.0"
+  sha256 "d75fe178c97d85f11e3cf51bfb8ae4a6b9f864587f3762a7ca608abe48ed4a03"
 
   bottle do
-    sha256 "2d34597f4d793a15bad4d280df11cec2a9a818cf87d20f600107e00cb6ce573f" => :yosemite
-    sha256 "a9a8ae6f10923cc1ff228dfa8b12b16ae854a77a0433c0bb5421f749d25a6db8" => :mavericks
+    sha256 "9140d235a079f1159f693405494ea29bea39bd2d5ec039933da375899e49a825" => :el_capitan
+    sha256 "8381c85fa3d43831ee3991ab509211e7297b43c8f4f4df28166d71ef8d313730" => :yosemite
+    sha256 "6d8e8013b68a2bda35f0044c5272d94c99c85bae0199478690a3e13363997029" => :mavericks
+    sha256 "fd2fac2613ee332def1e987c5a104c730e062afac99929aab4aa43d58f59228e" => :x86_64_linux
   end
 
   depends_on "cmake" => :build

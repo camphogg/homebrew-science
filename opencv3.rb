@@ -1,55 +1,64 @@
+require File.expand_path("../Requirements/cuda_requirement", __FILE__)
+
 class Opencv3 < Formula
   desc "Open source computer vision library, version 3"
   homepage "http://opencv.org/"
 
   stable do
-    url "https://github.com/Itseez/opencv/archive/3.0.0.tar.gz"
-    sha256 "da51a4e459b0bcbe14fb847c4f168415f421765fb91996f42b9e1ce0575f05d5"
+    url "https://github.com/opencv/opencv/archive/3.2.0.tar.gz"
+    sha256 "b9d62dfffb8130d59d587627703d5f3e6252dce4a94c1955784998da7a39dd35"
 
     resource "contrib" do
-      url "https://github.com/Itseez/opencv_contrib/archive/3.0.0.tar.gz"
-      sha256 "8fa18564447a821318e890c7814a262506dd72aaf7721c5afcf733e413d2e12b"
+      url "https://github.com/opencv/opencv_contrib/archive/3.2.0.tar.gz"
+      sha256 "1e2bb6c9a41c602904cc7df3f8fb8f98363a88ea564f2a087240483426bf8cbe"
     end
   end
+
   bottle do
-    sha256 "52eb80230c4958f5240a16bcb9bf0930fd25a95b84b0fcbc96ec21e4f6e9bb68" => :yosemite
-    sha256 "01b822e8e75578b195c1a5edb69ceb4d16ed4e57f652505032c46bb15af3433d" => :mavericks
-    sha256 "6d7a0737b6995f22151d7b20e9cac205aaa325cd5abd365190b939fe5a3af9c3" => :mountain_lion
+    sha256 "57424663b5b7636bff5bbd99b789bebfe9cf17471fb59badb0fe7bb4938b2eda" => :sierra
+    sha256 "2c561cba408449d9381a1bb355eac0a7e1c7b671e5e20e5ba1b7edd9f44a1941" => :el_capitan
+    sha256 "97abd7941d559771293d9b002c752443413a2cf07c9813985ee7c8639a0d17eb" => :yosemite
+    sha256 "c9d09ffa7108512f9d823ff34c66e629b10af54fd7b8b7d08cf32c9b18a1a4cb" => :x86_64_linux
   end
 
-
   head do
-    url "https://github.com/Itseez/opencv.git"
+    url "https://github.com/opencv/opencv.git"
 
     resource "contrib" do
-      url "https://github.com/Itseez/opencv_contrib.git"
+      url "https://github.com/opencv/opencv_contrib.git"
     end
   end
 
   keg_only "opencv3 and opencv install many of the same files."
 
-  option "32-bit"
+  deprecated_option "without-tests" => "without-test"
+  deprecated_option "32-bit" => "with-32-bit"
+
   option "with-contrib", 'Build "extra" contributed modules'
   option "with-cuda", "Build with CUDA v7.0+ support"
+  option "with-examples", "Install C and python examples (sources)"
   option "with-java", "Build with Java support"
+  option "with-nonfree", "Enable non-free algorithms"
   option "with-opengl", "Build with OpenGL support (must use --with-qt5)"
   option "with-quicktime", "Use QuickTime for Video I/O instead of QTKit"
-  option "with-qt", "Build the Qt4 backend to HighGUI"
   option "with-qt5", "Build the Qt5 backend to HighGUI"
+  option "with-static", "Build static libraries"
   option "with-tbb", "Enable parallel code in OpenCV using Intel TBB"
   option "without-numpy", "Use a numpy you've installed yourself instead of a Homebrew-packaged numpy"
   option "without-opencl", "Disable GPU code in OpenCV using OpenCL"
   option "without-python", "Build without Python support"
-  option "without-tests", "Build without accuracy & performance tests"
+  option "without-test", "Build without accuracy & performance tests"
 
   option :cxx11
 
   depends_on :ant => :build if build.with? "java"
   depends_on "cmake" => :build
+  depends_on CudaRequirement => :optional
   depends_on "pkg-config" => :build
 
   depends_on "eigen" => :recommended
   depends_on "ffmpeg" => :optional
+  depends_on "gphoto2" => :optional
   depends_on "gstreamer" => :optional
   depends_on "gst-plugins-good" if build.with? "gstreamer"
   depends_on "jasper" => :optional
@@ -60,11 +69,12 @@ class Opencv3 < Formula
   depends_on "libtiff"
   depends_on "openexr" => :recommended
   depends_on "openni" => :optional
+  depends_on "openni2" => :optional
   depends_on :python => :recommended unless OS.mac? && MacOS.version > :snow_leopard
   depends_on :python3 => :optional
-  depends_on "qt" => :optional
   depends_on "qt5" => :optional
   depends_on "tbb" => :optional
+  depends_on "vtk" => :optional
 
   with_python = build.with?("python") || build.with?("python3")
   pythons = build.with?("python3") ? ["with-python3"] : []
@@ -74,13 +84,13 @@ class Opencv3 < Formula
   cxxstdlib_check :skip
 
   resource "icv-macosx" do
-    url "https://downloads.sourceforge.net/project/opencvlibrary/3rdparty/ippicv/ippicv_macosx_20141027.tgz", :using => :nounzip
-    sha256 "07e9ae595154f1616c6c3e33af38695e2f1b0c99c925b8bd3618aadf00cd24cb"
+    url "https://raw.githubusercontent.com/opencv/opencv_3rdparty/81a676001ca8075ada498583e4166079e5744668/ippicv/ippicv_macosx_20151201.tgz", :using => :nounzip
+    sha256 "8a067e3e026195ea3ee5cda836f25231abb95b82b7aa25f0d585dc27b06c3630"
   end
 
   resource "icv-linux" do
-    url "https://downloads.sourceforge.net/project/opencvlibrary/3rdparty/ippicv/ippicv_linux_20141027.tgz", :using => :nounzip
-    sha256 "a5669b0e3b500ee813c18effe1de2477ef44af59422cf7f8862a360f3f821d80"
+    url "https://raw.githubusercontent.com/opencv/opencv_3rdparty/81a676001ca8075ada498583e4166079e5744668/ippicv/ippicv_linux_20151201.tgz", :using => :nounzip
+    sha256 "4333833e40afaa22c804169e44f9a63e357e21476b765a5683bcb3760107f0da"
   end
 
   def arg_switch(opt)
@@ -91,7 +101,7 @@ class Opencv3 < Formula
     ENV.cxx11 if build.cxx11?
     jpeg = Formula["jpeg"]
     dylib = OS.mac? ? "dylib" : "so"
-    with_qt = build.with?("qt") || build.with?("qt5")
+    with_qt = build.with?("qt5")
 
     args = std_cmake_args + %W[
       -DBUILD_JASPER=OFF
@@ -111,6 +121,7 @@ class Opencv3 < Formula
     args << "-DWITH_1394=" + arg_switch("libdc1394")
     args << "-DWITH_EIGEN=" + arg_switch("eigen")
     args << "-DWITH_FFMPEG=" + arg_switch("ffmpeg")
+    args << "-DWITH_GPHOTO2=" + arg_switch("gphoto2")
     args << "-DWITH_GSTREAMER=" + arg_switch("gstreamer")
     args << "-DWITH_JASPER=" + arg_switch("jasper")
     args << "-DWITH_OPENEXR=" + arg_switch("openexr")
@@ -118,6 +129,7 @@ class Opencv3 < Formula
     args << "-DWITH_QUICKTIME=" + arg_switch("quicktime")
     args << "-DWITH_QT=" + (with_qt ? "ON" : "OFF")
     args << "-DWITH_TBB=" + arg_switch("tbb")
+    args << "-DWITH_VTK=" + arg_switch("vtk")
 
     if build.include? "32-bit"
       args << "-DCMAKE_OSX_ARCHITECTURES=i386"
@@ -137,6 +149,17 @@ class Opencv3 < Formula
       args << "-DOPENCV_EXTRA_MODULES_PATH=#{buildpath}/opencv_contrib/modules"
     end
 
+    if build.with? "examples"
+      args << "-DINSTALL_C_EXAMPLES=ON"
+      args << "-DINSTALL_PYTHON_EXAMPLES=ON"
+    end
+
+    if build.with? "nonfree"
+      resource("contrib").stage buildpath/"opencv_contrib"
+      args << "-DOPENCV_EXTRA_MODULES_PATH=#{buildpath}/opencv_contrib/modules"
+      args << "-DOPENCV_ENABLE_NONFREE=ON"
+    end
+
     # OpenCL 1.1 is required, but Snow Leopard and older come with 1.0
     args << "-DWITH_OPENCL=OFF" if build.without?("opencl") || MacOS.version < :lion
 
@@ -145,13 +168,19 @@ class Opencv3 < Formula
       # Set proper path for Homebrew's openni
       inreplace "cmake/OpenCVFindOpenNI.cmake" do |s|
         s.gsub! "/usr/include/ni", "#{Formula["openni"].opt_include}/ni"
-        s.gsub! "/usr/lib", "#{Formula["openni"].opt_lib}"
+        s.gsub! "/usr/lib", Formula["openni"].opt_lib
       end
+    end
+
+    if build.with? "openni2"
+      args << "-DWITH_OPENNI2=ON"
+      ENV["OPENNI2_INCLUDE"] ||= "#{Formula["openni2"].opt_include}/ni2"
+      ENV["OPENNI2_REDIST"] ||= "#{Formula["openni2"].opt_lib}/ni2"
     end
 
     if build.with? "python"
       py_prefix = `python-config --prefix`.chomp
-      py_lib = OS.linux? ? `python-config --configdir`.chomp : "#{py_prefix}/lib"
+      py_lib = "#{py_prefix}/lib"
       args << "-DPYTHON2_EXECUTABLE=#{which "python"}"
       args << "-DPYTHON2_LIBRARY=#{py_lib}/libpython2.7.#{dylib}"
       args << "-DPYTHON2_INCLUDE_DIR=#{py_prefix}/include/python2.7"
@@ -164,6 +193,8 @@ class Opencv3 < Formula
       args << "-DPYTHON3_LIBRARY=#{py3_config}/libpython#{py3_version}.#{dylib}"
       args << "-DPYTHON3_INCLUDE_DIR=#{py3_include}"
     end
+
+    args << "-DBUILD_SHARED_LIBS=OFF" if build.with?("static")
 
     if ENV.compiler == :clang && !build.bottle?
       args << "-DENABLE_SSSE3=ON" if Hardware::CPU.ssse3?
@@ -197,5 +228,8 @@ class Opencv3 < Formula
     EOS
     system ENV.cxx, "test.cpp", "-I#{include}", "-L#{lib}", "-o", "test"
     assert_equal `./test`.strip, version.to_s
+
+    ENV["PYTHONPATH"] = lib/"python2.7/site-packages"
+    assert_match version.to_s, shell_output("python -c 'import cv2; print(cv2.__version__)'")
   end
 end

@@ -1,16 +1,22 @@
 class Nfft < Formula
+  desc "Nonequispaced fast Fourier transform"
   homepage "http://www-user.tu-chemnitz.de/~potts/nfft"
   url "http://www-user.tu-chemnitz.de/~potts/nfft/download/nfft-3.2.3.tar.gz"
-  sha1 "9338cb0afbd5f4ddaf2bc5f9be5329ad61dc2ded"
+  sha256 "5c920f4be63230083756f36ad78bbdd083c4c2298ec361741dc74243c4d67818"
 
   bottle do
     cellar :any
-    sha1 "b784629c946fc3d4478ae58cd731a26805226a00" => :yosemite
-    sha1 "e5803723bb732944c9b3806f4cebb58a8a8d6244" => :mavericks
-    sha1 "59a64fa0b99b9dfe8f368a35dc77dde51df0abfb" => :mountain_lion
+    rebuild 1
+    sha256 "84139f9d6ff8086294af900a96c0127c7622505da1545284017d5e7d0b34c84c" => :sierra
+    sha256 "fb20ea3b10936307e4941509a097c78db2bb51e79d590f0a1002ee52cf1a9a6a" => :el_capitan
+    sha256 "e7693f10ebff1091b248bf432165f9931cfa3086f1cdc4c6145b5025e621faa4" => :yosemite
   end
 
+  option "with-openmp", "Enable OpenMP multithreading"
+
   depends_on "fftw"
+
+  needs :openmp if build.with? "openmp"
 
   fails_with :clang do
     build 425
@@ -19,14 +25,34 @@ class Nfft < Formula
 
   def install
     args = %W[--disable-debug --disable-dependency-tracking --prefix=#{prefix}]
-    if ENV.compiler == :clang
-      opoo "Clang does not support OpenMP. Compile with gcc (--cc=gcc-x.y) if this is not acceptable."
-    else
-      args << "--enable-openmp"
-    end
+    args << "--enable-openmp" if build.with? "openmp"
     system "./configure", *args
     system "make", "install"
     system "make", "check"
+  end
+
+  def caveats
+    <<-EOS.undent
+    NFFT is built as serial (not multi-threaded) library by default
+    when being built with clang, as this compiler doesn't support
+    OpenMP.
+
+    A multi-threaded version of the NFFT library can be build with
+    Homebrew's GNU C compiler, using
+
+      brew install nfft --with-openmp
+
+    which will create both serial and multi-threaded NFFT libraries.
+
+    Linking against the serial libraries:
+
+       ... -L#{opt_lib} -lnfft -lfftw3 ...
+
+    Linking against the multi-threaded libraries (if built):
+
+       ... -L#{opt_lib} -lnfft_threads -lfftw3_threads ...
+
+    EOS
   end
 
   test do
@@ -46,29 +72,5 @@ class Nfft < Formula
     EOS
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lnfft3", "-o", "test"
     system "./test"
-  end
-
-  def caveats
-    <<-EOS.undent
-    NFFT is built as serial (not multi-threaded) library by default
-    when being built with clang, as this compiler doesn't support
-    OpenMP.
-
-    A multi-threaded version of the NFFT library can be build with
-    Homebrew's GNU C compiler, using
-
-      brew install --cc=gcc-x.y nfft
-
-    which will create both serial and multi-threaded NFFT libraries.
-
-    Linking against the serial libraries:
-
-       ... -L#{opt_lib} -lnfft -lfftw3 ...
-
-    Linking against the multi-threaded libraries (if built):
-
-       ... -L#{opt_lib} -lnfft_threads -lfftw3_threads ...
-
-    EOS
   end
 end

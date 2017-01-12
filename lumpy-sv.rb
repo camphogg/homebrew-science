@@ -1,15 +1,17 @@
 class LumpySv < Formula
   homepage "https://github.com/arq5x/lumpy-sv"
-  url "https://github.com/arq5x/lumpy-sv/releases/download/0.2.11/lumpy-sv-0.2.11.tar.gz"
+  url "https://github.com/arq5x/lumpy-sv/archive/0.2.11.tar.gz"
   sha256 "ce2d8d6353cbce1c83a0aaa25a5bd9238f0ebaa8253b873b01bd446290e54379"
   # doi "10.1186/gb-2014-15-6-r84"
   # tag "bioinformatics"
 
   bottle do
-    cellar :any
-    sha256 "fd9aede7dbebd6ce2f637021cab59eca573672c97aab708400590544d587cb9c" => :yosemite
-    sha256 "abf2c320127023a5d4b578cfb36bd5af654804c58e9eb09b9caee652be419316" => :mavericks
-    sha256 "3788bd3abbbd508a5b44e2df6306cbf6d5b090a6b508077596ed73da7ffacb83" => :mountain_lion
+    cellar :any_skip_relocation
+    revision 1
+    sha256 "1f571d7d8757b2daadb579f6de1c450b55ccded198ff839eb3cb666706c93113" => :el_capitan
+    sha256 "47909b1938634e7649094958d04ca3e9253d62ec75d75cdb4ed02a54d9777d6f" => :yosemite
+    sha256 "2c7698685d3a58d1c594bc1b318b18f864af2c7d5969440c5a03978107761d04" => :mavericks
+    sha256 "eb106f5abe0c4940959cf6746e55ccad69c138d61dcf31aef933776cb09a2b4b" => :x86_64_linux
   end
 
   depends_on "samblaster" => :optional

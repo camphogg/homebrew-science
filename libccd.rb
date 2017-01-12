@@ -1,27 +1,26 @@
-require 'formula'
-
 class Libccd < Formula
-  homepage 'http://libccd.danfis.cz'
-  url 'http://libccd.danfis.cz/files/libccd-2.0.tar.gz'
-  sha1 'f6ab9053c7f3b18a781c8be973c1844c4421936a'
-  head 'https://github.com/danfis/libccd.git'
+  homepage "http://libccd.danfis.cz"
+  url "https://github.com/danfis/libccd/archive/v2.0.tar.gz"
+  sha256 "1b4997e361c79262cf1fe5e1a3bf0789c9447d60b8ae2c1f945693ad574f9471"
+  head "https://github.com/danfis/libccd.git"
+  revision 1
 
   bottle do
     cellar :any
-    sha1 "e75db5205d2a92cf32f26f6a8ab554e80ef583ef" => :yosemite
-    sha1 "4b51107e036d27f9613bfce599a3a7e0d521ec52" => :mavericks
-    sha1 "2f422e63317729ff3fc34e06f02278c0d955e204" => :mountain_lion
+    sha256 "d23aeb24c111b74c1fa0bd0baddecdae3cf47e8e1a4c90e84373f7d5f2ef5ffe" => :el_capitan
+    sha256 "336624be19dfcd178a5ca2aaaeaf2ac959c50cb3acd2e5239a00d204a232b553" => :yosemite
+    sha256 "9ad6f74a1906d1bbfbc9730a48736f453d016464c977432d0101ae4bc357bc93" => :mavericks
   end
 
-  depends_on 'cmake' => :build
+  depends_on "cmake" => :build
 
   def install
     system "cmake", ".", *std_cmake_args
-    system "make install"
+    system "make", "install"
   end
 
   test do
-    (testpath/'test.c').write <<-EOS.undent
+    (testpath/"test.c").write <<-EOS.undent
       #include <ccd/vec3.h>
       int main() {
         ccdVec3PointSegmentDist2(

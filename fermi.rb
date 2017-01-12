@@ -4,13 +4,14 @@ class Fermi < Formula
   # tag "bioinformatics"
 
   url "https://github.com/lh3/fermi/archive/1.1.tar.gz"
-  sha1 "95d9a78df345def9ac781be0485b5c7680e0ad04"
+  sha256 "0597d82376ddcc76ad6e3a2552300bdc5315a172e8b22d3ada9e68e8bfeb1bc8"
   head "https://github.com/lh3/fermi.git"
 
   bottle do
     cellar :any
-    sha1 "16c506171d368f987101a2c359db1531afb3e882" => :yosemite
-    sha1 "4ba4cd1501553930efcddd24d14ce84656f34569" => :mavericks
+    sha256 "4ad67cf62a8e1a20ab3fe935ed5646d233c0e23e88d590d6f95232784709e5c5" => :yosemite
+    sha256 "a2240c62dc918a11afd442021f88486f0c95a54767474e791a7cbde6485cf827" => :mavericks
+    sha256 "ea9409a0e5dca458b0f9f93bb6bbe35179b75341799331222941b76ee436ed65" => :x86_64_linux
   end
 
   def install

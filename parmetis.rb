@@ -1,15 +1,15 @@
 class Parmetis < Formula
-  homepage "http://glaros.dtc.umn.edu/gkhome/metis/parmetis/overview"
   desc "MPI-based library for graph/mesh partitioning and computing fill-reducing orderings"
+  homepage "http://glaros.dtc.umn.edu/gkhome/metis/parmetis/overview"
   url "http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/parmetis-4.0.3.tar.gz"
-  sha1 "e0df69b037dd43569d4e40076401498ee5aba264"
+  sha256 "f2d9a231b7cf97f1fee6e8c9663113ebf6c240d407d3c118c55b3633d6be6e5f"
+  revision 4
 
   bottle do
     cellar :any
-    revision 2
-    sha256 "98818f2f53c82461dd816b6b86cd569d05ba1d341c470d4948195397a9b1f7a1" => :yosemite
-    sha256 "adacf5ac72bed2a487598817eaac83f854d47f5d7163bc00f2b070aeb71c3959" => :mavericks
-    sha256 "f5a81fe89fbdddcc211dad3cee285af03cfd7e022f46ac2e00993a87c8e97e5e" => :mountain_lion
+    sha256 "d54a239c0e9a43c283a44c5de26bf743232228385c0cc9fc451214c1aca555a0" => :el_capitan
+    sha256 "a74338aed08dfa66560d6a69c9d029998e84929571798866b0573948995d9056" => :yosemite
+    sha256 "7e5d864a99fb917bb9c0b6cdd942bf494e0a156d4ddb7d22f51119c53b691206" => :mavericks
   end
 
   # METIS 5.* is required. It comes bundled with ParMETIS.
@@ -22,16 +22,30 @@ class Parmetis < Formula
   # Do not build the METIS 5.* that ships with ParMETIS.
   patch :DATA
 
+  # Bug fixes from PETSc developers. Mirrored because the SHA-256s get
+  # invalidated every time Bitbucket updates the Git version they use.
+  patch do
+    # From: https://bitbucket.org/petsc/pkg-parmetis/commits/82409d68aa1d6cbc70740d0f35024aae17f7d5cb/raw/
+    url "https://raw.githubusercontent.com/Homebrew/patches/f104fbb1e09402798cbbc06d2f695d85398c0c89/parmetis/commit-82409d68.patch"
+    sha256 "0349f5bc19a2ba9fe9e1b9d385072dabe59262522bd7cf66f26c6bc31bbb1b86"
+  end
+
+  patch do
+    # From: https://bitbucket.org/petsc/pkg-parmetis/commits/1c1a9fd0f408dc4d42c57f5c3ee6ace411eb222b/raw/
+    url "https://raw.githubusercontent.com/Homebrew/patches/f104fbb1e09402798cbbc06d2f695d85398c0c89/parmetis/commit-1c1a9fd0.patch"
+    sha256 "baec5e1fa6bb4f6c59e3ede564485e0ad743f58c9875fd65cb715b5c14a491b5"
+  end
+
   def install
     ENV["LDFLAGS"] = "-L#{Formula["metis"].lib} -lmetis -lm"
 
     system "make", "config", "prefix=#{prefix}", "shared=1"
     system "make", "install"
-    (share/"parmetis").install "Graphs" # Sample data for test
+    pkgshare.install "Graphs" # Sample data for test
   end
 
   test do
-    system "mpirun", "-np", "4", "#{bin}/ptest", "#{share}/parmetis/Graphs/rotor.graph"
+    system "mpirun", "-np", "4", "#{bin}/ptest", "#{pkgshare}/Graphs/rotor.graph"
     ohai "Test results are in ~/Library/Logs/Homebrew/parmetis."
   end
 end
@@ -50,3 +64,17 @@ index ca945dd..1bf94e9 100644
  add_subdirectory(include)
  add_subdirectory(libparmetis)
  add_subdirectory(programs)
+
+diff --git a/libparmetis/CMakeLists.txt b/libparmetis/CMakeLists.txt
+index 9cfc8a7..dfc0125 100644
+--- a/libparmetis/CMakeLists.txt
++++ b/libparmetis/CMakeLists.txt
+@@ -5,7 +5,7 @@ file(GLOB parmetis_sources *.c)
+ # Create libparmetis
+ add_library(parmetis ${ParMETIS_LIBRARY_TYPE} ${parmetis_sources})
+ # Link with metis and MPI libraries.
+-target_link_libraries(parmetis metis ${MPI_LIBRARIES})
++target_link_libraries(parmetis metis ${MPI_LIBRARIES} "-lm")
+ set_target_properties(parmetis PROPERTIES LINK_FLAGS "${MPI_LINK_FLAGS}")
+
+ install(TARGETS parmetis

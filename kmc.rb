@@ -1,17 +1,18 @@
 class Kmc < Formula
+  desc "Fast and frugal disk based k-mer counter"
   homepage "http://sun.aei.polsl.pl/kmc/"
   # doi "10.1093/bioinformatics/btv022"
   # tag "bioinformatics"
 
-  url "https://github.com/marekkokot/KMC/archive/2.1.1.tar.gz"
-  sha1 "4e02620f4afc034d99b7d8bed41ba02fc71c291f"
+  url "https://github.com/marekkokot/KMC/archive/2.3.tar.gz"
+  sha256 "829fd983db883f09c07e533292e0452d79256a76b5dc9ca2be2392368358eafe"
 
   head "https://github.com/marekkokot/KMC.git"
 
   bottle do
-    sha1 "372e4be330575a56c2fcf97b3b687d6a52921d2f" => :yosemite
-    sha1 "7875e23b857d2517090bfef5ee7db7c454d2d0e9" => :mavericks
-    sha1 "e6c87b894020a6f386d18828c494832ca7a0b6db" => :mountain_lion
+    sha256 "b032543b37c84dabd62521956aa089d00cceee494644cc7b587ad9bc22b7db8e" => :el_capitan
+    sha256 "4b7ba0f11a574487234c5774e6852543aa99e6f0583f1ad3fc29b1a5f6a1fe0b" => :yosemite
+    sha256 "c43b05feeea4b221e0de1fa9b48d760315013d20f8d73d47bb6ba8e66ffa3ecd" => :mavericks
   end
 
   fails_with :clang do

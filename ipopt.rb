@@ -1,19 +1,22 @@
 class Ipopt < Formula
+  desc "Large-scale nonlinear optimization package"
   homepage "https://projects.coin-or.org/Ipopt"
-  url "http://www.coin-or.org/download/source/Ipopt/Ipopt-3.12.1.tgz"
-  sha1 "cbb197f6a90e0e1d64e438a5159da5f33f06aa08"
+  url "http://www.coin-or.org/download/source/Ipopt/Ipopt-3.12.5.tgz"
+  sha256 "53e7af6eefcb6de1f8e936c9c887c7bcb5a9fa4fcf7673a227f16de131147325"
   head "https://projects.coin-or.org/svn/Ipopt/trunk", :using => :svn
-  revision 3
+  revision 1
 
   bottle do
-    sha256 "129d9e418612d9771f509d1c3c7c349fc23e6ca9955ee2af6a38456660a4690d" => :yosemite
-    sha256 "afa33eb1ac04988d72eb0a01874df8aaf4c0b394efee678457b672bab69910c1" => :mavericks
-    sha256 "f705d7a6a0f743a1618baa28754d4edd44bba3ddd76d675f8f3118745157cdc9" => :mountain_lion
+    cellar :any
+    sha256 "8fd21f3fc02a89b05de121fde1ad91f8cc2ee333e2256008837d8581e7fe9840" => :sierra
+    sha256 "a1de12618e1de406317bea05c6a848373b764b3b10d4c294c660a5fde2f10cef" => :el_capitan
+    sha256 "511d4fdf8a74bfffc83adecacf42869c0831274283a94fd30bf27a7606b2247b" => :yosemite
   end
 
-  option "without-check", "Skip build-time tests (not recommended)"
+  option "without-test", "Skip build-time tests (not recommended)"
+  deprecated_option "without-check" => "without-test"
 
-  depends_on "asl" => :recommended
+  depends_on "ampl-mp" => :recommended
   depends_on "openblas" => :optional
   depends_on "pkg-config" => :build
 
@@ -45,21 +48,20 @@ class Ipopt < Formula
       args << "--with-lapack-lib=-L#{Formula["openblas"].opt_lib} -lopenblas"
     end
 
-    if build.with? "asl"
-      args << "--with-asl-incdir=#{Formula["asl"].opt_include}/asl"
-      args << "--with-asl-lib=-L#{Formula["asl"].opt_lib} -lasl"
+    if build.with? "ampl-mp"
+      args << "--with-asl-incdir=#{Formula["ampl-mp"].opt_include}/asl"
+      args << "--with-asl-lib=-L#{Formula["ampl-mp"].opt_lib} -lasl"
     end
 
     system "./configure", *args
     system "make"
     ENV.deparallelize # Needs a serialized install
-    system "make", "test" if build.with? "check"
+    system "make", "test" if build.with? "test"
     system "make", "install"
   end
 
   test do
     # IPOPT still fails to converge on the Waechter-Biegler problem?!?!
-    system "#{bin}/ipopt", "#{Formula["asl"].opt_share}/asl/example/examples/wb" if build.with? "asl"
+    system "#{bin}/ipopt", "#{Formula["ampl-mp"].opt_pkgshare}/example/examples/wb" if build.with? "ampl-mp"
   end
 end
-

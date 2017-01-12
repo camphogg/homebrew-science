@@ -1,15 +1,18 @@
 class Ncl < Formula
+  desc "A C++ library for parsing NEXUS files"
   homepage "http://ncl.sourceforge.net/"
-  #doi "10.1093/bioinformatics/btg319"
-  #tag "bioinformatics"
-
+  # doi "10.1093/bioinformatics/btg319"
+  # tag "bioinformatics"
   url "https://downloads.sourceforge.net/project/ncl/NCL/ncl-2.1.18/ncl-2.1.18.tar.gz"
-  sha1 "54e4f1ff4fef52cfd633b467a839e57a2670a397"
+  sha256 "6e792ede614f6969a0cd342fea1505b4ea3e3e4c0f50a1c0c16a3af67bfe9737"
 
   bottle do
-    sha1 "b947e17defc2915c7b8eb80727c5105e33a97a4c" => :yosemite
-    sha1 "78b8bced22543506a48bba1ab2d86b72263c2d06" => :mavericks
-    sha1 "f20283932a9b76677fe96f97e8d34b2238da8c8b" => :mountain_lion
+    cellar :any
+    revision 1
+    sha256 "ae9815430b8e5f3f13f15aa7a7721cded1418983207f19f6e42d39ee0fa732e3" => :yosemite
+    sha256 "ce0281513cf22d3c6dd7e419ced8f672fd649bb32ca57ed6de5872b292c8ddea" => :mavericks
+    sha256 "f800df10f205f1fe880877e18bcd7dee1c383b9e7b071f62484ea3c14404fb69" => :mountain_lion
+    sha256 "8f7d6a553123a642483c967fa5d18e929037a2f0c5167276dc2dc6a03c03f766" => :x86_64_linux
   end
 
   def install
@@ -22,11 +25,11 @@ class Ncl < Formula
     system "make", "check"
     system "make", "install"
 
-    share.install "data", "example", "test"
+    pkgshare.install "data", "example", "test"
   end
 
   test do
-    cp "#{share}/data/sample.tre", "."
+    cp "#{pkgshare}/data/sample.tre", "."
     system "#{bin}/NCLconverter", "sample.tre"
     assert File.exist?("out.xml")
   end

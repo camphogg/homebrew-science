@@ -1,18 +1,17 @@
-require "formula"
-
 class Cegma < Formula
+  desc "Core eukaryotic genes mapping approach"
   homepage "http://korflab.ucdavis.edu/datasets/cegma/"
-  #doi "10.1093/bioinformatics/btm071"
-  #tag "bioinformatics"
+  # doi "10.1093/bioinformatics/btm071"
+  # tag "bioinformatics"
 
-  url "http://korflab.ucdavis.edu/datasets/cegma/cegma_v2.4.010312.tar.gz"
-  sha1 "4c046fe0376d69f6969a32af3481c60088306b9b"
+  url "http://korflab.ucdavis.edu/datasets/cegma/CEGMA_v2.5.tar.gz"
+  sha256 "dd7381c0402622645404ea009c66e54f7c915d8b80a16e02b8e17ccdc1859e76"
 
   bottle do
-    cellar :any
-    sha1 "05109e3eb93ebe55011ffa94350082a4b7894e8c" => :yosemite
-    sha1 "eee84e57db04c733be24fe0e910828fc861b60c4" => :mavericks
-    sha1 "0db56c758491ba137490d0d45afcd82a3e17602e" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "c0953276f654ad3f2696fd7ddb3c33fa6a61d6765b4b6ac4aae694618fb9a32b" => :el_capitan
+    sha256 "48c10c321a8868e69dd06bef16e48c41d5db331fd2ea460866d3a04770a56259" => :yosemite
+    sha256 "2a827211542d44535a0b1525474e3cee46b950bc12c5f82932e4b84b0384e58f" => :mavericks
   end
 
   depends_on "blast"
@@ -26,8 +25,8 @@ class Cegma < Formula
     system "make", "install", "INSTALLDIR=#{libexec/"bin"}"
     (lib/"perl5/site_perl").install Dir["lib/*.pm"]
     libexec.install "data"
-    doc.install "README"
     bin.install_symlink "../libexec/bin/cegma"
+    prefix.install "release_notes.md"
   end
 
   def caveats; <<-EOS.undent
@@ -38,6 +37,7 @@ class Cegma < Formula
   end
 
   test do
-    system "#{bin}/cegma --help 2>&1 |grep -q cegma"
+    ENV.prepend_path "PERL5LIB", lib/"perl5/site_perl"
+    assert_match version.to_s, shell_output("#{bin}/cegma --help", 1)
   end
 end

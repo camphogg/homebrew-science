@@ -1,16 +1,17 @@
 class Corset < Formula
-  homepage "https://code.google.com/p/corset-project/"
-  #doi "10.1186/s13059-014-0410-6"
-  #tag "bioinformatics"
+  desc "Clusters de novo assembled transcripts and counts overlapping reads"
+  homepage "https://github.com/Oshlack/Corset/wiki"
+  # doi "10.1186/s13059-014-0410-6"
+  # tag "bioinformatics"
 
-  url "https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.04.tar.gz"
-  sha1 "730322d7b8c229a01edf7b0c0ad4acc11a014959"
+  url "https://github.com/Oshlack/Corset/archive/version-1.05.tar.gz"
+  sha256 "a4902035ad58e9a5896fe1951de83c3d6b64759919589ecc27cf714c6acfc487"
 
   bottle do
-    cellar :any
-    sha1 "595de71a818accd8ba9ea1733919a2c1accb7f2a" => :yosemite
-    sha1 "febb53baec4b65caed6bea4f73775207f390b0fe" => :mavericks
-    sha1 "2e37f1e46e0c0e1e37b7180487759cfe2f719870" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "67000ee4879523d782b8a57ec94772a863dae25fd6c29fe573cfc9c1be5c8be1" => :el_capitan
+    sha256 "ee530d4840361f257f7206097d995c04fa8745348e1999628582b9d54b86c80f" => :yosemite
+    sha256 "f6a43255fa86b7cb67ddd6abd614f05c349a3043225f81cfed1edfeae99ae818" => :mavericks
   end
 
   depends_on "samtools"

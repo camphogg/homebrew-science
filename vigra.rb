@@ -1,14 +1,21 @@
-require 'formula'
-
 class Vigra < Formula
-  homepage 'http://hci.iwr.uni-heidelberg.de/vigra/'
-  url 'https://github.com/ukoethe/vigra/releases/download/Version-1-10-0/vigra-1.10.0-src-with-docu.tar.gz'
-  sha1 '0a882bc09f5a6ec1f8381ff571020259eb88ee67'
-  head 'https://github.com/ukoethe/vigra.git'
-  revision 1
+  desc "Image processing and analysis library"
+  homepage "https://ukoethe.github.io/vigra/"
+  url "https://github.com/ukoethe/vigra/releases/download/Version-1-11-0/vigra-1.11.0-src.tar.gz"
+  sha256 "68617de347eae7d4700a8f66cd59ce31d6cd92ffb4a235b4df34c688673af5cb"
+  head "https://github.com/ukoethe/vigra.git"
+
+  bottle do
+    cellar :any
+    sha256 "3aa7a33ae3f131a46afacb98ed935aca16a8b8d220c2aa5357f34f9c00e3ada6" => :sierra
+    sha256 "68b480cd2c1cae02beac2cb0ac66f7a06cc5d1904e2d847be8140f7af4b00031" => :el_capitan
+    sha256 "4b61b3e25a1a0d8196474e1778d3eb38df6e67f3ef363f9e21c73a5548757062" => :yosemite
+  end
 
   option :cxx11
-  option "without-check", "skip tests"
+  option "without-test", "skip tests"
+
+  deprecated_option "without-check" => "without-test"
 
   depends_on :python => :optional
   depends_on "numpy" => :python if build.with? :python
@@ -41,7 +48,7 @@ class Vigra < Formula
     mkdir "build" do
       system "cmake", "..", *cmake_args
       system "make"
-      system "make", "check" if build.with? "check"
+      system "make", "check" if build.with? "test"
       system "make", "install"
     end
   end
@@ -50,12 +57,12 @@ class Vigra < Formula
     s = ""
     libtiff = Formula["libtiff"]
     libtiff_cxx11 = Tab.for_formula(libtiff).cxx11?
-    if (build.cxx11? and not libtiff_cxx11) or (libtiff_cxx11 and not build.cxx11?)
+    if (build.cxx11? && !libtiff_cxx11) || (libtiff_cxx11 && !build.cxx11?)
       s += <<-EOS.undent
       The Homebrew warning about libtiff not being built with the C++11
       standard may be safely ignored as Vigra only relies on C API of libtiff.
       EOS
     end
-    return s
+    s
   end
 end

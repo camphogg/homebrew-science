@@ -1,16 +1,20 @@
 class GraphTool < Formula
+  desc "efficient network analysis"
   homepage "http://graph-tool.skewed.de/"
-  url "http://downloads.skewed.de/graph-tool/graph-tool-2.2.44.tar.bz2"
-  sha256 "42b97c24c155ddd95c79a16b4e3cb034cb3139e912c37aed66e6493e4ff20566"
+
+  stable do
+    url "https://downloads.skewed.de/graph-tool/graph-tool-2.19.tar.bz2"
+    sha256 "eba1090f94b0434890beedaf0c100dd0fc77e41ebfe29b4725d76cadb82099af"
+  end
 
   bottle do
-    sha256 "8d9ec4a8eff050f3eb65c66318e1a74d9ba2e68185f393f59a5577bb6e2325b0" => :yosemite
-    sha256 "9e9b87d27858a52dce599d2f6956072a4c68d8853b182ecb1b4fe143c718311e" => :mavericks
-    sha256 "713daa0e2ec965e6cde55bc4086d94c3bd1a051ba800cb3eee0588c6310af167" => :mountain_lion
+    sha256 "548cec02e9b37106c208c85f16e906ce3cc60a81b47eda960eff53515140651f" => :sierra
+    sha256 "aae2cca7b0edaec413d5de47b3d4167cea96bab364da051a0d07b33ee9de3315" => :el_capitan
+    sha256 "6a434696db83d434f244e2f50606c953d60af4a8c4a2ea7c741fb20765397a7f" => :yosemite
   end
 
   head do
-    url "https://github.com/count0/graph-tool.git"
+    url "https://git.skewed.de/count0/graph-tool.git"
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
@@ -22,18 +26,20 @@ class GraphTool < Formula
   option "without-numpy", "Use a numpy you've installed yourself instead of a Homebrew-packaged numpy"
   option "without-python", "Build without python2 support"
   option "without-scipy", "Use a scipy you've installed yourself instead of a Homebrew-packaged scipy"
+  option "with-openmp", "Enable OpenMP multithreading"
 
   cxx11 = MacOS.version < :mavericks ? ["c++11"] : []
+
+  depends_on :python3 => :optional
   with_pythons = build.with?("python3") ? ["with-python3"] : []
 
   depends_on "pkg-config" => :build
   depends_on "boost" => cxx11
   depends_on "boost-python" => cxx11 + with_pythons
-  depends_on "cairomm" => cxx11 if build.with? "cairo"
+  depends_on "cairomm" if build.with? "cairo"
   depends_on "cgal" => cxx11
   depends_on "google-sparsehash" => cxx11 + [:recommended]
   depends_on "gtk+3" => :recommended
-  depends_on :python3 => :optional
 
   depends_on "homebrew/python/numpy" => [:recommended] + with_pythons
   depends_on "homebrew/python/scipy" => [:recommended] + with_pythons
@@ -50,20 +56,47 @@ class GraphTool < Formula
     depends_on "pygobject3" => with_pythons
   end
 
+  # We need a compiler with C++14 support.
+  fails_with :llvm
+
+  fails_with :clang do
+    cause "Older versions of clang have buggy c++14 support."
+    build 699
+  end
+
+  fails_with :gcc => "4.8" do
+    cause "We need GCC 5.0 or above for sufficient c++14 support"
+  end
+  fails_with :gcc => "4.9" do
+    cause "We need GCC 5.0 or above for sufficient c++14 support"
+  end
+
+  if MacOS.version == :mavericks
+    fails_with :gcc => "6" do
+      cause "GCC 6 fails with 'Internal compiler error' on Mavericks. You should install GCC 5 instead with 'brew tap homebrew/versions; brew install gcc5"
+    end
+  end
+
+  needs :openmp if build.with? "openmp"
+
   def install
-    ENV.cxx11
+    if MacOS.version == :mavericks && (Tab.for_name("boost").stdlib == "libcxx" || Tab.for_name("boost-python").stdlib == "libcxx")
+      odie "boost and boost-python must be built against libstdc++ on Mavericks. One way to achieve this, is to use GCC to compile both libraries."
+    end
 
     system "./autogen.sh" if build.head?
 
     config_args = %W[
       --disable-debug
       --disable-dependency-tracking
-      --disable-optimization
       --prefix=#{prefix}
     ]
 
+    # fix issue with boost + gcc with C++11/C++14
+    ENV.append "CXXFLAGS", "-fext-numeric-literals" unless ENV.compiler == :clang
     config_args << "--disable-cairo" if build.without? "cairo"
     config_args << "--disable-sparsehash" if build.without? "google-sparsehash"
+    config_args << "--enable-openmp" if build.with? "openmp"
 
     Language::Python.each_python(build) do |python, version|
       config_args_x = ["PYTHON=#{python}"]
@@ -75,6 +108,7 @@ class GraphTool < Formula
 
       if python == "python3"
         inreplace "configure", "libboost_python", "libboost_python3"
+        inreplace "configure", "ax_python_lib=boost_python", "ax_python_lib=boost_python3"
       end
 
       mkdir "build-#{python}-#{version}" do

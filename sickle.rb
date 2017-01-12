@@ -3,14 +3,15 @@ class Sickle < Formula
   # tag "bioinformatics
 
   url "https://github.com/najoshi/sickle/archive/v1.33.tar.gz"
-  sha1 "593274fb7e12a52c9086dff69623aedca1799a5c"
+  sha256 "eab271d25dc799e2ce67c25626128f8f8ed65e3cd68e799479bba20964624734"
   head "https://github.com/najoshi/sickle.git"
 
   bottle do
     cellar :any
-    sha1 "ffaaf08bc55e6d79972208a64c44c125f60a6539" => :yosemite
-    sha1 "8d94809d5e0068715169dd71c2681608a5ff82b8" => :mavericks
-    sha1 "9f02ace513d34ea9a75a830fc9e1d3e55a8a300a" => :mountain_lion
+    sha256 "eb4555ff573507d200d64bb30ad6942fd3dfb868ef264d19f13620cf0fc7c8b7" => :yosemite
+    sha256 "d0bb7a585523d2421837ee81feb7ee38833a642f8b10e1ff3587a156fcc41105" => :mavericks
+    sha256 "d3a236d00a622e1130865ac83807281b32e1e2ae18747e5de533a8c8c5b5cb70" => :mountain_lion
+    sha256 "b5669cea983c07e356339307cf030f000968868a7936790c388bfb779cdcf0a6" => :x86_64_linux
   end
 
   def install

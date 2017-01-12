@@ -1,28 +1,33 @@
 class Mumps < Formula
   desc "Parallel Sparse Direct Solver"
   homepage "http://mumps-solver.org"
-  url "http://mumps.enseeiht.fr/MUMPS_5.0.1.tar.gz"
-  mirror "http://graal.ens-lyon.fr/MUMPS/MUMPS_5.0.1.tar.gz"
-  sha256 "50355b2e67873e2239b4998a46f2bbf83f70cdad6517730ab287ae3aae9340a0"
+  url "http://mumps.enseeiht.fr/MUMPS_5.0.2.tar.gz"
+  mirror "http://graal.ens-lyon.fr/MUMPS/MUMPS_5.0.2.tar.gz"
+  sha256 "77292b204942640256097a3da482c2abcd1e0d5a74ecd1d4bab0f5ef6e60fe45"
 
   bottle do
     cellar :any
-    sha256 "4510d3460be5aa0bef39e2f776c34eecc978e736453cb687876cc55fcf949255" => :yosemite
-    sha256 "7b8097db2750879d77a2a4b39d0d1147b008fcf014b4b6902fd44fb5b808b9fd" => :mavericks
-    sha256 "01779df7a8e244e0e6ea198d1f6b402cff5799de9f1fa745275b69fb8c44a962" => :mountain_lion
+    sha256 "bc6b4ff949520d550cd9808b3af48293ebb250b8a2c842e3f7389e8cff9491b9" => :sierra
+    sha256 "a4cd336293ca818e7b3f9a6df27488b30ce813bbb5d425189776b92b8fc0cab4" => :el_capitan
+    sha256 "4f3412a8017d46db7e1ead3eed0069f50dc28f97c322edfc8e11c26435326723" => :yosemite
   end
 
   depends_on :mpi => [:cc, :cxx, :f90, :recommended]
+  depends_on "openblas" => OS.mac? ? :optional : :recommended
+  depends_on "veclibfort" if build.without?("openblas") && OS.mac?
+  depends_on :fortran
+
   if build.with? "mpi"
-    depends_on "scalapack" => (build.with? "openblas") ? ["with-openblas"] : :build
+    if OS.mac?
+      depends_on "scalapack" => build.with?("openblas") ? ["with-openblas"] : []
+    else
+      depends_on "scalapack" => build.without?("openblas") ? ["without-openblas"] : []
+    end
   end
   depends_on "metis"    => :optional if build.without? "mpi"
   depends_on "parmetis" => :optional if build.with? "mpi"
   depends_on "scotch5"  => :optional
   depends_on "scotch"   => :optional
-  depends_on "openblas" => :optional
-
-  depends_on :fortran
 
   resource "mumps_simple" do
     url "https://github.com/dpo/mumps_simple/archive/v0.4.tar.gz"
@@ -30,13 +35,14 @@ class Mumps < Formula
   end
 
   def install
+    make_args = ["RANLIB=echo"]
     if OS.mac?
       # Building dylibs with mpif90 causes segfaults on 10.8 and 10.10. Use gfortran.
-      make_args = ["LIBEXT=.dylib",
-                   "AR=#{ENV["FC"]} -dynamiclib -Wl,-install_name -Wl,#{lib}/$(notdir $@) -undefined dynamic_lookup -o ",
-                   "RANLIB=echo"]
+      shlibs_args = ["LIBEXT=.dylib",
+                     "AR=#{ENV["FC"]} -dynamiclib -Wl,-install_name -Wl,#{lib}/$(notdir $@) -undefined dynamic_lookup -o "]
     else
-      make_args = ["LIBEXT=.so", "AR=$(FL) -shared -Wl,-soname -Wl,$(notdir $@) -o ", "RANLIB=echo"]
+      shlibs_args = ["LIBEXT=.so",
+                     "AR=$(FL) -shared -Wl,-soname -Wl,$(notdir $@) -o "]
     end
     make_args += ["OPTF=-O", "CDEFS=-DAdd_"]
     orderingsf = "-Dpord"
@@ -95,7 +101,7 @@ class Mumps < Formula
                     "FC=#{ENV["MPIFC"]} -fPIC",
                     "FL=#{ENV["MPIFC"]} -fPIC",
                     "SCALAP=-L#{Formula["scalapack"].opt_lib} -lscalapack",
-                    "INCPAR=",  # Let MPI compilers fill in the blanks.
+                    "INCPAR=", # Let MPI compilers fill in the blanks.
                     "LIBPAR=$(SCALAP)"]
     else
       make_args += ["CC=#{ENV["CC"]} -fPIC",
@@ -105,39 +111,39 @@ class Mumps < Formula
 
     if build.with? "openblas"
       make_args << "LIBBLAS=-L#{Formula["openblas"].opt_lib} -lopenblas"
+    elsif build.with? "veclibfort"
+      make_args << "LIBBLAS=-L#{Formula["veclibfort"].opt_lib} -lvecLibFort"
     else
       make_args << "LIBBLAS=-lblas -llapack"
     end
 
-    ENV.deparallelize  # Build fails in parallel on Mavericks.
+    ENV.deparallelize # Build fails in parallel on Mavericks.
 
-    # First build libs, install them, and then link example programs.
-    system "make", "alllib", *make_args
+    system "make", "alllib", *(shlibs_args + make_args)
 
     lib.install Dir["lib/*"]
-    lib.install ("libseq/libmpiseq" + ((OS.mac?) ? ".dylib" : ".so")) if build.without? "mpi"
+    lib.install ("libseq/libmpiseq" + (OS.mac? ? ".dylib" : ".so")) if build.without? "mpi"
+
+    # Build static libraries (e.g., for Dolfin)
+    system "make", "alllib", *make_args
+    (libexec/"lib").install Dir["lib/*.a"]
+    (libexec/"lib").install "libseq/libmpiseq.a" if build.without? "mpi"
 
     inreplace "examples/Makefile" do |s|
       s.change_make_var! "libdir", lib
     end
 
-    system "make", "all", *make_args  # Build examples.
-
-    if build.with? "mpi"
-      include.install Dir["include/*"]
-    else
-      libexec.install "include"
-      include.install_symlink Dir[libexec / "include/*"]
-      # The following .h files may conflict with others related to MPI
-      # in /usr/local/include. Do not symlink them.
-      (libexec / "include").install Dir["libseq/*.h"]
-    end
+    libexec.install "include"
+    include.install_symlink Dir[libexec/"include/*"]
+    # The following .h files may conflict with others related to MPI
+    # in /usr/local/include. Do not symlink them.
+    (libexec/"include").install Dir["libseq/*.h"] if build.without? "mpi"
 
     doc.install Dir["doc/*.pdf"]
-    (pkgshare + "examples").install Dir["examples/*[^.o]"]
+    pkgshare.install "examples"
 
     prefix.install "Makefile.inc"  # For the record.
-    File.open(prefix / "make_args.txt", "w") do |f|
+    File.open(prefix/"make_args.txt", "w") do |f|
       f.puts(make_args.join(" "))  # Record options passed to make.
     end
 
@@ -155,14 +161,18 @@ class Mumps < Formula
         simple_args += ["blas_libdir=#{Formula["openblas"].opt_lib}",
                         "blas_libs=-L$(blas_libdir) -lopenblas"] if build.with? "openblas"
         system "make", "SHELL=/bin/bash", *simple_args
-        lib.install ("libmumps_simple." + ((OS.mac?) ? "dylib" : "so"))
+        lib.install ("libmumps_simple." + (OS.mac? ? "dylib" : "so"))
         include.install "mumps_simple.h"
       end
     end
   end
 
   def caveats
-    s = ""
+    s = <<-EOS.undent
+      MUMPS was built with shared libraries. If required,
+      static libraries are available in
+        #{opt_libexec}/lib
+    EOS
     if build.without? "mpi"
       s += <<-EOS.undent
       You built a sequential MUMPS library.
@@ -174,12 +184,39 @@ class Mumps < Formula
   end
 
   test do
-    cmd = build.without?("mpi") ? "" : "mpirun -np 2"
-    system "#{cmd} #{pkgshare}/examples/ssimpletest < #{pkgshare}/examples/input_simpletest_real"
-    system "#{cmd} #{pkgshare}/examples/dsimpletest < #{pkgshare}/examples/input_simpletest_real"
-    system "#{cmd} #{pkgshare}/examples/csimpletest < #{pkgshare}/examples/input_simpletest_cmplx"
-    system "#{cmd} #{pkgshare}/examples/zsimpletest < #{pkgshare}/examples/input_simpletest_cmplx"
-    system "#{cmd} #{pkgshare}/examples/c_example"
-    ohai "Test results are in ~/Library/Logs/Homebrew/mumps"
+    ENV.fortran
+    cp_r pkgshare/"examples", testpath
+    opts = ["-I#{opt_include}", "-L#{opt_lib}", "-lmumps_common", "-lpord"]
+    if Tab.for_name("mumps").with? "openblas"
+      opts << "-L#{Formula["openblas"].opt_lib}" << "-lopenblas"
+    elsif OS.mac?
+      opts << "-L#{Formula["veclibfort"].opt_lib}" << "-lvecLibFort"
+    else
+      opts << "-lblas" << "-llapack"
+    end
+    if Tab.for_name("mumps").with?("mpi")
+      f90 = "mpif90"
+      cc = "mpicc"
+      mpirun = "mpirun -np 2"
+      opts << "-lscalapack"
+    else
+      f90 = ENV["FC"]
+      cc = ENV["CC"]
+      mpirun = ""
+    end
+
+    cd testpath/"examples" do
+      system f90, "-o", "ssimpletest", "ssimpletest.F", "-lsmumps", *opts
+      system "#{mpirun} ./ssimpletest < input_simpletest_real"
+      system f90, "-o", "dsimpletest", "dsimpletest.F", "-ldmumps", *opts
+      system "#{mpirun} ./dsimpletest < input_simpletest_real"
+      system f90, "-o", "csimpletest", "csimpletest.F", "-lcmumps", *opts
+      system "#{mpirun} ./csimpletest < input_simpletest_cmplx"
+      system f90, "-o", "zsimpletest", "zsimpletest.F", "-lzmumps", *opts
+      system "#{mpirun} ./zsimpletest < input_simpletest_cmplx"
+      system cc, "-c", "c_example.c", "-I#{opt_include}"
+      system f90, "-o", "c_example", "c_example.o", "-ldmumps", *opts
+      system *(mpirun.split + ["./c_example"] + opts)
+    end
   end
 end

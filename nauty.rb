@@ -1,39 +1,50 @@
 class Nauty < Formula
+  desc "automorphism groups of graphs and digraphs"
   homepage "http://cs.anu.edu.au/~bdm/nauty/"
-  url "http://cs.anu.edu.au/~bdm/nauty/nauty25r9.tar.gz"
-  version "25r9"
-  sha1 "a533cfd764bf56b35e117c46cb85b0142833e8b2"
+  url "http://users.cecs.anu.edu.au/~bdm/nauty/nauty26r5.tar.gz"
+  version "26r5"
+  sha256 "5043e7d8157c36bf0e7f5ccdc43136f610108d2d755bf1a30508b4cb074302eb"
+  # doi "10.1016/j.jsc.2013.09.003"
+  # tag "math"
 
   bottle do
-    cellar :any
-    sha1 "56737485de432d2eede7000386b308ebb767e14b" => :yosemite
-    sha1 "570ab91fca5c0ac09f601892796b9720c0ddddc7" => :mavericks
-    sha1 "1f103e310878f0241dbd70b67f921cfd2dede546" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "f37f9e97552f2663377c71f7149277e6c9573fe91c07d425a65a42c40dea1c6c" => :el_capitan
+    sha256 "c6f11644f03d80e12cb00298f97800da9e446ca50a3c735539d229b2e57731d0" => :yosemite
+    sha256 "1f91481f5a64f6a7698af50549756ff81a3ec0691a55d14e74b120a5f234901a" => :mavericks
   end
 
-  deprecated_option "run-tests" => "with-checks"
-
-  option "without-checks", "Skip building the included test programs"
+  option "without-test", "Skip building the included test programs"
 
   def install
     system "./configure", "--disable-debug", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
     system "make", "all"
-    system "make", "checks" if build.with? "checks"
+    system "make", "checks" if build.with? "test"
 
     bin.install %w[
-      NRswitchg addedgeg amtog biplabg catg complg copyg countg
-      deledgeg directg dreadnaut dretog genbg geng genrang gentourng labelg
-      linegraphg listg multig newedgeg pickg planarg ranlabg shortg showg subdivideg
-      watercluster2
+      NRswitchg addedgeg amtog biplabg catg complg converseg copyg countg
+      cubhamg deledgeg delptg directg dreadnaut dretodot dretog genbg genbgL
+      geng genquarticg genrang genspecialg gentourng gentreeg hamheuristic
+      labelg linegraphg listg multig newedgeg pickg planarg ranlabg shortg
+      showg subdivideg twohamg vcolg watercluster2
     ]
 
-    prefix.install "nug25.pdf"
+    doc.install "nug26.pdf"
   end
 
   def caveats; <<-EOS.undent
     User guide was saved locally to:
-      #{opt_prefix}/nug25.pdf
+      #{doc}/nug26.pdf
     EOS
+  end
+
+  test do
+    # from ./runalltests
+    out1 = shell_output("#{bin}/geng -ud1D7t 11 2>&1")
+    out2 = shell_output("#{bin}/genrang -r3 114 100 | #{bin}/countg --nedDr -q")
+
+    assert_match /92779 graphs generated/, out1
+    assert_match /100 graphs : n=114; e=171; mindeg=3; maxdeg=3; regular/, out2
   end
 end

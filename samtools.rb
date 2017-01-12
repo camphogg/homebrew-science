@@ -1,49 +1,36 @@
 class Samtools < Formula
+  desc "Tools for manipulating next-generation sequencing data"
   homepage "http://www.htslib.org/"
   # doi "10.1093/bioinformatics/btp352"
   # tag "bioinformatics"
 
-  url "https://github.com/samtools/samtools/archive/1.2.tar.gz"
-  sha1 "9fabb4903b9d1521aeea8a5538e64aefe8e85526"
-
+  url "https://github.com/samtools/samtools/releases/download/1.3.1/samtools-1.3.1.tar.bz2"
+  sha256 "6c3d74355e9cf2d9b2e1460273285d154107659efa36a155704b1e4358b7d67e"
   head "https://github.com/samtools/samtools.git"
 
   bottle do
     cellar :any
-    sha1 "de1ad3b2b528b175bdfcf0e78ac923da8187c7de" => :yosemite
-    sha1 "37fca3fb8113838ae9178c2fc17043e9e3e42791" => :mavericks
-    sha1 "e4d41de74cd32b2d88519e16f08abad025955582" => :mountain_lion
+    sha256 "a00c0988740cfca3ab5c6320022e0be1040b388657e49392dda21991e0dd863d" => :el_capitan
+    sha256 "7c0706b65c5675889a355c3d0ca544ff9f8f22e9401b7270c2a42486b780da99" => :yosemite
+    sha256 "a7450a2071e194b8d53ca269279e875debce2167436b4e7d6e1cccb334a97f9f" => :mavericks
+    sha256 "fb76b53c76435522541953727533afda8d95a848bc4c8754022c6c4e7c194dca" => :x86_64_linux
   end
 
-  option "with-dwgsim", "Build with Whole Genome Simulation"
-  option "without-curses", "Skip use of libcurses, for platforms without it, or different curses naming"
-
   depends_on "htslib"
-  depends_on "dwgsim" => :optional
+  depends_on "homebrew/dupes/ncurses" unless OS.mac?
 
   def install
-    if build.without? "curses"
-      ohai "Building without curses"
-      inreplace "Makefile" do |s|
-        s.gsub! "-D_CURSES_LIB=1", "-D_CURSES_LIB=0"
-        s.gsub! "-lcurses", "# -lcurses"
-      end
-    end
+    system "./configure", "--with-htslib=#{Formula["htslib"].opt_prefix}"
+    system "make"
 
-    inreplace "Makefile", "include $(HTSDIR)/htslib.mk", ""
-    htslib = Formula["htslib"].opt_prefix
-    system "make", "HTSDIR=#{htslib}/include", "HTSLIB=#{htslib}/lib/libhts.a"
-
-    bin.install "samtools"
-    bin.install %w{misc/maq2sam-long misc/maq2sam-short misc/md5fa misc/md5sum-lite misc/wgsim}
-    bin.install Dir["misc/*.pl"]
+    bin.install Dir["{samtools,misc/*}"].select { |f| File.executable?(f) }
     lib.install "libbam.a"
-    man1.install %w{samtools.1}
-    (share+"samtools").install %w{examples}
-    (include+"bam").install Dir["*.h"]
+    (include/"bam").install Dir["*.h"]
+    man1.install "samtools.1"
+    pkgshare.install "examples"
   end
 
   test do
-    system "samtools 2>&1 |grep -q samtools"
+    system bin/"samtools", "--help"
   end
 end

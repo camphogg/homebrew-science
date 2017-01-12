@@ -1,20 +1,19 @@
 class Last < Formula
-  desc "LAST finds similar regions between sequences"
+  desc "Find similar regions between sequences"
   homepage "http://last.cbrc.jp/"
+  url "http://last.cbrc.jp/last-752.zip"
+  sha256 "e2e8efc1ce1ec9b20cb3554126bf7a86a62fff712a07e156b414554283236ed5"
+  head "http://last.cbrc.jp/last", :using => :hg
   # doi "10.1101/gr.113985.110"
   # tag "bioinformatics"
 
-  url "http://last.cbrc.jp/last-581.zip"
-  sha256 "8a25ca32585df56160214445195ce29861824ed570fe25e2344015f59fd81b0a"
-
   bottle do
-    cellar :any
-    sha256 "9cd5e65821807e813ca092e74c829d0603b5af3ada0a61358a00bb268aabfa7f" => :yosemite
-    sha256 "d35f171412e0b6a91f2107a10241a6fd06d2426a24c6d3f18184cd7b3650cef5" => :mavericks
-    sha256 "a1e551765c684464924b862620f0cfc72854c11a14d2a17f614f8e3dd00af1ba" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "42425823c96441555576551dfcde5b343c2c2f5236f59262a5eb8284a890bb2b" => :el_capitan
+    sha256 "8b6623e595b0219cf4747766793a97597048e2859224c2cbfc4cc0688f97454a" => :yosemite
+    sha256 "c1851700dac785895aa0bbea9d0dc31ba8c33b9913933cab2df9e93ebaaa9085" => :mavericks
+    sha256 "bbe981e9a0b324301e75656d8568db46ef6e2c560fa5f819017aa95a1259b78c" => :x86_64_linux
   end
-
-  head "http://last.cbrc.jp/last", :using => :hg
 
   resource "mito" do
     url "http://last.cbrc.jp/tutorial/files/human-mito.fasta"

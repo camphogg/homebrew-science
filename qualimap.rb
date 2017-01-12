@@ -1,26 +1,27 @@
-require 'formula'
-
 class Qualimap < Formula
-  homepage 'http://qualimap.bioinfo.cipf.es/'
-  url 'https://bitbucket.org/kokonech/qualimap/downloads/qualimap-build-30-03-15.tar.gz'
-  sha1 'ce5c8262493bda49f3eafd2568b11dfc84af7f64'
-  version '30-03-15'
+  desc "Facilitates the quality control of alignment sequencing data"
+  homepage "http://qualimap.bioinfo.cipf.es/"
+  url "https://bitbucket.org/kokonech/qualimap/downloads/qualimap-build-28-03-16.tar.gz"
+  version "20160328"
+  sha256 "12fd342a2ccc76ea09bbd5e9ae38c1ae9ae44aad5e6f0296298e584e55b0d8ae"
+
   bottle do
-    cellar :any
-    sha256 "19f916083ad21fe1a05315be7a1ed49c0a7793dddf0f1735af7527ea82e1dd18" => :yosemite
-    sha256 "66f1205aee6ae32ce98072e2176f90c37ac456a8b13bb2b1d657af21a0044704" => :mavericks
-    sha256 "71fadee98ab35e9d47bd06e9081e32848671b58c3e58c0b718e6fb5743f73f6f" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "87452d8d5cc0dc5a4a4a52952ac94c2804fa3935c2a66685026a595bc9d39c63" => :el_capitan
+    sha256 "91e74025f9f2a738abecbdb3529f0e70bf427402a5ab06f18f41e793c1a46d6f" => :yosemite
+    sha256 "5659d4fef01656d4e8e70394e125e579e1f67090c692434fad1f6244a578a234" => :mavericks
   end
-  depends_on 'r' => :optional
+
+  depends_on "r" => :optional
 
   def install
-    inreplace 'qualimap', /-classpath [^ ]*/, "-classpath '#{libexec}/*'"
-    bin.install 'qualimap'
-    libexec.install 'scripts', 'species', 'qualimap.jar', *Dir['lib/*.jar']
-    doc.install 'QualimapManual.pdf'
+    inreplace "qualimap", /-classpath [^ ]*/, "-classpath '#{libexec}/*'"
+    bin.install "qualimap"
+    libexec.install "scripts", "species", "qualimap.jar", *Dir["lib/*.jar"]
+    doc.install "QualimapManual.pdf"
   end
 
   test do
-    system 'qualimap', '-h'
+    system "qualimap", "-h"
   end
 end

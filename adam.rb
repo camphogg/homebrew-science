@@ -1,30 +1,41 @@
 class Adam < Formula
+  desc "Genomics analysis platform built on Apache Avro, Apache Spark and Parquet"
   homepage "https://github.com/bigdatagenomics/adam"
-  url "https://github.com/bigdatagenomics/adam/releases/download/adam-parent-0.13.0/adam-0.13.0-bin.tar.gz"
-  sha1 "5cfe704c768b7be0d493e3052257578f971fc3ec"
+  url "https://search.maven.org/remotecontent?filepath=org/bdgenomics/adam/adam-distribution-spark2_2.11/0.21.0/adam-distribution-spark2_2.11-0.21.0-bin.tar.gz"
+  sha256 "6ab1cd7073a7b39034bdc342aeab2cbb84e89cfb251e7138cd9811f28fc372d3"
+  # tag "bioinformatics"
+
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "7d8abbbff2fb1ea1744a635bc67e620b9456a6315365e4a3970055ac386d5323" => :sierra
+    sha256 "9848eeb79990b911693dbe563a26943935a6758f24e520d5d8fe45d7261c8886" => :el_capitan
+    sha256 "9848eeb79990b911693dbe563a26943935a6758f24e520d5d8fe45d7261c8886" => :yosemite
+    sha256 "4bc23de98e36c433c66fcf6df3739e700d2c9e51bb7c028b53b1f1a9dd2b4686" => :x86_64_linux
+  end
 
   head do
-    url "https://github.com/bigdatagenomics/adam.git"
+    url "https://github.com/bigdatagenomics/adam.git", :shallow => false
     depends_on "maven" => :build
   end
 
-  option "without-check", "Disable build-time checking (not recommended)"
+  option "without-test", "Disable build-time checking (not recommended)"
+
+  deprecated_option "without-check" => "without-test"
+
+  depends_on "apache-spark"
 
   def install
     if build.head?
-      system "mvn", "clean", "install",
-                    "-DskipAssembly=True",
-                    "-DskipTests=" + (build.with?("check") ? "False" : "True")
-      chmod 0755, "adam-cli/target/appassembler/bin/adam"
-      prefix.install "adam-cli/target/appassembler/repo"
-      bin.install "adam-cli/target/appassembler/bin/adam"
-    else
-      prefix.install "repo"
-      bin.install "bin/adam"
+      system "scripts/move_to_scala_2.11.sh"
+      system "scripts/move_to_spark_2.sh"
+      system "mvn", "clean", "package",
+                    "-DskipTests=" + (build.with?("test") ? "False" : "True")
     end
+    libexec.install Dir["*"]
+    bin.write_exec_script Dir["#{libexec}/bin/*"]
   end
 
   test do
-    system "#{bin}/adam", "buildinfo"
+    system "#{bin}/adam-submit", "--version"
   end
 end

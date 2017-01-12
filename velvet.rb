@@ -1,24 +1,31 @@
 class Velvet < Formula
+  desc "sequence assembler for very short reads"
   homepage "http://www.ebi.ac.uk/~zerbino/velvet/"
   url "http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.10.tgz"
-  sha1 "216f0941609abf3a73adbba19ef1f364df489d18"
+  sha256 "884dd488c2d12f1f89cdc530a266af5d3106965f21ab9149e8cb5c633c977640"
+
   bottle do
-    cellar :any
-    sha1 "ecf378cb7ed8b9b566c3f0f1049083c6b83ea4af" => :yosemite
-    sha1 "ebf96b199d156ed982d4adbf8609fe664db7b9a7" => :mavericks
-    sha1 "a20d3967da762fcb77bef5530b80ad8634de4dd3" => :mountain_lion
+    cellar :any_skip_relocation
+    rebuild 1
+    sha256 "b475b9b3cd469d2f0665fa84fc73108632c86e53a06d04b9b979c2a4ced65344" => :sierra
+    sha256 "6fe3c9d2afef2247e13d63fe148baefb4be9515a680267c78474467f92528820" => :el_capitan
+    sha256 "505a5749837f89cfe68f058593bc23a6c1c935ff5e212c03109b3c9c136d4de0" => :yosemite
+    sha256 "83ff1ef5b16dd8f142418c9b54189ff86979d7ba427ca55cc44c3fe6ad2197c0" => :x86_64_linux
   end
 
-  #doi "10.1101/gr.074492.107"
-  #tag "bioinformatics"
+  # doi "10.1101/gr.074492.107"
+  # tag "bioinformatics"
   head "https://github.com/dzerbino/velvet.git"
 
   option "with-maxkmerlength=", "Specify maximum k-mer length, any positive odd integer (default: 31)"
   option "with-categories=", "Specify number of categories, any positive integer (default: 2)"
+  option "with-openmp", "Enable OpenMP multithreading"
+
+  needs :openmp if build.with? "openmp"
 
   def install
     args = ["CFLAGS=-Wall -m64", "LONGSEQUENCES=1"]
-    args << "OPENMP=1" unless ENV.compiler == :clang
+    args << "OPENMP=1" if build.with? "openmp"
     maxkmerlength = ARGV.value("with-maxkmerlength") || "-1"
     categories = ARGV.value("with-categories") || "-1"
     args << "MAXKMERLENGTH=#{maxkmerlength}" if maxkmerlength.to_i > 0

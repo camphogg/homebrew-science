@@ -1,16 +1,16 @@
 class Wxmaxima < Formula
-  homepage "http://andrejv.github.io/wxmaxima"
-  url "https://downloads.sourceforge.net/project/wxmaxima/wxMaxima/13.04.2/wxMaxima-13.04.2.tar.gz"
-  sha1 "9508d3badb6c339f34e73e01c5065f679329a17c"
+  desc "Cross platform GUI for Maxima"
+  homepage "https://andrejv.github.io/wxmaxima"
+  url "https://downloads.sourceforge.net/project/wxmaxima/wxMaxima/16.12.0/wxmaxima-16.12.0.tar.gz"
+  sha256 "30d4fcf2b33349fb60d13f7efcd0d9b5460915fa7065665a2c7c291c77d26a06"
 
   bottle do
     cellar :any
-    sha1 "d110a3c63e434f87f4441952a28d48889cfc6a10" => :yosemite
-    sha1 "3e66edeec9ae6008f34024238857423fbfd04df5" => :mavericks
-    sha1 "29ff6b7afe5e143eb5a2714d0565a3327f82aff2" => :mountain_lion
+    sha256 "864290d79a7e640f9a8b0ad7cfc99f09ba1b621b2f8654a94aec3a732a57e43a" => :sierra
+    sha256 "b963da2eb5f2140823dacc843533a5290598789c7b07010ea9064eaeb764cc02" => :el_capitan
+    sha256 "0af994505af783ffa40276ce6766a786d854ed06e07af1b723c9e44f410e950a" => :yosemite
+    sha256 "85493211a9129e274928159b2b82471a231ba93a9889dbdee0fd6fa8b6537f85" => :x86_64_linux
   end
-
-  depends_on "wxmac"
 
   head do
     url "https://github.com/andrejv/wxmaxima.git"
@@ -18,6 +18,8 @@ class Wxmaxima < Formula
     depends_on "automake" => :build
     depends_on "gettext" => :build
   end
+
+  depends_on "wxmac"
 
   def install
     system "./bootstrap" if build.head?

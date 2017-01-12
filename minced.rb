@@ -1,26 +1,26 @@
 class Minced < Formula
   desc "Mining CRISPRs in Environmental Datasets"
   homepage "https://github.com/ctSkennerton/minced"
-  bottle do
-    cellar :any
-    sha256 "52af6d39cf5c38d4be24c04a1febec2dea60e2725eb43b4594c8de816984058b" => :yosemite
-    sha256 "e702a38fc2a6c461369d297e66f1baa74a22e2ce2e37cedeeb48f49de9c7ea42" => :mavericks
-    sha256 "3fa76116539321ca84774df87972b08c54a810a59d86d5a9a5dba56abc8f0464" => :mountain_lion
-  end
-
+  url "https://github.com/ctSkennerton/minced/archive/0.2.0.tar.gz"
+  sha256 "e1ca61e0307e6a2a2480bc0a1291a2c677110f34c3247d4773fdba7e95a6b573"
+  head "https://github.com/ctSkennerton/minced.git"
   # tag "bioinformatics"
 
-  url "https://github.com/ctSkennerton/minced/releases/download/0.1.6/minced.jar"
-  sha256 "acccd14078a29fbd79d7848e080e28c4a1f1f8f799376b6de41f937bb2984f43"
+  bottle do
+    cellar :any_skip_relocation
+    sha256 "a216985fb9de6c65592a71c336ce839bcf6369a9be4555a0144e1ea10eaa78b5" => :el_capitan
+    sha256 "b2a6011525aeaeec87cb6585076aa6eb73b082af726560204be829381c5bed90" => :yosemite
+    sha256 "0fd88dba11618543b5862298780961df12d0e9cb6f353ffdc173004e8d403839" => :mavericks
+    sha256 "47c01ab05039209cc26031aaafe3a16e7a5685714de26ec789fb0e7c6654e514" => :x86_64_linux
+  end
 
-  # head "https://github.com/ctSkennerton/minced.git"
-
-  depends_on :java
+  depends_on :java => "1.8"
 
   def install
-    name = "minced"
-    (share/name).install "#{name}.jar"
-    bin.write_jar_script share/"#{name}/#{name}.jar", name
+    system "make"
+    libexec.install "minced.jar"
+    bin.write_jar_script libexec/"minced.jar", "minced"
+    pkgshare.install Dir["t/*"]
   end
 
   test do

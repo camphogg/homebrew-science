@@ -4,18 +4,17 @@ class Bwa < Formula
   # doi "10.1093/bioinformatics/btp324"
   # tag "bioinformatics"
 
-  url "https://downloads.sf.net/project/bio-bwa/bwa-0.7.12.tar.bz2"
-  sha256 "701dcad147ae470d741717a72c369b338df7f80bff4bb8eee8176c66f16d608c"
+  url "https://github.com/lh3/bwa/releases/download/v0.7.15/bwa-0.7.15.tar.bz2"
+  sha256 "2f56afefa49acc9bf45f12edb58e412565086cc20be098b8bf15ec07de8c0515"
 
   head "https://github.com/lh3/bwa.git"
 
   bottle do
-    cellar :any
-    revision 1
-    sha256 "787af05be50a58ac1e3a39bdde57f939f76628b34651898ba8cbac19005149ca" => :yosemite
-    sha256 "af7d34365a5d3a13cedc74f5d26e5640a3638717c8bfc20395bb24de1108aa7f" => :mavericks
-    sha256 "4195e81b4ab9758f1e9c4b05c06c504ea8ec240d8ce18436727236f1957a6907" => :mountain_lion
-    sha256 "f60955dd3c1980ab4cb3ba65c8db24dba461306389357a5e18c3be74067d0f71" => :x86_64_linux
+    cellar :any_skip_relocation
+    sha256 "d8341ec482130b67c1a43394b56fcf0eb39da2ed9e37a1c27dbf7d8201901347" => :el_capitan
+    sha256 "2906054058cbdad87364cb58c6bbc25d1dc900709e9a2ba0629899d1d7a05bdb" => :yosemite
+    sha256 "a75a5025de6c1f1df0e53d005fb752843562271389dbde5fcbc865ca3aed9e7e" => :mavericks
+    sha256 "2539f7596fab900908bb4d72ecca16bf505436b2fbc3785b409abd0cdb375011" => :x86_64_linux
   end
 
   def install
@@ -26,8 +25,9 @@ class Bwa < Formula
   end
 
   test do
-    (testpath/"test.fasta").write ">0\nMEEPQSDPSV\n"
+    (testpath/"test.fasta").write ">0\nAGATGTGCTG\n"
     system "#{bin}/bwa", "index", "test.fasta"
     assert File.exist?("test.fasta.bwt")
+    assert_match "AGATGTGCTG", shell_output("#{bin}/bwa mem test.fasta test.fasta")
   end
 end

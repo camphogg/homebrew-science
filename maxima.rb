@@ -1,12 +1,13 @@
 class Maxima < Formula
+  desc "Computer algebra system"
   homepage "http://maxima.sourceforge.net/"
-  url "https://downloads.sourceforge.net/project/maxima/Maxima-source/5.36.1-source/maxima-5.36.1.tar.gz"
-  sha1 "7ab4136e59906f5230fb72ffd2582f4d4bd13b0c"
+  url "https://downloads.sourceforge.net/project/maxima/Maxima-source/5.38.1-source/maxima-5.38.1.tar.gz"
+  sha256 "0e866536ab5847ec045ba013570f80f36206ca6ce07a5d13987010bcb321c6dc"
 
   bottle do
-    sha256 "b4de12a5030ca617f54b3b521594bf41d9189f5ad2f9a2a59b92da65b89753ed" => :yosemite
-    sha256 "cac81a7194531c4c71d31e2a7e2d8f58079cf33789c468ffeacda93652f975be" => :mavericks
-    sha256 "dc3300cce67db65b6c2f4204e2841b72d8106b5a931ccdf92c56b06029a78a5f" => :mountain_lion
+    sha256 "cc1146cce7a4fc5b6566471009decec74cb07233c33ffe5ff65615b2b003064d" => :sierra
+    sha256 "d61ee4d879fa7d95a14fc95f54ae2d59dac759a24fca0b31013e92b72aee8a39" => :el_capitan
+    sha256 "8532791366e8f8be335072f115a5e64de60849cbb12e513edcc0f6ea954c13e5" => :yosemite
   end
 
   depends_on "sbcl" => :build
@@ -14,15 +15,7 @@ class Maxima < Formula
   depends_on "gnuplot"
   depends_on "rlwrap"
 
-  # required for maxima help(), describe(), "?" and "??" lisp functionality
-  skip_clean "share/info"
-
-  # fixes 3468021: imaxima.el uses incorrect tmp directory on OS X:
-  # https://sourceforge.net/tracker/?func=detail&aid=3468021&group_id=4933&atid=104933
-  patch :DATA
-
   def install
-    ENV.deparallelize
     system "./configure", "--disable-debug", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
                           "--enable-sbcl", "--with-sbcl=#{Formula["sbcl"].opt_bin}/sbcl",
@@ -39,18 +32,3 @@ class Maxima < Formula
     system "#{bin}/maxima", "--batch-string=run_testsuite(); quit();"
   end
 end
-
-__END__
-diff --git a/interfaces/emacs/imaxima/imaxima.el b/interfaces/emacs/imaxima/imaxima.el
-index e3feaa6..3a52a0b 100644
---- a/interfaces/emacs/imaxima/imaxima.el
-+++ b/interfaces/emacs/imaxima/imaxima.el
-@@ -296,6 +296,8 @@ nil means no scaling at all, t allows any scaling."
- 	 (temp-directory))
- 	((eql system-type 'cygwin)
- 	 "/tmp/")
-+	((eql system-type 'darwin)
-+	 "/tmp/")
- 	(t temporary-file-directory))
-   "*Directory used for temporary TeX and image files."
-   :type '(directory)

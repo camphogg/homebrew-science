@@ -1,74 +1,64 @@
 class SuperluDist < Formula
-  desc "A general purpose library for the direct solution of large, sparse, nonsymmetric systems of linear equations on high performance machines."
+  desc "Distributed LU factorization for large linear systems"
   homepage "http://crd-legacy.lbl.gov/~xiaoye/SuperLU/"
-  url "http://crd-legacy.lbl.gov/~xiaoye/SuperLU/superlu_dist_4.1.tar.gz"
-  sha256 "50793bdd26f4b0a4a9c40e41299db8df219af5a38ffb4f3e4c0f29f9d573f0eb"
+  url "http://crd-legacy.lbl.gov/~xiaoye/SuperLU/superlu_dist_5.1.0.tar.gz"
+  sha256 "30ac554a992441e6041c6fb07772da4fa2fa6b30714279de03573c2cad6e4b60"
+  revision 1
 
   bottle do
-    cellar :any
-    revision 1
-    sha256 "248d87755fcd723d5a4d00aa61355d61247b527b1b8113249c0f41dc2a6fac22" => :yosemite
-    sha256 "3a8f4d391986bdb8d67e0c6c7299ff3e0df66ca7b0f753e8e565a0db4beacbb6" => :mavericks
-    sha256 "ba1b2ac27ebaa2ce335ff170a8fec66afc7037a33de15ae2e1912ccf95089b19" => :mountain_lion
+    rebuild 1
+    sha256 "2c6577bcf69fdc17fce4cd136773a34527f0bbb9f149090c5cfd3cd769b634d4" => :sierra
+    sha256 "1a97d5838c71422d1a4545684c1a6e6accf0306924bf32ae7045425cd34d715d" => :el_capitan
+    sha256 "82c1a6f39857a82cd568b4d818d2596d4355298fddf61456e24b261eb7717a2f" => :yosemite
   end
 
+  option "without-test", "skip build-time tests (not recommended)"
+  option "with-openmp", "Enable OpenMP multithreading"
+  needs :openmp if build.with? "openmp"
+
+  depends_on "cmake" => :build
   depends_on :fortran
-  depends_on :mpi => [:cc, :f77]
+  depends_on :mpi => [:cc, :f77, :f90]
 
   depends_on "parmetis"
-  depends_on "openblas" => :optional
-
-  # fix duplicate symbols [mc64dd_,mc64ed_,mc64fd_] when linking with superlu
-  patch do
-    url "https://bitbucket.org/petsc/pkg-superlu_dist/commits/2faf8669a2ba20250ffe2d8a1b63d4f8ef8c5b74/raw/"
-    sha256 "09dcd7de83ef9d2590465742df76753cb7c61bfe8e7819c02613d9bcf20ed255"
-  end
+  depends_on "openblas" => OS.mac? ? :optional : :recommended
+  depends_on "veclibfort" if build.without?("openblas") && OS.mac?
 
   def install
     # prevent linking errors on linuxbrew:
     ENV.deparallelize
-    rm "#{buildpath}/make.inc"
-    blaslib = ((build.with? "openblas") ? "-L#{Formula["openblas"].opt_lib} -lopenblas" : "-framework Accelerate")
-    (buildpath / "make.inc").write <<-EOS.undent
-      PLAT         = _mac_x
-      DSuperLUroot = #{buildpath}
-      DSUPERLULIB  = $(DSuperLUroot)/lib/libsuperlu_dist.a
-      BLASDEF      = -DUSE_VENDOR_BLAS
-      BLASLIB      = #{blaslib}
-      METISLIB     = -L#{Formula["metis"].opt_lib} -lmetis
-      PARMETISLIB  = -L#{Formula["parmetis"].opt_lib} -lparmetis
-      FLIBS        =
-      LIBS         = $(DSUPERLULIB) $(BLASLIB) $(PARMETISLIB) $(METISLIB)
-      ARCH         = ar
-      ARCHFLAGS    = cr
-      RANLIB       = true
-      CC           = #{ENV["MPICC"]}
-      CFLAGS       = -fPIC -O2 -I#{Formula["parmetis"].opt_include} -I#{Formula["metis"].opt_include}
-      NOOPTS       = -fPIC
-      FORTRAN      = #{ENV["MPIF77"]}
-      F90FLAGS     = -O2
-      LOADER       = #{ENV["MPIF77"]}
-      LOADOPTS     =
-      CDEFS        = -DAdd_
-    EOS
 
-    system "make", "lib"
-    cd "EXAMPLE" do
+    dylib_ext = OS.mac? ? "dylib" : "so"
+
+    cmake_args = std_cmake_args
+    cmake_args << "-DTPL_PARMETIS_LIBRARIES=#{Formula["parmetis"].opt_lib}/libparmetis.#{dylib_ext};#{Formula["metis"].opt_lib}/libmetis.#{dylib_ext}"
+    cmake_args << "-DTPL_PARMETIS_INCLUDE_DIRS=#{Formula["parmetis"].opt_include};#{Formula["metis"].opt_include}"
+    cmake_args << "-DCMAKE_C_FLAGS=-fPIC -O2"
+    cmake_args << "-DBUILD_SHARED_LIBS=ON"
+    cmake_args << "-DCMAKE_C_COMPILER=#{ENV["MPICC"]}"
+    cmake_args << "-DCMAKE_Fortran_COMPILER=#{ENV["MPIF90"]}"
+    cmake_args << "-DCMAKE_INSTALL_PREFIX=#{prefix}"
+
+    blaslib = ((build.with? "openblas") ? "-L#{Formula["openblas"].opt_lib} -lopenblas" : "-L#{Formula["veclibfort"].opt_lib} -lvecLibFort")
+    cmake_args << "-DTPL_BLAS_LIBRARIES=#{blaslib}"
+
+    mkdir "build" do
+      system "cmake", "..", *cmake_args
       system "make"
+      system "make", "install"
+      system "make", "test" if build.with? "test"
     end
-    prefix.install "make.inc"  # Record make.inc used
-    lib.install Dir["lib/*"]
-    (include / "superlu_dist").install Dir["SRC/*.h"]
-    doc.install Dir["Doc/*"]
-    (share / "superlu_dist").install "EXAMPLE"
+
+    doc.install "DOC/ug.pdf"
+    pkgshare.install "EXAMPLE"
   end
 
   test do
-    cd (share / "superlu_dist/EXAMPLE") do
-      system "mpirun", "-np", "4", "./pddrive", "-r", "2", "-c", "2", "g20.rua"
-      system "mpirun", "-np", "10", "./pddrive4", "g20.rua"
-      system "mpirun", "-np", "4", "./pzdrive", "-r", "2", "-c", "2", "cg20.cua"
-      system "mpirun", "-np", "10", "./pzdrive4", "cg20.cua"
-    end
+    ENV.fortran
+    cp pkgshare/"EXAMPLE/dcreate_matrix.c", testpath
+    cp pkgshare/"EXAMPLE/pddrive.c", testpath
+    cp pkgshare/"EXAMPLE/g20.rua", testpath
+    system "mpicc", "-o", "pddrive", "pddrive.c", "dcreate_matrix.c", "-L#{Formula["superlu_dist"].opt_lib}", "-lsuperlu_dist"
+    system "mpirun", "-np", "4", "./pddrive", "-r", "2", "-c", "2", "g20.rua"
   end
 end

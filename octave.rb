@@ -1,137 +1,203 @@
 class Octave < Formula
-  desc "a high-level interpreted language for numerical computations."
+  desc "High-level interpreted language for numerical computing"
   homepage "https://www.gnu.org/software/octave/index.html"
-  url "http://ftpmirror.gnu.org/octave/octave-3.8.2.tar.bz2"
-  mirror "https://ftp.gnu.org/gnu/octave/octave-3.8.2.tar.bz2"
-  sha256 "83bbd701aab04e7e57d0d5b8373dd54719bebb64ce0a850e69bf3d7454f33bae"
-  head "http://www.octave.org/hg/octave", :branch => "default", :using => :hg
-  revision 2
-
-  stable do
-    # Allows clang 3.5 to compile with a recent libc++ release.
-    # See: https://savannah.gnu.org/bugs/?43298
-    patch do
-      url "https://gist.github.com/tchaikov/6ce5f697055b0756126a/raw/4fc94a1fa1d5b032f8586ce3ab0015b04351426f/octave-clang3.5-fix.patch"
-      sha1 "6e5c0d8f6b07803152c8a1caad39a113fc8b8d0a"
-    end
-  end
+  url "https://ftpmirror.gnu.org/octave/octave-4.2.0.tar.lz"
+  mirror "https://ftp.gnu.org/gnu/octave/octave-4.2.0.tar.lz"
+  sha256 "119d45c21d567c02eb0042987da4676aa25c7c2fde6e119053e0c6d779a47ba7"
+  revision 1
 
   bottle do
-    sha256 "98d8a35cd7c4e20e13b77e6999bc75a39ef52f8e5fa6deafd80f60e10c8db8d0" => :yosemite
-    sha256 "0a28985e322d56002755469a22cc5ae3c487c191d35c8b5b3b25c34abcc0b2cb" => :mavericks
-    sha256 "35344dafa1cb05d8d7d1c77c469e012d404b0a5062c840ed062570c94fce3d2b" => :mountain_lion
+    sha256 "111afdbd235cf1150aafa781986b200893010bea579be681d1d9565513fb07e2" => :sierra
+    sha256 "6b73d53148279442587b3eea063c8de9a1022f31b5eb2df453cfe6dd999404f7" => :el_capitan
+    sha256 "5f77b2b04db7133e7d9d529149d4e690a47ef1a4045766873cd23a16b80c303a" => :yosemite
   end
 
-  head do
-    # Allows clang 3.5 to compile with a recent libc++ release.
-    # See: https://savannah.gnu.org/bugs/?43298
+  if OS.mac? && DevelopmentTools.clang_version < "7.0"
+    # Fix the build error with LLVM 3.5svn (-3.6svn?) and libc++ (bug #43298)
+    # See: http://savannah.gnu.org/bugs/?43298
     patch do
-      url "https://gist.github.com/schoeps/ec25b19bf30f97d33cdb/raw/6f164415e5e0fb556c1cfc2b039985d25dfad872/octave-clang3.5-fix.patch"
-      sha1 "c3209b0bebd69ff5b9fa2d0463c8034d53f99225"
+      url "http://savannah.gnu.org/bugs/download.php?file_id=32255"
+      sha256 "ef83b32384a37cca13ecdd30d98dacac314b7c23f2c1df3d1113074bd1169c0f"
     end
   end
 
-  # Allows mkoctfile to process "-framework vecLib" properly.
-  # See: https://savannah.gnu.org/bugs/?42002
-  patch do
-    url "https://savannah.gnu.org/patch/download.php?file_id=31072"
-    sha1 "19f2dcaf636f1968c4b1639797415f83fb21d5a3"
+  # Fix bug #46723: retina scaling of buttons
+  # see https://savannah.gnu.org/bugs/?46723
+  patch :p1 do
+    url "https://savannah.gnu.org/bugs/download.php?file_id=38206"
+    sha256 "8307cec2b84fe546c8f490329b488ecf1da628ce823301b6765ffa7e6e292eed"
   end
 
-  # Allows other software to interface Octave and find its headers.
-  # See: https://github.com/shogun-toolbox/shogun/issues/2396
-  patch :DATA
+  # dependencies needed for head
+  head do
+    url "http://www.octave.org/hg/octave", :branch => "default", :using => :hg
+    depends_on :hg             => :build
+    depends_on "autoconf"      => :build
+    depends_on "automake"      => :build
+    depends_on "icoutils"      => :build
+  end
+
+  # build the pdf docs
+  if build.with? "docs"
+    depends_on :tex             => :build
+    depends_on "librsvg"        => :build
+  end
 
   skip_clean "share/info" # Keep the docs
 
-  option "without-check",          "Skip build-time tests (not recommended)"
-  option "without-docs",           "Don't build documentation"
-  option "without-gui",            "Do not build the experimental GUI"
-  option "with-native-graphics",   "Use native OpenGL/FLTKgraphics (does not work with the GUI)"
-  option "without-gnuplot",        "Do not use gnuplot graphics"
-  option "with-jit",               "Use the experimental JIT support (not recommended)"
+  # deprecated options
+  deprecated_option "with-jit"      => "with-llvm"
+  deprecated_option "with-audio"    => "with-sndfile"
+  deprecated_option "without-check" => "without-test"
+  deprecated_option "without-gui"   => "without-qt5"
 
-  option "with-openblas",          "Use OpenBLAS instead of native LAPACK/BLAS"
+  # options, enabled by default
   option "without-curl",           "Do not use cURL (urlread/urlwrite/@ftp)"
   option "without-fftw",           "Do not use FFTW (fft,ifft,fft2,etc.)"
+  option "without-fltk",           "Do not use FLTK graphics backend"
   option "without-glpk",           "Do not use GLPK"
+  option "without-gnuplot",        "Do not use gnuplot graphics"
   option "without-hdf5",           "Do not use HDF5 (hdf5 data file support)"
+  option "without-opengl",         "Do not use opengl"
   option "without-qhull",          "Do not use the Qhull library (delaunay,voronoi,etc.)"
   option "without-qrupdate",       "Do not use the QRupdate package (qrdelete,qrinsert,qrshift,qrupdate)"
-  option "without-suite-sparse421", "Do not use SuiteSparse (sparse matrix operations)"
+  option "without-qt5",            "Do not compile with qt-based graphical user interface"
+  option "without-suite-sparse",   "Do not use SuiteSparse (sparse matrix operations)"
+  option "without-test",           "Do not perform build-time tests (not recommended)"
   option "without-zlib",           "Do not use zlib (compressed MATLAB file formats)"
 
+  # options, disabled by default
+  option "with-docs",              "Compile and install documentation"
+  option "with-java",              "Use Java, requires Java 6 from https://support.apple.com/kb/DL1572"
+  option "with-llvm",              "Use the experimental just-in-time compiler (not recommended)"
+  option "with-openblas",          "Use OpenBLAS instead of native LAPACK/BLAS"
+  option "with-osmesa",            "Use the OSmesa library (incompatible with opengl)"
+  option "with-portaudio",         "Use portaudio for audio playback and recording"
+  option "with-sndfile",           "Use sndfile libraries for audio file operations"
+
+  # build dependencies
+  depends_on "gnu-sed"             => :build # http://lists.gnu.org/archive/html/octave-maintainers/2016-09/msg00193.html
+  depends_on "pkg-config"          => :build
+
+  # essential dependencies
   depends_on :fortran
-
-  depends_on "pkg-config"     => :build
-  depends_on "gnu-sed"        => :build
-  depends_on "texinfo"        => :build if build.with?("docs") && OS.linux?
-
-  head do
-    depends_on "bison"        => :build
-    depends_on "automake"     => :build
-    depends_on "autoconf"     => :build
-    depends_on "qscintilla2"
-    depends_on "qt"
-    depends_on "fltk"
-    depends_on "fontconfig"
-    depends_on "freetype"
-  end
-
+  depends_on :x11
+  depends_on "bison"               => :build
+  depends_on "fontconfig"
+  depends_on "freetype"
+  depends_on "gawk"                => :build
+  depends_on "texinfo"             => :build # we need >4.8
   depends_on "pcre"
-  if build.with? "gui"
+
+  # recommended dependencies (implicit options)
+  depends_on "arpack"              => :recommended
+  depends_on "curl"                => :recommended
+  depends_on "epstool"             => :recommended
+  depends_on "fftw"                => :recommended
+  depends_on "fltk"                => :recommended
+  depends_on "gl2ps"               => :recommended
+  depends_on "glpk"                => :recommended
+  depends_on "graphicsmagick"      => :recommended # imread/imwrite
+  depends_on "hdf5"                => :recommended
+  depends_on "qhull"               => :recommended
+  depends_on "qrupdate"            => :recommended
+  depends_on "readline"            => :recommended
+  depends_on "suite-sparse"        => :recommended
+  depends_on "transfig"            => :recommended
+
+  # recommended blas dependencies
+  depends_on "openblas"            => (OS.mac? ? :optional : :recommended)
+  depends_on "veclibfort"          if build.without?("openblas") && OS.mac?
+
+  # recommended ghostscript dependencies
+  depends_on "ghostscript"         => :recommended # ps/pdf image output
+  depends_on "pstoedit"            if build.with? "ghostscript"
+
+  # recommended qt5 dependencies
+  depends_on "qt5"                 => :recommended
+  if build.with? "qt5"
     depends_on "qscintilla2"
-    depends_on "qt"
+    depends_on "gnuplot" => [:recommended, "with-qt5"]
+  else
+    depends_on "gnuplot" => :recommended
   end
-  if build.with? "native-graphics"
-    depends_on "fltk"
-    depends_on "fontconfig"
-    depends_on "freetype"
+
+  # other optional dependencies
+  depends_on "libsndfile"          => :optional
+  depends_on "llvm"                => :optional
+  depends_on "portaudio"           => :optional
+  depends_on :java                 => ["1.6+", :optional]
+
+  # Fix bug #49053: retina scaling of figures
+  # see https://savannah.gnu.org/bugs/?49053
+  resource "retina-scaling-patch" do
+    url "https://savannah.gnu.org/support/download.php?file_id=38902"
+    sha256 "d56eff94f9f811845ba3b0897b70cba43c0715a0102b1c79852b72ab10d24e6c"
   end
-  depends_on "llvm"           if build.with? "jit"
-  depends_on "curl"           if build.with?("curl") && MacOS.version == :leopard
-  depends_on :java            => :recommended
 
-  depends_on "gnuplot"       => [:recommended, build.with?("gui") ? "with-qt" : ""]
-  depends_on "suite-sparse421" => :recommended
-  depends_on "readline"       => :recommended
-  depends_on "arpack"         => :recommended
-  depends_on "fftw"           => :recommended
-  depends_on "glpk"           => :recommended
-  depends_on "gl2ps"          => :recommended
-  depends_on "graphicsmagick" => :recommended  # imread/imwrite
-  depends_on "hdf5"           => :recommended
-  depends_on "qhull"          => :recommended
-  depends_on "qrupdate"       => :recommended
-  depends_on "epstool"        => :recommended
-
-  depends_on "ghostscript"    => :recommended  # ps/pdf image output
-  depends_on "pstoedit"       if build.with? "ghostscript"
-
-  depends_on "openblas"       => :optional
+  # If GraphicsMagick was built from source, it is possible that it was
+  # done to change quantum depth. If so, our Octave bottles are no good.
+  # https://github.com/Homebrew/homebrew-science/issues/2737
+  if build.with? "graphicsmagick"
+    def pour_bottle?
+      Tab.for_name("graphicsmagick").bottle?
+    end
+  end
 
   def install
     ENV.m64 if MacOS.prefer_64_bit?
     ENV.append_to_cflags "-D_REENTRANT"
     ENV.append "LDFLAGS", "-L#{Formula["readline"].opt_lib} -lreadline" if build.with? "readline"
+    ENV.prepend_path "PATH", Formula["texinfo"].bin
+    ENV["FONTCONFIG_PATH"] = "/opt/X11/lib/X11/fontconfig"
+
+    resource("retina-scaling-patch").stage do
+      inreplace "download.php" do |s|
+        s.gsub! "#include <QApplication.h>", "#include <QApplication>"
+        s.gsub! "__fontsize_points__", "fontsize_points" if build.stable?
+      end
+      system "patch", "-p1", "-i", Pathname.pwd/"download.php", "-d", buildpath
+    end
+
+    # basic arguments
     args = ["--prefix=#{prefix}"]
+    args << "--enable-dependency-tracking"
+    args << "--enable-link-all-dependencies"
+    args << "--enable-shared"
+    args << "--disable-static"
+    args << "--with-x=no" if OS.mac? # We don't need X11 for Mac at all
 
-    args << "--with-blas=-L#{Formula["openblas"].opt_lib} -lopenblas" if build.with? "openblas"
-    args << "--disable-docs"     if build.without? "docs"
-    args << "--enable-jit"       if build.with? "jit"
-    args << "--disable-gui"      if build.without? "gui"
-    args << "--without-opengl"   if build.without?("native-graphics") && !build.head?
+    # arguments for options enabled by default
+    args << "--without-curl"             if build.without? "curl"
+    args << "--disable-docs"             if build.without? "docs"
+    args << "--without-fftw3"            if build.without? "fftw"
+    args << "--with-fltk-prefix=#{Formula["fltk"].opt_prefix}" if build.with? "fltk"
+    args << "--without-glpk"             if build.without? "glpk"
+    args << "--without-qt"               if build.without? "qt5"
+    args << "--without-opengl"           if build.without? "opengl"
+    args << "--without-framework-opengl" if build.without? "opengl"
+    args << "--without-OSMesa"           if build.without? "osmesa"
+    args << "--without-qhull"            if build.without? "qhull"
+    args << "--without-qrupdate"         if build.without? "qrupdate"
+    args << "--disable-readline"         if build.without? "readline"
+    args << "--without-zlib"             if build.without? "zlib"
 
-    args << "--disable-readline" if build.without? "readline"
-    args << "--without-curl"     if build.without? "curl"
-    args << "--without-fftw3"    if build.without? "fftw"
-    args << "--without-glpk"     if build.without? "glpk"
-    args << "--without-hdf5"     if build.without? "hdf5"
-    args << "--disable-java"     if build.without? :java
-    args << "--without-qhull"    if build.without? "qhull"
-    args << "--without-qrupdate" if build.without? "qrupdate"
+    # arguments for options disabled by default
+    args << "--with-portaudio"           if build.with? "portaudio"
+    args << "--with-sndfile"             if build.with? "sndfile"
+    args << "--disable-java"             if build.without? "java"
+    args << "--enable-jit"               if build.with? "jit"
 
-    if build.without? "suite-sparse421"
+    # ensure that the right hdf5 library is used
+    if build.with? "hdf5"
+      args << "--with-hdf5-includedir=#{Formula["hdf5"].opt_include}"
+      args << "--with-hdf5-libdir=#{Formula["hdf5"].opt_lib}"
+    else
+      args << "--without-hdf5"
+    end
+
+    # arguments if building without suite-sparse
+    if build.without? "suite-sparse"
       args << "--without-amd"
       args << "--without-camd"
       args << "--without-colamd"
@@ -141,109 +207,97 @@ class Octave < Formula
       args << "--without-cholmod"
       args << "--without-umfpack"
     else
-      sparse = Tab.for_name("suite-sparse421")
-      ENV.append_to_cflags "-L#{Formula["metis4"].opt_lib} -lmetis" if sparse.with? "metis4"
+      ENV.append "LDFLAGS", "-L#{Formula["suite-sparse"].opt_lib} -lsuitesparseconfig"
+      ENV.append "LDFLAGS", "-L#{Formula["metis"].opt_lib} -lmetis"
     end
 
-    args << "--without-zlib"     if build.without? "zlib"
-    args << "--with-x=no"        if OS.mac? # We don't need X11 for Mac at all
+    # check if openblas settings are compatible
+    if build.with? "openblas"
+      if ["arpack", "qrupdate", "suite-sparse"].any? { |n| Tab.for_name(n).without? "openblas" }
+        odie "Octave is compiled --with-openblas but arpack, qrupdate or suite-sparse are not."
+      else
+        args << "--with-blas=-L#{Formula["openblas"].opt_lib} -lopenblas"
+      end
+    elsif OS.mac? # without "openblas"
+      if ["arpack", "qrupdate", "suite-sparse"].any? { |n| Tab.for_name(n).with? "openblas" }
+        odie "Arpack, qrupdate or suite-sparse are compiled --with-openblas but Octave is not."
+      else
+        args << "--with-blas=-L#{Formula["veclibfort"].opt_lib} -lvecLibFort"
+      end
+    else # OS.linux? and without "openblas"
+      args << "--with-blas=-lblas -llapack"
+    end
 
     system "./bootstrap" if build.head?
 
-    # Libtool needs to see -framework to handle dependencies better.
-    inreplace "configure", "-Wl,-framework -Wl,", "-framework "
-
-    # The Mac build configuration passes all linker flags to mkoctfile to
+    # the Mac build configuration passes all linker flags to mkoctfile to
     # be inserted into every oct/mex build. This is actually unnecessary and
     # can cause linking problems.
     inreplace "src/mkoctfile.in.cc", /%OCTAVE_CONF_OCT(AVE)?_LINK_(DEPS|OPTS)%/, '""'
 
-    if build.with?("gnuplot") && build.with?("gui")
-      # ~/.octaverc takes precedence over site octaverc
-      open("scripts/startup/local-rcfile", "a") do |file|
-        file.write "setenv('GNUTERM','#{build.with?("gui") ? "qt" : ""}')"
-      end
-    end
+    # Octave does strict assumptions on the name of qscintilla2
+    # see http://savannah.gnu.org/bugs/?48773
+    inreplace "configure", "qscintilla2-qt5 qt5scintilla2", "qscintilla2-qt5 qt5scintilla2 qscintilla2"
 
     system "./configure", *args
     system "make", "all"
-    system "make check 2>&1 | tee make-check.log" if build.with? "check"
+    system "make", "check" if build.with? "test"
     system "make", "install"
-    prefix.install "make-check.log" if File.exist? "make-check.log"
+
     prefix.install "test/fntests.log" if File.exist? "test/fntests.log"
   end
 
   def caveats
     s = ""
 
-    if build.with? "gnuplot"
+    if build.with?("qt5")
       s += <<-EOS.undent
 
-        gnuplot's Qt terminal is supported by default with the Octave GUI.
-        Use other gnuplot graphics terminals by setting the environment variable
-        GNUTERM in ~/.octaverc, and building gnuplot with the matching options.
+      Octave is compiled with a graphical user interface. The start-up option --no-gui
+      will run the familiar command line interface. The option --no-gui-libs runs a
+      minimalistic command line interface that does not link with the Qt libraries and
+      uses the fltk toolkit for plotting if available.
 
-          setenv('GNUTERM','qt')    # Default graphics terminal with Octave GUI
-          setenv('GNUTERM','x11')   # Requires XQuartz; install gnuplot --with-x
-          setenv('GNUTERM','wxt')   # wxWidgets/pango; install gnuplot --wx
+      EOS
+
+    else
+
+      s += <<-EOS.undent
+
+      Octave's graphical user interface is disabled; compile Octave with the option
+      --with-qt5 to enable it.
+
+      EOS
+
+    end
+
+    if build.with?("gnuplot") || build.with?("fltk")
+      s += <<-EOS.undent
+
+        Several graphics toolkit are available. You can select them by using the command
+        'graphics_toolkit' in Octave.  Individual Gnuplot terminals can be chosen by setting
+        the environment variable GNUTERM and building gnuplot with the following options:
+
+          setenv('GNUTERM','qt')    # Requires QT; install gnuplot --with-qt5
+          setenv('GNUTERM','x11')   # Requires XQuartz; install gnuplot --with-x11
+          setenv('GNUTERM','wxt')   # Requires wxmac; install gnuplot --with-wxmac
           setenv('GNUTERM','aqua')  # Requires AquaTerm; install gnuplot --with-aquaterm
 
-          You may also set this variable from within Octave.
+        You may also set this variable from within Octave. For printing the cairo backend
+        is recommended, i.e., install gnuplot with --with-cairo, and use
+
+          print -dpdfcairo figure.pdf
 
       EOS
     end
 
-    if build.with?("native graphics") || build.head?
+    if build.without?("osmesa") || (build.with?("osmesa") && build.with?("opengl"))
       s += <<-EOS.undent
 
-        You have configured Octave to use "native" OpenGL/FLTK plotting by
-        default. If you prefer gnuplot, you can activate it for all future
-        figures with the command
-            graphics_toolkit ('gnuplot')
-        or for a specific figure handle h using
-            graphics_toolkit (h,'gnuplot')
+      When using the native Qt or fltk toolkits then invisible figures do not work because
+      osmesa is incompatible with Mac's OpenGL. The usage of gnuplot is recommended.
+
       EOS
-    end
-
-    if build.head?
-      s += <<-EOS.undent
-
-        The HEAD installation activates the experimental GUI by default.
-        To use the CLI version of octave, run the command "octave-cli".
-      EOS
-    elsif build.with? "gui"
-      s += <<-EOS.undent
-
-        The Octave GUI is experimental and not enabled by default. To use it,
-        use the command-line argument "--force-gui"; e.g.,
-            octave --force-gui
-      EOS
-      if build.with? "native-graphics"
-        s += <<-EOS.undent
-
-          Native graphics do *not* work with the GUI. You must switch to
-          gnuplot when using it.
-        EOS
-      end
-    end
-
-    logfile = "#{prefix}/make-check.log"
-    if File.exist? logfile
-      logs = `grep 'libinterp/array/.*FAIL \\d' #{logfile}`
-      unless logs.empty?
-        s += <<-EOS.undent
-
-            Octave's self-tests for this installation produced the following failues:
-            --------
-        EOS
-        s += logs + <<-EOS.undent
-            --------
-            These failures indicate a conflict between Octave and its BLAS-related
-            dependencies. You can likely correct these by removing and reinstalling
-            arpack, qrupdate, suite-sparse421, and octave. Please use the same BLAS
-            settings for all (i.e., with the default, or "--with-openblas").
-        EOS
-      end
     end
 
     s += "\n" unless s.empty?
@@ -251,34 +305,8 @@ class Octave < Formula
   end
 
   test do
-    system "octave", "--eval", "'(22/7 - pi)/pi'"
+    system bin/"octave", "--eval", "(22/7 - pi)/pi"
+    # this is supposed to crash octave if there is a problem with veclibfort
+    system bin/"octave", "--eval", "single ([1+i 2+i 3+i]) * single ([ 4+i ; 5+i ; 6+i])"
   end
 end
-
-__END__
-diff --git a/libinterp/corefcn/comment-list.h b/libinterp/corefcn/comment-list.h
-index 2f2c4d5..18df774 100644
---- a/libinterp/corefcn/comment-list.h
-+++ b/libinterp/corefcn/comment-list.h
-@@ -25,7 +25,7 @@ along with Octave; see the file COPYING.  If not, see
- 
- #include <string>
- 
--#include <base-list.h>
-+#include "base-list.h"
- 
- extern std::string get_comment_text (void);
- 
-diff --git a/libinterp/corefcn/oct.h b/libinterp/corefcn/oct.h
-index c6d21ad..db06357 100644
---- a/libinterp/corefcn/oct.h
-+++ b/libinterp/corefcn/oct.h
-@@ -28,7 +28,7 @@ along with Octave; see the file COPYING.  If not, see
- // config.h needs to be first because it includes #defines that can */
- // affect other header files.
- 
--#include <config.h>
-+#include "config.h"
- 
- #include "Matrix.h"
- 

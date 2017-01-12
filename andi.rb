@@ -4,26 +4,27 @@ class Andi < Formula
   # tag "bioinformatics"
   # doi "10.1093/bioinformatics/btu815"
 
-  url "https://github.com/EvolBioInf/andi/releases/download/v0.9.2/andi-0.9.2.tar.gz"
-  sha256 "3bb5a114995c50d800d9d7c4cd984f259b18f785a6627f81eceee47481a4f1d3"
+  url "https://github.com/EvolBioInf/andi/releases/download/v0.10/andi-0.10.tar.gz"
+  sha256 "7182d43bd13aa51d12a5d69fe4e3e4f83aab8429f5030192ae860e1a1b0e3f77"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "caa3c95977c845f8e3635d342a6c07b43e1e26505b68ab1d817aed7b7f664f31" => :yosemite
-    sha256 "b1cedba1d1807db3811f25e06f6942e51aa86a1d11c8645892a9a43bd86d4203" => :mavericks
-    sha256 "75953fc9b966ef6fc4efab3c2c47fa30d096a91617788f9431a58d6d97b35f13" => :mountain_lion
+    sha256 "d1c6a0d147a5422463933a8311ceaa6aba6e0c03b1bde520c9a0fd96621affc0" => :sierra
+    sha256 "92ea0b4143d62faafd41495514d5f966d761b6dd6f30bae1a16afb094628c417" => :el_capitan
+    sha256 "e220eb0b520a6aec9539596af23eccb060ce3ae69667e177b2dbf0005865181e" => :yosemite
+    sha256 "232bbad5b5e892049e1e3353ec754ca4daff972862011a2848de1e57bf756ea6" => :mavericks
+    sha256 "de9bd35d612595c6900206fbc18adf71b6caef7ca8e042ab4ead4326358856b1" => :x86_64_linux
   end
 
-  depends_on "libdivsufsort"
+  depends_on "gsl"
 
   def install
-    lib = Formula["libdivsufsort"]
     system "./configure",
       "--disable-dependency-tracking",
       "--disable-silent-rules",
       "--prefix=#{prefix}",
-      "CPPFLAGS=-I#{lib.opt_include}",
-      "LDFLAGS=-L#{lib.opt_lib}"
+      "--without-libdivsufsort"
     system "make", "install"
   end
 

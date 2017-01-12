@@ -1,23 +1,26 @@
 class Flint < Formula
+  desc "C library for number theory"
   homepage "http://flintlib.org"
-  #doi "10.1007/978-3-642-15582-6_18"
-  #tag "math"
-  url "http://flintlib.org/flint-2.4.5.tar.gz"
-  mirror "https://mirrors.kernel.org/debian/pool/main/f/flint/flint_2.4.5.orig.tar.gz"
-  sha256 "e489354df00f0d84976ccdd0477028693977c87ccd14f3924a89f848bb0e01e3"
+  # doi "10.1007/978-3-642-15582-6_18"
+  # tag "math"
+  url "http://flintlib.org/flint-2.5.2.tar.gz"
+  sha256 "cbf1fe0034533c53c5c41761017065f85207a1b770483e98b2392315f6575e87"
   head "https://github.com/wbhart/flint2.git", :branch => "trunk"
 
   bottle do
-    sha256 "791a7d2fc59c971a8201a3b81b7a5d4315165b58ba9c2b5b3807111d9e9896ad" => :yosemite
-    sha256 "499a90a4ab6d7783fcf43fa35428f90b5923c7a28722474231736668d9b1f26a" => :mavericks
-    sha256 "e82ce164d3161c934971f674a5459ee9a354baf7b4c4d4cca7f2bd5006a626d0" => :mountain_lion
+    revision 1
+    sha256 "c1f138713448831b1c0b7139f8b5f6e5db1efa24ea36e362fa034b7583b4dfd2" => :el_capitan
+    sha256 "7d9eb3063db06aeba1e2f56dc996f18ec956ac5cebb119b0f3b731f616d87158" => :yosemite
+    sha256 "698ffed40c561b5235aff6e4fd577786ceb28b0c0de3fb5a708401ad0dc1bba4" => :mavericks
   end
 
   depends_on "gmp"
   depends_on "mpfr"
 
   def install
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", "--prefix=#{prefix}",
+                          "--with-gmp=#{Formula["gmp"].opt_prefix}",
+                          "--with-mpfr=#{Formula["mpfr"].opt_prefix}"
     system "make"
     system "make", "install"
   end

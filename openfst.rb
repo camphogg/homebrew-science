@@ -1,15 +1,15 @@
-require "formula"
-
 class Openfst < Formula
+  desc "Open-source library for working with weighted finite-state transducers."
   homepage "http://www.openfst.org/"
-  url "http://openfst.org/twiki/pub/FST/FstDownload/openfst-1.5.0.tar.gz"
-  sha256 "01c2b810295a942fede5b711bd04bdc9677855c846fedcc999c792604e02177b"
+  url "http://openfst.org/twiki/pub/FST/FstDownload/openfst-1.5.4.tar.gz"
+  sha256 "acc115aaaa33de53de62dae44120ab368fabaea06f52606b77714081ecd32657"
 
   bottle do
     cellar :any
-    sha256 "1bfc2e5b726d2230a2c8d8114e8317d9509aa2efd88bceb4e5074ed9fbb6a7cf" => :yosemite
-    sha256 "cf7ad2775f80643bef502de1fd14666df330a0a56bdcdebe14eeda205d25e148" => :mavericks
-    sha256 "bbf6182d91486e61f2f7dac0b1ed1814e212e50f88f0aeae757ba66bcb9cf80e" => :mountain_lion
+    sha256 "cfe30e7883dc714d8d43a8e0617434c78ba3338e3f534e7f8858a6b60ce19066" => :sierra
+    sha256 "aab7e1ae09f71d183e432ea84abf841218d77dc0b791b2600c193059c0cacb10" => :el_capitan
+    sha256 "0b4ebfec53234c67e715fffc77ebdf558e477fd4493aca63ff8b96ddae7dc8d1" => :yosemite
+    sha256 "9be38a5d4573bc9404a64cf0186e020f8e221c59ae5900cfeeb4af8501dc03d7" => :x86_64_linux
   end
 
   needs :cxx11
@@ -27,7 +27,7 @@ class Openfst < Formula
                           "--enable-mpdt",
                           "--enable-ngram-fsts",
                           "--enable-pdt"
-    system "make install"
+    system "make", "install"
   end
 
   test do

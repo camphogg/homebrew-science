@@ -1,37 +1,28 @@
 class Muscle < Formula
+  desc "Multiple sequence alignment program"
   homepage "http://www.drive5.com/muscle/"
-  #doi "10.1093/nar/gkh340", "10.1186/1471-2105-5-113"
-  #tag "bioinformatics"
-
-  url "http://www.drive5.com/muscle/downloads3.8.31/muscle3.8.31_src.tar.gz"
-  version "3.8.31"
-  sha1 "2fe55db73ff4e7ac6d4ca692f8f213d1c5071dac"
+  url "http://www.drive5.com/muscle/muscle_src_3.8.1551.tar.gz"
+  sha256 "c70c552231cd3289f1bad51c9bd174804c18bb3adcf47f501afec7a68f9c482e"
+  # doi "10.1093/nar/gkh340", "10.1186/1471-2105-5-113"
+  # tag "bioinformatics"
 
   bottle do
-    cellar :any
-    revision 1
-    sha256 "0a990ee3f64ded25220d31a433c042bcdba901a73dbece2ec9ada87922f63223" => :yosemite
-    sha256 "8d13788647466efb841666a9c063cc464abf41fdb430b4b2cb20936bec74b4f3" => :mavericks
-    sha256 "00f1fff48e1003d2e31a3868bd7360a4c2d2736bce3e398e6149dbce87bcf1de" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "e772cd2b482c3fc892485504ccae0ee5a486cb00a57b8e6e154b9f20d0d201e5" => :sierra
+    sha256 "46fb3219f56a068c718f6b7f3a8d13db9a4b7c6c9483a969da16c7588e59a4e1" => :el_capitan
+    sha256 "7b9fdbd97e273d81c87881e2b58151311221aeaedca1b875c560232d831c0b30" => :yosemite
+    sha256 "c554628301f042c9803c045da94ea9109c414b277f994cd6fc07763c93c7e510" => :x86_64_linux
   end
 
   def install
-    # This patch makes 3.8.31 build on OSX >= Lion.
-    # It has been reported upstream but not fixed yet.
-    inreplace "src/globalsosx.cpp",
-              "#include <mach/task_info.h>",
-              "#include <mach/vm_statistics.h>\n#include <mach/task_info.h>"
+    # Fix build per Makefile instructions
+    inreplace "Makefile", "-static", ""
 
-    # This patch makes 3.8.31 build on RHEL 7.x
-    # It ONLY affects Linux (in an "if Linux" clause in the 'mk' script)
-    # It is unnecessary to create a static binary
-    inreplace "src/mk",
-              "LINK_OPTS=-static",
-              "LINK_OPTS="
+    system "make"
+    bin.install "muscle"
+  end
 
-    cd "src" do
-      system "make"
-      bin.install "muscle"
-    end
+  test do
+    assert_match version.to_s, shell_output("#{bin}/muscle -version")
   end
 end

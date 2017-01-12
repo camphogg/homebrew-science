@@ -1,22 +1,24 @@
 class Mhap < Formula
+  desc "MinHash Alignment Process"
   homepage "https://github.com/marbl/MHAP"
-  # doi "10.1101/008003"
+  # doi "10.1038/nbt.3238"
   # tag "bioinformatics"
 
-  url "https://github.com/marbl/MHAP/releases/download/v1.5b1/mhap-1.5b1.tar.gz"
-  sha256 "fa3a7fbf370d61deedb1866cf141ddf6b7538b05009be1fd8f2cbd55ff28ca99"
-
+  url "https://github.com/marbl/MHAP/releases/download/v2.1.1/mhap-2.1.1.jar.gz"
+  version "2.1.1"
+  sha256 "66a5f34eb7ed23a4073edb44e3019d7ca16357951945b75a1825fd0c8763fdb3"
   head "https://github.com/marbl/MHAP.git"
 
   bottle do
-    cellar :any
-    sha256 "04759dd37c8096f22e57b8ce8022292efe112013e9d59c51269469e641945161" => :yosemite
-    sha256 "69455089478902596629aa009ac76f98e7779fc29dbf7b069ca2f6060092ae47" => :mavericks
-    sha256 "adbf98a0bf965072416d2c0aaeaec677b921f9455904c62589536ed2d22c83b5" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "9adbb7bd7ecb554569963c18b240943d7ac688e33a134abbd04928194f003bd2" => :sierra
+    sha256 "a646dc8d072bc89d60771f7a38d55c599aea25f4a45c057cf4774e99f678d365" => :el_capitan
+    sha256 "165943433f514997de36880f545b9d3d4b1ed0f196c8f4fd9e5bb10de4b9dc8c" => :yosemite
+    sha256 "c1cdeee8009b8d12e7e841873fb4b433fb45bed634aa3091f7c444d2c8a346cf" => :x86_64_linux
   end
 
   def install
-    prefix.install "mhap-#{version}.jar", Dir["lib/*"]
+    prefix.install "mhap-#{version}.jar"
     bin.write_jar_script prefix/"mhap-#{version}.jar", "mhap"
   end
 

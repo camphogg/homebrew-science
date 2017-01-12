@@ -1,25 +1,24 @@
-require 'formula'
-
 class Repeatmasker < Formula
-  homepage 'http://www.repeatmasker.org/'
-  #tag "bioinformatics"
+  homepage "http://www.repeatmasker.org/"
+  # tag "bioinformatics"
 
-  version '4.0.5'
-  url 'http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz'
-  sha1 '9b00047639845bcff6dccf4148432ab2378d095c'
+  version "4.0.5"
+  url "http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz"
+  sha256 "e4c15c64b90d57ce2448df4c49c37529eeb725e97f3366cc90f794a4c0caeef7"
 
   bottle do
-    sha1 "c46730ceac418dfa4ed61989c944ca64ab224433" => :yosemite
-    sha1 "f037a6b32368ed09cdfc2e639d302dd5828064af" => :mavericks
-    sha1 "ad7aefdfd3b9393cdb12974647b52575a76f65da" => :mountain_lion
+    sha256 "32acef0307f30cc3d20eca9e1eb7c3f485369bdcf5ac6bc6f25ebce2e257f521" => :yosemite
+    sha256 "acc0c2ea5291b32f3165bd1ff097d0efb8d42bac4e80b7a2952157ecdcb3bb84" => :mavericks
+    sha256 "2ebf7447cc0d9902df64fa6f292f2b1754118601455bf1889808b69eb5f3bf73" => :mountain_lion
+    sha256 "f75455ed5a322cd31ed3f11c961cc2bcc442d300b2f36ec2ff55bb6df8dcc775" => :x86_64_linux
   end
 
-  option 'without-configure', 'Do not run configure'
+  option "without-configure", "Do not run configure"
 
-  depends_on 'hmmer' # at least version 3.1 for nhmmer
+  depends_on "hmmer" # at least version 3.1 for nhmmer
   depends_on "perl" => :optional
-  depends_on 'rmblast'
-  depends_on 'trf'
+  depends_on "rmblast"
+  depends_on "trf"
 
   def install
     perl = if build.with? "perl"
@@ -28,8 +27,8 @@ class Repeatmasker < Formula
       "/usr/bin/perl"
     end
 
-    libexec.install Dir['*']
-    bin.install_symlink '../libexec/RepeatMasker'
+    libexec.install Dir["*"]
+    bin.install_symlink "../libexec/RepeatMasker"
 
     # Configure RepeatMasker. The prompts are:
     # PRESS ENTER TO CONTINUE
@@ -79,6 +78,6 @@ class Repeatmasker < Formula
   end
 
   test do
-    system 'RepeatMasker'
+    system "RepeatMasker"
   end
 end

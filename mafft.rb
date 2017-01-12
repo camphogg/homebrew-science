@@ -1,15 +1,18 @@
 class Mafft < Formula
+  desc "Multiple alignments with fast Fourier transforms"
   homepage "http://mafft.cbrc.jp/alignment/software/index.html"
   # doi "10.1093/nar/gkf436"
   # tag "bioinformatics"
 
-  url "http://mafft.cbrc.jp/alignment/software/mafft-7.221-with-extensions-src.tgz"
-  sha256 "0bc78111966d9b00ddfa14fa217fa5bb0c593a558674a13f02dca7bcd51f7fcf"
+  url "http://mafft.cbrc.jp/alignment/software/mafft-7.305-with-extensions-src.tgz"
+  sha256 "26fccbd7091edfe6528a0535d33738546ee57b4a3b6e43332ffc3323e29ff4d1"
 
   bottle do
-    sha256 "ca251da2e73a13e9598ab25eb528c4305ceb14af0652c90ebb76074990c4e2ec" => :yosemite
-    sha256 "ce06f63d9cd72f5b0faec1cf517d857151a5e061e25a32e6f1a21fb67153c60e" => :mavericks
-    sha256 "5c9b9ab39a0e54e180a2fc3e365280e529b4c931a069661232cc4a4dceb0782c" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "8809d503a8ce528e51072e57b80902384df4f2a011d427a431b8ea533e6f5d5d" => :sierra
+    sha256 "2e07771ee7a58f3ab7595b7b20d5f220104ce40414977d691d2f03f1d793049c" => :el_capitan
+    sha256 "8806462b6e5e4077819b18e6a48eff94f154199ca03a2e524de273b6b09d2a7f" => :yosemite
+    sha256 "d9dddf512066174d8c819051397e155b6e964c226aa39998349e247cdc8a987b" => :x86_64_linux
   end
 
   fails_with :clang do

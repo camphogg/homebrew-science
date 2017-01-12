@@ -1,16 +1,17 @@
 class Proverif < Formula
+  desc "Proverif, cryptographic protocol verifier in the formal model"
   homepage "http://prosecco.gforge.inria.fr/personal/bblanche/proverif"
-  url "http://prosecco.gforge.inria.fr/personal/bblanche/proverif/proverif1.90.tar.gz"
-  sha256 "7132729a7674c8c71414d0f0d9a86f6cb4aae7552598a8cd8b0239673521a991"
+  url "http://prosecco.gforge.inria.fr/personal/bblanche/proverif/proverif1.92.tar.gz"
+  sha256 "8c7a83dbe36ed0b5fbecf477d35769a31f8c349950aa40495e69761306048da5"
 
   bottle do
-    cellar :any
-    sha256 "60d688d67296523154187081ba6bc046481f0995eb2253fff34cf1416bc7db1b" => :yosemite
-    sha256 "bbca3ce1cb0a4d0f4ebb75e9d3cf5758beee768dee481d3571e97b32979b6687" => :mavericks
-    sha256 "f7ccdb5ba4c721f6316ea67287c6e13c6c852826f95c44b1659a6936a1e7abb1" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "f9c1a86d99a32269705b1c00ec4156e2ca051b02de1d7eca9b047c612b5800ca" => :el_capitan
+    sha256 "1d17c42100fd86080e0f07ba9e7c5509a7e27d3188ba637492b9e091a4bfc99a" => :yosemite
+    sha256 "53c51851f8682d7e3f8d47a1990dfcc1ac22a9a6cd59cd14f2bcb6d913352b73" => :mavericks
   end
 
-  depends_on "objective-caml"
+  depends_on "ocaml"
 
   def install
     system "./build"
@@ -19,20 +20,20 @@ class Proverif < Formula
     doc.install Dir["docs/*"], "README", "examples"
 
     (prefix/"cryptoverif").install "cryptoverif.pvl"
-    (share/"emacs/site-lisp").install Dir["emacs/*"]
+    (share/"emacs/site-lisp/proverif").install Dir["emacs/*"]
     (prefix/"tests").install "test", "test-type"
-  end
-
-  test do
-    system "#{bin}/proverif", doc/"examples/horn/auth/needham"
   end
 
   def caveats; <<-EOS.undent
     Cryptoverif compatibility library has been installed to
-      #{prefix}/cryptoverif/cryptoverif.pvl
+    #{prefix}/cryptoverif/cryptoverif.pvl
 
     Extensive checks should be perfomed manually using
-      #{prefix}/tests/test
+    #{prefix}/tests/test
     EOS
+  end
+
+  test do
+    system "#{bin}/proverif", doc/"examples/horn/auth/needham"
   end
 end

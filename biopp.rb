@@ -6,14 +6,13 @@ class Biopp < Formula
 
   bottle do
     cellar :any
-    revision 1
-    sha256 "78bfb23487417b433c6ab4cccc895e7a3b0584e96868bf59f001c22a3f715f09" => :yosemite
-    sha256 "a09ed60fc8333de3c1d9a15192d647fd02ca80e9a6fec79db8163b1ef26fbe4a" => :mavericks
-    sha256 "07026550e81a868284e88c9db44dcd34f7f0b6f1885e44a2651b7489dbd45365" => :mountain_lion
+    rebuild 2
+    sha256 "0a334099d68f8bd0edad8d0d92b1000ff966342b7916e87ddf50c327577625c3" => :sierra
+    sha256 "1f0e4aa50929c5779cc07fcbfd0f6bc65aaba413bdeeeec0422b9a7ab49cc5a2" => :el_capitan
+    sha256 "cf17b2874d780309086794cda9d5c6d16d0c95cd47013b1cc001ca5ebfade78f" => :yosemite
   end
 
   depends_on "cmake" => :build
-  depends_on "qt" => :recommended
 
   resource "bppcore" do
     url "http://biopp.univ-montp2.fr/repos/sources/bpp-core-2.2.0.tar.gz"
@@ -45,27 +44,12 @@ class Biopp < Formula
     sha256 "c7ec73a5af84808362f301479c548b6a01c47a66065b28a053ff8043409e861a"
   end
 
-  resource "bppqt" do
-    url "http://biopp.univ-montp2.fr/repos/sources/bpp-qt-2.2.0.tar.gz"
-    sha256 "9662f66bc3491d8e128263f6bd91fcdbecdb375ec9f24519f44855cdcdb9d553"
-  end
-
   def install
     %w[bppcore bppseq bppphyl bpppopgen bppseqomics bppraa].each do |r|
       resource(r).stage do
         mkdir "build" do
           system "cmake", "..", *std_cmake_args
           system "make", "#{r}-shared", "#{r}-static"
-          system "make", "install"
-        end
-      end
-    end
-
-    if build.with? "qt"
-      resource("bppqt").stage do
-        mkdir "build" do
-          system "cmake", "..", *std_cmake_args
-          system "make", "bppqt-shared", "bppqt-static"
           system "make", "install"
         end
       end
@@ -116,7 +100,6 @@ class Biopp < Formula
     EOS
     libs = %W[-lbpp-core -lbpp-seq -lbpp-phyl -lbpp-raa -lbpp-seq-omics
               -lbpp-phyl-omics -lbpp-popgen]
-    libs << "-lbpp-qt" if build.with? "qt"
     system ENV.cxx, "-o", "test", "bpp-phyl-test.cpp",
            "-I#{include}", "-L#{lib}", *libs
     system "./test"

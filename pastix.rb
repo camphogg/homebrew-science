@@ -1,14 +1,17 @@
 class Pastix < Formula
+  desc "Parallel solver for sparse linear systems based on direct methods"
   homepage "http://pastix.gforge.inria.fr"
-  url "https://gforge.inria.fr/frs/download.php/file/34392/pastix_5.2.2.20.tar.bz2"
-  sha1 "d55acf287ed0b6a59fc12606a21e42e3d38507c5"
+  url "https://gforge.inria.fr/frs/download.php/file/35070/pastix_5.2.2.22.tar.bz2"
+  sha256 "30f771a666719e6b116f549a6e4da451beabab99c2ecabc0745247c3654acbed"
+  revision 2
+
   head "git://scm.gforge.inria.fr/ricar/ricar.git"
-  revision 3
 
   bottle do
-    sha256 "4dc1de1d66b728154b6157095259c4231b20f450e57d872f7b8252c8a558d55f" => :yosemite
-    sha256 "8ba979033897b56109d1f50a5e5270ff11d3ed756b771498ffd2cfd299724b44" => :mavericks
-    sha256 "c937cf0feae8da2a185ac9e984c917fba3b5cfd0c19f6518d4ca0938ec671efc" => :mountain_lion
+    cellar :any
+    sha256 "8cabeb3fa4157bda56c4895212feb6b15c10e9996388180fe9c3f9703143e463" => :el_capitan
+    sha256 "a9ce2368273b3d5fbddb9db328d0b5b91337325e89032be718b425d1d48129ea" => :yosemite
+    sha256 "52d8bc960f44d3a9a40e35ebaf05748f052ebb8102e66623deff2969f148d937" => :mavericks
   end
 
   depends_on "scotch"
@@ -18,6 +21,7 @@ class Pastix < Formula
 
   depends_on :mpi       => [:cc, :cxx, :f90]
   depends_on :fortran
+  depends_on "gcc"
 
   def install
     ENV.deparallelize
@@ -31,7 +35,7 @@ class Pastix < Formula
         s.change_make_var! "MCFPROG",   ENV["MPIFC"]
         s.change_make_var! "MPCCPROG",  ENV["MPICC"]
         s.change_make_var! "MPCXXPROG", ENV["MPICXX"]
-        s.change_make_var! "VERSIONBIT", ((MacOS.prefer_64_bit?) ? "_64bit" : "_32bit")
+        s.change_make_var! "VERSIONBIT", MacOS.prefer_64_bit? ? "_64bit" : "_32bit"
 
         libgfortran = `#{ENV["MPIFC"]} --print-file-name libgfortran.a`.chomp
         s.change_make_var! "EXTRALIB", "-L#{File.dirname(libgfortran)} -lgfortran -lm"
@@ -81,26 +85,31 @@ class Pastix < Formula
       end
       system "make"
       system "make", "install"
-      system "make", "examples"
+
+      # Build examples against just installed libraries, so they continue to
+      # work once the temporary directory is gone, e.g., for `brew test`.
+      system "make", "examples", "PASTIX_BIN=#{bin}",
+                                 "PASTIX_LIB=#{lib}",
+                                 "PASTIX_INC=#{include}"
       system "./example/bin/simple", "-lap", "100"
-      prefix.install "config.in"    # For the record.
-      share.install "example"       # Contains all test programs.
-      ohai "Simple test result is in ~/Library/Logs/Homebrew/pastix. Please check."
+      prefix.install "config.in" # For the record.
+      pkgshare.install "example" # Contains all test programs.
+      ohai "Simple test result is in #{HOMEBREW_LOGS}/pastix. Please check."
     end
   end
 
   test do
-    Dir.foreach("#{share}/example/bin") do |example|
+    Dir.foreach("#{pkgshare}/example/bin") do |example|
       next if example =~ /^\./ || example =~ /plot_memory_usage/ || example =~ /mem_trace.o/ || example =~ /murge_sequence/
-      next if example == "reentrant"  # May fail due to thread handling. See http://goo.gl/SKDGPV
+      next if example == "reentrant" # May fail due to thread handling. See http://goo.gl/SKDGPV
       if example == "murge-product"
-        system "#{share}/example/bin/#{example}", "100", "10", "1"
+        system "#{pkgshare}/example/bin/#{example}", "100", "10", "1"
       elsif example =~ /murge/
-        system "#{share}/example/bin/#{example}", "100", "4"
+        system "#{pkgshare}/example/bin/#{example}", "100", "4"
       else
-        system "#{share}/example/bin/#{example}", "-lap", "100"
+        system "#{pkgshare}/example/bin/#{example}", "-lap", "100"
       end
     end
-    ohai "All test output is in ~/Library/Logs/Homebrew/pastix. Please check."
+    ohai "All test output is in #{HOMEBREW_LOGS}/pastix. Please check."
   end
 end

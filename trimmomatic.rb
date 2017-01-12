@@ -1,23 +1,24 @@
 class Trimmomatic < Formula
+  desc "Flexible read trimming tool for Illumina data"
   homepage "http://www.usadellab.org/cms/?page=trimmomatic"
+  url "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.36.zip"
+  sha256 "4846c42347b663b9d6d3a8cef30da2aec89fc718bf291392c58e5afcea9f70fe"
   # tag "bioinformatics"
   # doi "10.1093/bioinformatics/btu170"
 
-  url "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.33.zip"
-  sha256 "6968583a6c5854a44fff7d427e7ccdcb8dc17f4616082dd390a0633f87a09e3d"
-
   bottle do
-    cellar :any
-    sha256 "167c3b4bd6b20ea9ecd5d90c8dc03ef1b40e049b99c3b8121ea35f8549eaabf8" => :yosemite
-    sha256 "a3b3a456599ab75b9ad0ef8c11cabdc35152c3c47b67f66d060599e56606b4e3" => :mavericks
-    sha256 "964615ac7f4507223de6e81c1b84f8d8f73abb103f019b16b4295b940fddbcea" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "1d577a23cc018332b026bb651dc9866a0398822ebafa4eb9c2d6baa581a50a28" => :el_capitan
+    sha256 "9d7d33b3dffd1955151ce5fa9178e1ca8f8fed8a74410151f36eecfb5f6508de" => :yosemite
+    sha256 "1ef4c722d1ffd49272fbbcb7b31ba181241007b7940ed0cfc1b8adc8837b7569" => :mavericks
+    sha256 "eaa3194a59e4ac63201a7da134d98807a645a1316ece600b390ec6888cc37b18" => :x86_64_linux
   end
 
   depends_on :java
 
   def install
     cmd = "trimmomatic"
-    jar = "#{cmd}-0.33.jar"
+    jar = "#{cmd}-0.36.jar"
     java = share/"java"
     java.install jar
     bin.write_jar_script java/jar, cmd

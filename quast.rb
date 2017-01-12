@@ -1,17 +1,18 @@
 class Quast < Formula
   desc "QUAST: Quality Assessment Tool for Genome Assemblies"
-  homepage "http://bioinf.spbau.ru/en/quast"
-  # doi "10.1093/bioinformatics/btt086"
+  homepage "http://cab.spbu.ru/software/quast/"
+  # doi "10.1093/bioinformatics/btt086", "10.1093/bioinformatics/btv697", "10.1093/bioinformatics/btw379"
   # tag "bioinformatics"
 
-  url "https://downloads.sourceforge.net/project/quast/quast-3.0.tar.gz"
-  sha256 "d8f65808007ca989dfb740935dc3a28909ceb2d9d77ac456bfbc54287fdd9ee7"
+  url "http://cab.spbu.ru/wp-content/uploads/2016/04/quast-4.4.1.tar.gz"
+  sha256 "73ccf6bfc20503e6c72e0479a073aadd4319a36badba15b0810217b27e078ea3"
 
   bottle do
-    cellar :any
-    sha256 "31424b63c4575c86f8a8738e344f5de2db54dc825c48768ca05eba203f739cb0" => :yosemite
-    sha256 "e7059ac774256316780e30786c01f62848b47f084c235414d22efbdc3c917598" => :mavericks
-    sha256 "01b2f6d165f44f5883c6a149ae5761902b22e7fc5e1c9ad95928899a142968e4" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "2d3a3fc7e4840c09b9a642ae72f5435931c975bdeb5b4a959c41d287f18599fd" => :sierra
+    sha256 "0804992f335212327fa1fc9674bef2ccffb294442270f12197109e4fdd6bc726" => :el_capitan
+    sha256 "c29b8da6a51e654627b9df896ac36cf6fd42950cb7a4256d8b093ae3497c5faf" => :yosemite
+    sha256 "f4b54ea0477fd1d2793ec5deb824ae117e75466f1218fc4b922e77e1cbcd03d9" => :x86_64_linux
   end
 
   if OS.mac? && MacOS.version <= :mountain_lion
@@ -20,18 +21,19 @@ class Quast < Formula
     # Mavericks and newer include matplotlib
     depends_on "matplotlib" => :python
   end
+  depends_on "e-mem"
 
   def install
+    # removing precompiled E-MEM binary causing troubles with brew audit
+    rm "quast_libs/E-MEM-osx/e-mem"
     prefix.install Dir["*"]
     bin.install_symlink "../quast.py", "../metaquast.py",
       "quast.py" => "quast", "metaquast.py" => "metaquast"
+    # Compile MUMmer, so that `brew test quast` does not fail.
+    system "#{bin}/quast", "--test"
   end
 
   test do
-    system "#{bin}/quast"
-    cd prefix do
-      system "#{bin}/quast", "--test"
-      rm_rf "quast_test_output"
-    end
+    system "#{bin}/quast", "--test"
   end
 end

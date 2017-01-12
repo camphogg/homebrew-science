@@ -1,27 +1,30 @@
 class Seqan < Formula
+  desc "C++ library of sequence algorithms and data structures"
   homepage "http://www.seqan.de/"
   # doi "10.1186/1471-2105-9-11"
   # tag "bioinformatics"
 
-  url "http://packages.seqan.de/seqan-library/seqan-library-1.4.2.tar.bz2"
-  sha1 "2413d558c2665ae813bb0a2ab3aa57e07cc00675"
+  url "https://github.com/seqan/seqan/releases/download/seqan-v2.3.1/seqan-library-2.3.1.tar.xz"
+  sha256 "79df48e97373dd8612913fe66d7aaa03288d09859dcf918bcb4a5f754ec7af7a"
+  head "https://github.com/seqan/seqan.git"
 
-  bottle do
-    cellar :any
-    sha1 "26f7482ddf437875f0254d75887e0a088c545c4f" => :yosemite
-    sha1 "bfcd857c0b28f56770ea87b9cbada300c944787c" => :mavericks
-    sha1 "d2df35b6b75cac64ab4b9fcb772a477d16c52c75" => :mountain_lion
-  end
-
-  devel do
-    url "http://packages.seqan.de/seqan-library/seqan-library-2.0.0.tar.bz2"
-    sha1 "872335665632ca63d115ac3042b4f1d28ab0d872"
-  end
-
-  head "http://svn.seqan.de/seqan/trunk/core"
+  # seqan-library installs only header files.
+  bottle :unneeded
 
   def install
     include.install "include/seqan"
-    doc.install Dir["share/doc/seqan/*"] unless build.head?
+    if build.head?
+      prefix.install_metafiles
+      pkgshare.install Dir["*"]
+    else
+      prefix.install_metafiles "share/doc/seqan"
+      doc.install Dir["share/doc/seqan/*"]
+      mv "lib", prefix
+    end
+  end
+
+  test do
+    # seqan-library installs only header files.
+    system "ls", include
   end
 end

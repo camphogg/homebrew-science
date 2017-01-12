@@ -1,26 +1,31 @@
 class Kmerstream < Formula
+  desc "Streaming algorithms for k-mer abundance estimation"
   homepage "https://github.com/pmelsted/KmerStream"
-  # tag "bioinformatics"
-  # doi "10.1101/003962"
-  url "https://github.com/pmelsted/KmerStream/archive/v1.0.tar.gz"
-  sha256 "65372515dc19fb30c89f912c4a8c302ee3b266e931bbb2983e232e1c9ea62efe"
+  url "https://github.com/pmelsted/KmerStream/archive/v1.1.tar.gz"
+  sha256 "cf5de6224a0dd40e30af4ccc464bb749d20d393a7d4d3fceafab5f3d75589617"
   head "https://github.com/pmelsted/KmerStream.git"
+  # doi "10.1093/bioinformatics/btu713"
+  # tag "bioinformatics"
 
   bottle do
     cellar :any
-    sha256 "22e8ce50d637f586ba2fcfed72377f8c7d7ffdce801fe0f90d701fdc6b6ad705" => :yosemite
-    sha256 "2c5bffccb04d1defd9b49e5568e4aec4c1e265674b5bf6f2f33bf89d02e464bc" => :mavericks
-    sha256 "166d431cace37bbb1c96c7dd6d9d47cfefefc0ee0fbcc9bb61289364834050e8" => :mountain_lion
+    sha256 "1da47f8ed39381d7ac8c79a72e91f4fc898d9013e13c835a0eb5e630893f6784" => :el_capitan
+    sha256 "f8528a7f5a74c25f549544b08b08d17d5cc2febb57932e473e0cff37b3a66ecc" => :yosemite
+    sha256 "0362b9af59d217c164cf036d77ce2c157124bdef1c76852229bde8c5faccce90" => :mavericks
+    sha256 "dfe473f73af618cedb1003c6d0d67f82592fc6297bd64e6b711153c688d4647d" => :x86_64_linux
   end
 
   needs :openmp
 
   def install
     system "make"
-    bin.install "KmerStream"
+    bin.install "KmerStream", "KmerStreamJoin", "KmerStreamEstimate.py"
+    doc.install "README.md"
   end
 
   test do
-    system "#{bin}/KmerStream 2>&1 |grep KmerStream"
+    assert_match "Usage", shell_output("#{bin}/KmerStream 2>&1", 1)
+    assert_match "Usage", shell_output("#{bin}/KmerStreamJoin 2>&1", 1)
+    assert_match "Usage", shell_output("#{bin}/KmerStreamEstimate.py 2>&1", 1)
   end
 end

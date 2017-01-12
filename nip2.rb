@@ -1,17 +1,18 @@
 class Nip2 < Formula
-  desc "A GUI for the VIPS image processing system"
+  desc "GUI for the VIPS image processing system"
   homepage "http://www.vips.ecs.soton.ac.uk/"
-  url "http://www.vips.ecs.soton.ac.uk/supported/7.42/nip2-7.42.1.tar.gz"
-  sha256 "541e95a4a8bb3f8ee850035c6beb8a67fe7e174df6c58032fa99ebaf80f58e92"
+  url "http://www.vips.ecs.soton.ac.uk/supported/8.4/nip2-8.4.0.tar.gz"
+  sha256 "7a8c8b145216fbf2212de6eda4fbaff1884e3e1f8970f5e14e12a5df164e2c8a"
 
   bottle do
     cellar :any
-    sha256 "66ee4db4daa9331151ccda266527f0f34fc4ab3bc650bf6f6b8b2c735fa23798" => :yosemite
-    sha256 "4f5b965c6fa470f39c46b870a1cfca5db9f4a37840873b1c17008b784ecbb646" => :mavericks
-    sha256 "fd8632028e5e781aaac730defea585a2b78ff1afb1aaa14dde1df38851716db7" => :mountain_lion
+    sha256 "e0af078a5d9786c71077ed55dd415e978d144c0ba2016cc61fdea009b62eaa74" => :sierra
+    sha256 "2333489eaae68a285287ea418de1445bcd4cc7bdc758b8cbf260f99e25e0d7b0" => :el_capitan
+    sha256 "073238e0e5b4d984e66f8eedd3b458d553e16edf047eb6696ae1fd752d68e0a8" => :yosemite
   end
 
-  option "with-check", "Enable build-time checking"
+  option "with-test", "Enable build-time testing"
+  deprecated_option "with-check" => "with-test"
 
   depends_on "pkg-config" => :build
   depends_on "XML::Parser" => :perl

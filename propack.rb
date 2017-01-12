@@ -1,12 +1,12 @@
 class Propack < Formula
   homepage "http://soi.stanford.edu/~rmunk/PROPACK"
   url "http://soi.stanford.edu/~rmunk/PROPACK/PROPACK77_v2.1.tar.gz"
-  sha1 "21afeafd23d3e3a5b4de2474be3a896d48a952ce"
+  sha256 "8ff42d1392cc31b19f2fda6d3ef436dd98c10daaede51cf9023e41dd2c478389"
 
   bottle do
-    sha1 "358f63b1d61ef73e9b8715037c2183fccfa3b019" => :yosemite
-    sha1 "fb6e0657539daefb25c57e3f671e8bce5e4690f8" => :mavericks
-    sha1 "a2862a04e56b0eb85dafd58ae1bb7b1cbf8189f8" => :mountain_lion
+    sha256 "c22dd4d0bb7402b7c7c544125713b020faac53777786e1637dbd56d259afc888" => :yosemite
+    sha256 "999228f494d55c6b975df6fe88a0d884bf78a00754289187c1895cca5255f6bb" => :mavericks
+    sha256 "ef4be83b9afb832151df6933cbff1fada192f30bd3e012b190eb85262a39f1cf" => :mountain_lion
   end
 
   option "without-check", "Disable build-time tests (not recommended)"

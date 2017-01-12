@@ -1,4 +1,5 @@
 # Homebrew Science
+![BrewSci logo](https://raw.githubusercontent.com/Homebrew/homebrew-science/gh-pages/images/brewsci-256x256.png)
 [![For science.](http://i.imgur.com/Bswp1.png)](http://xkcd.com/585)
 
 These formulæ provide software tailored to scientific endeavours. Need to store
@@ -11,14 +12,14 @@ process the images from your space telescope? Maybe we can help!
 Or `brew tap homebrew/science` and then `brew install <formula>`.
 
 ## Troubleshooting
-**IMPORTANT** First read the [Troubleshooting Checklist](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting).
+**IMPORTANT** First read the [Troubleshooting Checklist](http://docs.brew.sh/Troubleshooting.html).
 
 Use `brew gist-logs <formula>` to create a [Gist](https://gist.github.com/) and post the link in your issue.
 
-Search [open](https://github.com/Homebrew/homebrew-science/issues?state=open) and [closed](https://github.com/Homebrew/homebrew-science/issues?state=closed) issues. See also Homebrew's  [Common Issues](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Common-Issues.md) and [FAQ](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/FAQ.md).
+Search [open](https://github.com/Homebrew/homebrew-science/issues?state=open) and [closed](https://github.com/Homebrew/homebrew-science/issues?state=closed) issues. See also Homebrew's  [Common Issues](http://docs.brew.sh/Common-Issues.html) and [FAQ](http://docs.brew.sh/FAQ.html).
 
 ## Documentation
-`brew help`, `man brew` or check [Homebrew's documentation](https://github.com/Homebrew/homebrew/tree/master/share/doc/homebrew#readme).
+`brew help`, `man brew` or check [Homebrew's documentation](https://github.com/Homebrew/brew/blob/master/docs/README.md).
 
 ## Contributing
-Please see the [contributing guide](https://github.com/Homebrew/homebrew-science/blob/master/CONTRIBUTING.md).
+Please see the [contributing guide](https://github.com/Homebrew/homebrew-science/blob/master/.github/CONTRIBUTING.md).

@@ -1,18 +1,24 @@
 class Tophat < Formula
+  desc "Spliced read mapper for RNA-Seq"
   homepage "http://ccb.jhu.edu/software/tophat"
-  url "http://ccb.jhu.edu/software/tophat/downloads/tophat-2.0.14.tar.gz"
-  sha256 "547c5c9d127cbf7d61bc73c4251ff98a07d57e59b3718666a18b58acfb8fcfbf"
+  url "http://ccb.jhu.edu/software/tophat/downloads/tophat-2.1.1.tar.gz"
+  sha256 "37840b96f3219630082b15642c47f5ef95d14f6ee99c06a369b08b3d05684da5"
+  revision 2
+  # doi "10.1093/bioinformatics/btp120"
+  # tag "bioinformatics"
 
   bottle do
     cellar :any
-    sha256 "73296a1c7563a896cd80448424bd2406df4c28961d0ca4911b455602bfbfa829" => :yosemite
-    sha256 "262b03db609f12566948e21ad2cf38c7b9c272650d707b49b1630577cf815979" => :mavericks
-    sha256 "3735a997a3ff8e64534a1febb43b353b42e49c92414db86218f77626ce82c7da" => :mountain_lion
+    sha256 "d20f7ec73044caff50a40b9c1e072f66374f639e507d46b4d7947e04693e0d01" => :sierra
+    sha256 "d2d799921c520ce8e5a1a14e715d5076cc7ff2b5f5484f8086b17cc80080de11" => :el_capitan
+    sha256 "ec072c59e6435f6db7081e86ffdf24fc1b2a66f056d901f29bd04d9643c33029" => :yosemite
+    sha256 "81f1f3efd37b268d772476109019b283bccd5768b2143dd425658b6bd3c3c6c8" => :x86_64_linux
   end
 
-  depends_on "boost" => :build
+  depends_on "boost"
   depends_on "bowtie2"
   depends_on "bowtie" => :optional
+  depends_on :python if MacOS.version <= :snow_leopard
 
   patch :p0, :DATA
 
@@ -30,13 +36,20 @@ class Tophat < Formula
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
     system "make", "install"
+
+    # clean up Python libraries from bin
+    (libexec/"python").install bin/"intervaltree", bin/"sortedcontainers"
+    (libexec/"bin").install bin/"tophat-fusion-post"
+    (bin/"tophat-fusion-post").write_env_script libexec/"bin/tophat-fusion-post",
+      :PYTHONPATH => libexec/"python"
   end
 
   test do
     system bin/"tophat", "-r", "20",
       share/"test_data/test_ref",
       share/"test_data/reads_1.fq", share/"test_data/reads_2.fq"
-    assert File.read("tophat_out/align_summary.txt").include?("71.0%")
+    assert_match "71.0%", File.read("tophat_out/align_summary.txt")
+    system bin/"tophat-fusion-post", "--version"
   end
 end
 __END__
@@ -51,4 +64,53 @@ __END__
  	{																	\
  		type_t *i, *j, swap_tmp;										\
  		for (i = s + 1; i < t; ++i)										\
+--- src/tophat.py       2016-02-15 11:30:16.619093000 -0800
++++ src/tophat.py       2016-07-17 09:40:08.041311408 -0700
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python2.7
 
+ # encoding: utf-8
+ """
+--- src/tophat2.sh      2016-02-23 18:51:33.274718000 -0800
++++ src/tophat2.sh        2016-07-17 09:40:56.017800465 -0700
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ pbin=""
+-fl=$(readlink $0)
++fl=$(readlink -f $0)
+ if [[ -z "$fl" ]]; then
+    pbin=$(dirname $0)
+  else
+--- src/bed_to_juncs        2016-02-14 10:21:17.133079000 -0800
++++ src/bed_to_juncs  2016-07-17 09:53:12.097361445 -0700
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python2.7
+ # encoding: utf-8
+ """
+ bed_to_juncs.py
+--- src/contig_to_chr_coords        2016-02-14 10:21:17.199079000 -0800
++++ src/contig_to_chr_coords  2016-07-17 09:53:12.105361528 -0700
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python2.7
+ # encoding: utf-8
+ """
+ contig_to_chr_coords.py
+--- src/sra_to_solid        2016-02-14 10:21:17.802079000 -0800
++++ src/sra_to_solid  2016-07-17 09:53:12.109361569 -0700
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python2.7
+
+ """
+ sra_to_solid.py
+--- src/tophat-fusion-post  2016-02-23 13:20:44.317710000 -0800
++++ src/tophat-fusion-post    2016-07-17 09:53:12.113361611 -0700
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python2.7
+
+
+ """

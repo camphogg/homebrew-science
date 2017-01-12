@@ -1,33 +1,42 @@
-require "formula"
-
 class Augustus < Formula
+  desc "predict genes in eukaryotic genomic sequences"
   homepage "http://bioinf.uni-greifswald.de/augustus/"
-  #doi "10.1093/nar/gkh379"
-  #tag "bioinformatics"
+  # doi "10.1093/nar/gkh379"
+  # tag "bioinformatics"
 
-  url "http://bioinf.uni-greifswald.de/augustus/binaries/augustus.3.0.1.tar.gz"
-  mirror "https://science-annex.org/pub/augustus/augustus.3.0.1.tar.gz"
-  sha1 "19f40b3b834aba0386646d9cb8120caf3f0eb64e"
+  url "http://bioinf.uni-greifswald.de/augustus/binaries/augustus-3.2.2.tar.gz"
+  mirror "http://bioinf.uni-greifswald.de/augustus/binaries/old/augustus-3.2.2.tar.gz"
+  sha256 "bb36fcaaaab32920908e794d04e6cb57a0c61d689bfbd31b9b6315233ea3559e"
+  revision 1
 
   bottle do
-    cellar :any
-    sha1 "4950105f9950e28ea862bc0c3158707ba2d41f31" => :yosemite
-    sha1 "8200186f17826e50584c67cd58ed0bd0cf5db15f" => :mavericks
-    sha1 "7a31858172f66f0f9d3ccfae8a3d76af34b620d3" => :mountain_lion
+    sha256 "40e3004de6efeab4b5c51a8cdcd550da16e67c9e7d88c303bb9ad0c5ea28c858" => :el_capitan
+    sha256 "1eed43538484957cbf3a21dec725950adac6620b57f93f0c0686fc1038c931fa" => :yosemite
+    sha256 "51383cc511a460b6c9cf301a862d991b25e3f2e8d0e9ed51dfa1a27d03c61749" => :mavericks
+    sha256 "e8bf9a9233f323f203e58c688ded56dcf97f2bab3d13c40947a480b0733f223d" => :x86_64_linux
   end
 
-  depends_on "boost" => :recommended # for gz support
+  option "with-cgp",  "Enable comparative gene prediction"
 
-  fails_with :clang do
-    build 600
-    cause "error: invalid operands to binary expression"
+  depends_on "bamtools"
+  depends_on "boost"
+
+  if build.with? "cgp"
+    depends_on "gsl"
+    depends_on "lp_solve"
+    depends_on "suite-sparse"
   end
 
   def install
-    system "make"
-    rm_r %w[include mysql++ src]
+    args = []
+    args << "COMPGENEPRED=true" if build.with? "cgp"
+
+    system "make", "-C", "auxprogs/filterBam/src", "BAMTOOLS=#{Formula["bamtools"].opt_include}/bamtools", *args
+    system "make", "INCLUDES=#{Formula["bamtools"].opt_include}/bamtools", *args
+
+    rm_r %w[include src]
     libexec.install Dir["*"]
-    bin.install_symlink "../libexec/bin/augustus"
+    bin.install_symlink Dir[libexec/"bin/*"]
   end
 
   def caveats; <<-EOS.undent

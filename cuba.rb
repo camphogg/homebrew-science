@@ -1,15 +1,13 @@
-require "formula"
-
 class Cuba < Formula
   homepage "http://www.feynarts.de/cuba"
   url "http://www.feynarts.de/cuba/Cuba-4.1.tar.gz"
-  sha1 "2415fb0d29e06a9b86eadb7750fe79bc77dd44c0"
+  sha256 "0928fb2911b77a72a9d01c75f5ed9962f46f5f7e2d913baf7b302395ac851f5f"
 
   bottle do
     cellar :any
-    sha1 "ab45cb4ad7dee2a0ef6e6fb95b515dbee2ea8f6e" => :yosemite
-    sha1 "0f2d8087ebe59c0d345b4aafa457023419e1656a" => :mavericks
-    sha1 "3ff524e9b690162decc9dd89e163a42ca035f684" => :mountain_lion
+    sha256 "bb7790282cc4763dab620bd6fef3453317a54f91eae920a57767d9b508329ca2" => :yosemite
+    sha256 "9d64b534a14d2c3ea2e5293fa31c1dce3f26b4583ccd1eb12e55ce1dbe74891d" => :mavericks
+    sha256 "ee8416e347157716805e856441202ff1ee6fc3af8710512116310b30471337f2" => :mountain_lion
   end
 
   option "without-check", "Skip build-time tests (not recommended)"

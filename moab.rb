@@ -1,13 +1,17 @@
 class Moab < Formula
+  desc "Mesh-Oriented datABase for evaluating mesh data"
   homepage "http://press3.mcs.anl.gov/sigma/moab-library/"
-  url "http://ftp.mcs.anl.gov/pub/fathom/moab-4.8.0.tar.gz"
-  sha256 "349e66e06cac38325926eafb01807b9d520bfce73016088d5dd7b973e687467a"
+  url "http://ftp.mcs.anl.gov/pub/fathom/moab-4.9.2.tar.gz"
+  sha256 "5d79e299dd9bf76d7cade434cde478bb6dc8290e5b574b25cc30ee96f35a203d"
+  revision 1
+
   head "https://bitbucket.org/fathomteam/moab.git"
 
   bottle do
-    sha256 "097016feed8abaee3de749c285bebe43e154939e0dd389d14bea50fc961c08fe" => :yosemite
-    sha256 "1f0481c59eae7c0e97b2058eee421070e9b205c91c5ff7b977b73937d2d4b08c" => :mavericks
-    sha256 "ae9c07a183340ac8d454c7e9a9b1b86a7e1f47c27bee5a557bfe416c6f63c434" => :mountain_lion
+    cellar :any
+    sha256 "f96e01a4fa09e29564628aaa1f46e87a547e6fd298d1834d454fc10b51e663b1" => :sierra
+    sha256 "7ca1cccb8673a7ab276f0d106dafbdfd80172fa863c320727cf4d33c54aa4c4f" => :el_capitan
+    sha256 "7dea4499ba1fde279ba4f09b899fb31302e08b6095cd27c5ae50feacbf30d401" => :yosemite
   end
 
   depends_on "autoconf" => :build
@@ -38,5 +42,9 @@ class Moab < Formula
       # Move non-libraries out of lib
       prefix.install %w[iMesh-Defs.inc moab.config moab.make MOABConfig.cmake]
     end
+  end
+
+  test do
+    system bin/"mbconvert", "-h"
   end
 end

@@ -1,13 +1,16 @@
 class P4est < Formula
+  desc "Dynamic management of a collection (a forest) of adaptive octrees in parallel"
   homepage "http://www.p4est.org"
-  url "http://p4est.github.io/release/p4est-1.1.tar.gz"
-  sha1 "ed8737d82ef4c97b9dfa2fd6e5134226f24c9b0b"
+  url "https://p4est.github.io/release/p4est-1.1.tar.gz"
+  sha256 "0b5327a35f0c869bf920b8cab5f20caa4eb55692eaaf1f451d5de30285b25139"
+  revision 2
 
   bottle do
-    revision 1
-    sha256 "c103995bfa2358b28151e9047e4c56c10eaf653b82a1afb90cf2f6952bfededb" => :yosemite
-    sha256 "c92f14f4493858e9d759a773ba5ec8c113a13e0e500ce19f264c6ba37926612c" => :mavericks
-    sha256 "585ae796954969ae2ccba1e90aebaed7385b457addbe0ec337f78b73549b350e" => :mountain_lion
+    cellar :any
+    rebuild 1
+    sha256 "2b0996c9004c063cf4ef66974a89cc64e407fcb516e50b1da4930f4745c1c108" => :el_capitan
+    sha256 "02f1cdc1676238fc7095802cdb982a52f8d9c42df37878373a52114f417946b6" => :yosemite
+    sha256 "373ab802626785b1f17fdda807ef094cb2e4f654fe3d99318ebbed30823a6d15" => :mavericks
   end
 
   head do
@@ -30,7 +33,7 @@ class P4est < Formula
     ENV["CPPFLAGS"] = "-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL"
 
     if build.with? "openblas"
-      blas = "BLAS_LIBS=-L#{Formula['openblas'].opt_lib} -lopenblas"
+      blas = "BLAS_LIBS=-L#{Formula["openblas"].opt_lib} -lopenblas"
     elsif OS.mac?
       blas = "BLAS_LIBS=-framework Accelerate"
     else
@@ -44,7 +47,7 @@ class P4est < Formula
                           "--prefix=#{prefix}"
 
     system "make"
-    system "make", "check" if build.with? "check"
+    ENV.deparallelize { system "make", "check" } if build.with? "check"
     system "make", "install"
   end
 end

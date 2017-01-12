@@ -1,15 +1,16 @@
 class Madlib < Formula
   desc "Library for scalable in-database analytics."
   homepage "http://madlib.net"
-  url "https://github.com/madlib/madlib/archive/v1.7.1.tar.gz"
-  sha256 "10fccd0ab9a88073cb13cbc699e5fa66a374f98da8cb109dd851544b57f5568a"
+  url "https://github.com/madlib/madlib/archive/v1.8.tar.gz"
+  sha256 "15d8ee925866f477f4fb62964a1ea6a15796e9c7db676d786928495249078df3"
+  revision 1
 
   head "https://github.com/madlib/madlib.git"
 
   bottle do
-    sha256 "9f2482b2421226b461d5d95ad12011797fb730c1225bc79ae03ad37fa5c38a8a" => :yosemite
-    sha256 "fbbf99df8688564f32741708cdfee2ea7632b23a9509b4fd12490cd44da35f8e" => :mavericks
-    sha256 "4e1adb36f808003f1b01530141c520e0dc81d88097863246b06f4e5d212202f4" => :mountain_lion
+    sha256 "71f051842a24ba554179392c649e0f0bf8f6ba2d86a384a02f030beac833c5d8" => :el_capitan
+    sha256 "58e344a0e6ce85c91f0449108fda4b162771ac180dd3f603f1309aab7fde1a73" => :yosemite
+    sha256 "f3055c16600f8e90932783bd0ae7cde57e104619e241d6ea5245f227ba06f95d" => :mavericks
   end
 
   boost_opts = []
@@ -25,9 +26,9 @@ class Madlib < Formula
     sha256 "024f9d4740fde187cde469dbe8e3c277fe522a3420458c4ba428085c090afa69"
   end
 
-  fails_with :clang do
-    build 602
-    cause "Multiple compiler errors"
+  resource "eigen" do
+    url "https://bitbucket.org/eigen/eigen/get/3.2.2.tar.gz"
+    sha256 "318d68c5a9c20ec20d08f1a50a10fb4991a25fd5474a969e771cd9f2a79c9e5f"
   end
 
   fails_with :clang do
@@ -46,12 +47,17 @@ class Madlib < Formula
   end
 
   def install
+    # http://jira.madlib.net/browse/MADLIB-913
+    ENV.libstdcxx if ENV.compiler == :clang
+
     resource("pyxb").fetch
+    resource("eigen").fetch
 
     args = %W[
       -DCMAKE_INSTALL_PREFIX=#{prefix}
       -DCMAKE_BUILD_TYPE=Release
       -DPYXB_TAR_SOURCE=#{resource("pyxb").cached_download}
+      -DEIGEN_TAR_SOURCE=#{resource("eigen").cached_download}
     ]
     system "./configure", *args
     system "make", "install"

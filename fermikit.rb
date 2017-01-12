@@ -1,19 +1,20 @@
 class Fermikit < Formula
   desc "Assembly-based variant calling for Illumina reads"
   homepage "https://github.com/lh3/fermikit"
-  # doi "arXiv:1504.06574"
+  # doi "10.1093/bioinformatics/btv440"
   # tag "bioinformatics"
 
-  url "https://github.com/lh3/fermikit/releases/download/v0.12/fermikit-0.12.tar.bz2"
-  sha256 "c2d7281d3720fc06cfb5685dfa0b5b151636b44e4419fbac5a136cd5d73feb0a"
+  url "https://github.com/lh3/fermikit/releases/download/v0.13/fermikit-0.13.tar.bz2"
+  sha256 "067c7b8b5ddcac417f5c95d9138abe3077df9d147d6dc50ae7d4a563ac5ad82f"
 
   head "https://github.com/lh3/fermikit.git"
 
   bottle do
     cellar :any
-    sha256 "7cfc4ed60eec5fa75cd2af4d09c1a31080949ba8dda2fd85750109a82fcac60a" => :yosemite
-    sha256 "a61fc63afe190b41ea0f5ac38705c44b9b6f33f990177bceb638e1eb7ea5b911" => :mavericks
-    sha256 "b0f62232855027e6adccf5fafd87855616784d564ebe100560292ff40a15377a" => :mountain_lion
+    sha256 "b467bb944e76c9bac1631e99504af33ab246deff71d35f6ebe43b5cf6526f3a2" => :yosemite
+    sha256 "13cb6bc58404555edb8141637461336f18c2079ad931e8fe8806f656a7142745" => :mavericks
+    sha256 "7e3964a923ed60cd1c44cc8dab675b4bd4d988b5fd8bfd041d2a65ddc10eb33c" => :mountain_lion
+    sha256 "1e5597398b9a9d76768ad06ebeba772c4de6522bea7ed143ab56d87080f7770f" => :x86_64_linux
   end
 
   depends_on "bfc"

@@ -1,23 +1,18 @@
 class Clblas < Formula
+  desc "Library containing BLAS functions written in OpenCL"
   homepage "https://github.com/clMathLibraries/clBLAS"
-  url "https://github.com/clMathLibraries/clBLAS/archive/v2.2.tar.gz"
-  sha256 "0563e028485d240f8b6e6efcae61677049627b19e924dcb1ef8014065b6416df"
+  url "https://github.com/clMathLibraries/clBLAS/archive/v2.6.tar.gz"
+  sha256 "4607561a648949709bc7c368be4aaf7346174406e678454b643e31cfe861830c"
 
   bottle do
     cellar :any
-    sha256 "95e08bbfde36c49f8f4fae3f420980d329c67215f7198475f34a0bae22a05f4f" => :yosemite
-    sha256 "0315da2f6b54edfff65315709f2d16cc9c9514adafa2ea7400b6a759f16001c1" => :mavericks
-    sha256 "665bd59d4dc12933722003a7092eea19104ef5722aacfdc27e423c988df0f5ca" => :mountain_lion
+    sha256 "c2390d3ccd264c755b529dda21016583fa60dd8f8c1f30502ec22d73d55ef4ff" => :el_capitan
+    sha256 "fcaafc49c3123705e90b836902133e481859dd40140636317088326e8c22da98" => :yosemite
+    sha256 "bc59a237799fa5a1d880f39f5caa96abed14bf407bd4db222a87109c1947e7bd" => :mavericks
   end
 
   depends_on "cmake" => :build
   depends_on "boost" => :build
-
-  patch do
-    # install clBLAS cmake configuration and version files
-    url "https://github.com/clMathLibraries/clBLAS/commit/554d61ec834c72b6ce727b9232ecbf9864cf9d8c.diff"
-    sha256 "49bd44ef1c2cb6e0e63ab5286d2aa185224a529c04d3d9efff45533c984d6bf8"
-  end
 
   def install
     args = std_cmake_args
@@ -31,6 +26,6 @@ class Clblas < Formula
   end
 
   test do
-    system "#{bin}/client", "--cpu"
+    system "#{bin}/clBLAS-client", "--cpu"
   end
 end

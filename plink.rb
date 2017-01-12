@@ -1,4 +1,5 @@
 class Plink < Formula
+  desc "Whole genome association analysis toolset"
   homepage "http://pngu.mgh.harvard.edu/~purcell/plink/"
   url "http://pngu.mgh.harvard.edu/~purcell/plink/dist/plink-1.07-src.zip"
   sha256 "4af56348443d0c6a1db64950a071b1fcb49cc74154875a7b43cccb4b6a7f482b"
@@ -6,10 +7,20 @@ class Plink < Formula
   # doi "10.1086/519795"
 
   bottle do
-    cellar :any
-    sha256 "e9aae1de18b36eb1b9fa200a9ec4527af50e14df9b1ae245bd983eb592920250" => :yosemite
-    sha256 "b123ad9ffbc9825aece2080ce51ca6814c8a5821dcee5b865b328b24917332f7" => :mavericks
-    sha256 "e0b9b89dff5335544012f7592cfa72cfddc44ee33b6809c9a16c02343df7fa4e" => :mountain_lion
+    cellar :any_skip_relocation
+    rebuild 1
+    sha256 "92beceeafe1e15d5a0a4e6e6d78c9208256c402508f246035464c5842a9058d2" => :el_capitan
+    sha256 "5e6555322bafaa569abacea7e62bded2ecfdd2ac3a01a79d6f82cf7e0a93238e" => :yosemite
+    sha256 "40506cd63be7f7fd9829f73de28d2f2ab5fccbd28a5eaa76d1146fd46316f0ee" => :mavericks
+    sha256 "e7de28c47171e77be9023fd4ced2a7b860be794811982cac768c58154e16fa60" => :x86_64_linux
+  end
+
+  fails_with :clang do
+    build 425
+    cause <<-EOS.undent
+      Old versions of clang are missing some symbols for
+      exception unwinding (Homebrew/science issue #4234).
+      EOS
   end
 
   # allows plink to build with clang and new versions of gcc
@@ -22,16 +33,16 @@ class Plink < Formula
   option "without-webcheck", "Build without default version webcheck"
 
   def install
-    make_args = (OS.mac?) ? ["SYS=MAC"] : ["FORCE_DYNAMIC=1"]
+    make_args = OS.mac? ? ["SYS=MAC"] : ["FORCE_DYNAMIC=1"]
     make_args << "WITH_WEBCHECK=0" if build.without? "webcheck"
     system "make", *make_args
-    (share / "plink").install "test.map", "test.ped"
+    pkgshare.install "test.map", "test.ped"
     bin.install "plink"
     doc.install "COPYING.txt", "README.txt"
   end
 
   test do
-    system "plink", "--file", prefix/"share/plink/test"
+    system "#{bin}/plink", "--file", pkgshare/"test"
   end
 end
 __END__

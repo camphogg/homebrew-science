@@ -1,24 +1,26 @@
-require 'formula'
-
 class Symphony < Formula
-  homepage 'http://www.coin-or.org/projects/SYMPHONY.xml'
-  url 'http://www.coin-or.org/download/source/SYMPHONY/SYMPHONY-5.6.6.tgz'
-  sha1 'be97382f63e31ea8b8d6ff428f85abbadca414c0'
+  desc "Generic MILP solver"
+  homepage "http://www.coin-or.org/projects/SYMPHONY.xml"
+  url "http://www.coin-or.org/download/source/SYMPHONY/SYMPHONY-5.6.6.tgz"
+  sha256 "af28afff326635b04ac47857af648244704af0b0743c9a9acd6da0b6b2b60bfb"
+  revision 1
 
   bottle do
-    sha1 "ce7b24cbb3101c579f7364b314ee5ca73617f859" => :yosemite
-    sha1 "4780a63b393c7943ed60a8d17f608c46b638bcc4" => :mavericks
-    sha1 "6dc67ce005937e10991ac7f0613ae70bd191970f" => :mountain_lion
+    cellar :any
+    sha256 "08806b4cf87ace05706b77c5344800d54ef1f386bcfbcae221dec19d6ac84622" => :sierra
+    sha256 "9698ba6df20e9804258df4ec32213617f51437daf8169c08a902f0658e2ae85b" => :el_capitan
+    sha256 "9b2eb1a5a8989d6471004e62a79efd8fff3a21b956d72e3320f644b7e14cd2fa" => :yosemite
   end
 
-  option "without-check", "Skip build-time tests (not recommended)"
+  option "without-test", "Skip build-time tests (not recommended)"
   option "with-openmp", "Enable openmp support"
   option "with-gmpl", "GNU Modeling Language support via GLPK"
+
+  deprecated_option "without-check" => "without-test"
 
   depends_on "mysql" => :build if build.with? "gmpl"
   depends_on "readline" => :recommended
 
-  conflicts_with "coinutils", :because => "Symphony contains CoinUtils"
   conflicts_with "coinmp", :because => "Symphony and CoinMP contain CoinUtils"
 
   def install
@@ -46,18 +48,18 @@ class Symphony < Formula
       ENV.append "LDFLAGS", "-lgomp"
     end
 
-    system "./configure",  *args
+    system "./configure", *args
     system "make"
-    system "make", "test" if build.with? "check"
+    system "make", "test" if build.with? "test"
     ENV.deparallelize
-    system "make install"
+    system "make", "install"
 
-    (share / "symphony/Datasets").install "SYMPHONY/Datasets/sample.mps"
-    (share / "symphony/Datasets").install "SYMPHONY/Datasets/sample.mod", "SYMPHONY/Datasets/sample.dat" if build.with? "gmpl"
+    (pkgshare/"Datasets").install "SYMPHONY/Datasets/sample.mps"
+    (pkgshare/"Datasets").install "SYMPHONY/Datasets/sample.mod", "SYMPHONY/Datasets/sample.dat" if build.with? "gmpl"
   end
 
   test do
-    system "#{bin}/symphony", "-F", "#{share}/symphony/Datasets/sample.mps"
-    system "#{bin}/symphony", "-F", "#{share}/symphony/Datasets/sample.mod", "-D", "#{share}/symphony/Datasets/sample.dat" if build.with? "gmpl"
+    system "#{bin}/symphony", "-F", "#{pkgshare}/Datasets/sample.mps"
+    system "#{bin}/symphony", "-F", "#{pkgshare}/Datasets/sample.mod", "-D", "#{pkgshare}/Datasets/sample.dat" if build.with? "gmpl"
   end
 end

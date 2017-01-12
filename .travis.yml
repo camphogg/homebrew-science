@@ -1,56 +1,50 @@
 language: ruby
+os: linux
+rvm: 2.0.0
+sudo: required
+dist: trusty
+
+addons:
+  apt_packages:
+    - csh
+    - cython
+    - python-astropy
+    - python-matplotlib
+    - python-nose
+    - python-pip
+    - python-scipy
+    - python-sphinx
+
+before_install:
+  - export TRAVIS_COMMIT="$(git rev-parse --verify -q HEAD)"
+  - if [ -f ".git/shallow" ]; then
+      travis_retry git fetch --unshallow;
+    fi
+  - sudo mkdir -p /home/linuxbrew
+  - sudo chown "$USER" /home/linuxbrew
+  - LINUXBREW=/home/linuxbrew/.linuxbrew
+  - git clone --depth=1 https://github.com/Linuxbrew/brew.git "$LINUXBREW"
+  - export PATH="$LINUXBREW/bin:$PATH"
+  - HOMEBREW_TAP_DIR="$(brew --repo "$TRAVIS_REPO_SLUG")"
+  - rm -rf "$HOMEBREW_TAP_DIR"
+  - mkdir -p "$(dirname "$HOMEBREW_TAP_DIR")"
+  - ln -s "$PWD" "$HOMEBREW_TAP_DIR"
+  - export HOMEBREW_DEVELOPER="1"
+  - env | grep TRAVIS | tee /tmp/travis.env
+  - export HOMEBREW_DEVELOPER="1"
+  - ulimit -n 1024
+  # Fix incorrect file permissions (664)
+  - chmod 0644 *.rb
+  - umask 022
+  - brew tap linuxbrew/xorg
+
 install:
- - jdk_switcher use oraclejdk7
- # Warning: Setting DYLD_* vars can break dynamic linking.
- - unset DYLD_LIBRARY_PATH
- # Warning: You have a non-Homebrew 'pkg-config' in your PATH
- - sudo rm -f /usr/bin/pkg-config
- # Warning: "config" scripts exist outside your system or Homebrew directories.
- - sudo rm -f /usr/local/clang-3.4/bin/llvm-config
+  - pip install pysam
 
- # Install gcc-4.9 system wide[Default is gcc-4.6]
- - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y > /dev/null
- - sudo apt-get update -qq > /dev/null
- - sudo apt-get install -y libyajl-dev libxml2-dev libxqilla-dev > /dev/null
- - sudo apt-get install -y libstdc++-4.9-dev > /dev/null
- - sudo apt-get install -y g++-4.9 gfortran-4.9 > /dev/null
- - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90 > /dev/null
- - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90 > /dev/null
- - sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.9 90 > /dev/null
-
- # Install linuxbrew essentials
- - sudo apt-get install -y build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev > /dev/null
-
- # Install BLAS, LAPACK
- - sudo apt-get install -y libblas-dev liblapack-dev > /dev/null
- # Install openmpi
- - sudo apt-get install openmpi-bin > /dev/null
-
- - cd ..
- - git clone https://github.com/Homebrew/linuxbrew.git
- - PATH=$PWD/linuxbrew/bin:$PATH
- - LD_LIBRARY_PATH=$PWD/linuxbrew/lib:$LD_LIBRARY_PATH
-
-  # Symlink gcc, gfortran
- - ln -s $(which gcc) $PWD/linuxbrew/bin/gcc-$(gcc -dumpversion |cut -d. -f1,2)
- - ln -s $(which g++) $PWD/linuxbrew/bin/g++-$(g++ -dumpversion |cut -d. -f1,2)
- - ln -s $(which gfortran) $PWD/linuxbrew/bin/gfortran-$(gfortran -dumpversion |cut -d. -f1,2)
-
- # Install pkg-config[See: https://github.com/Homebrew/homebrew-science/pull/1664#issuecomment-69259072]
- - brew install pkg-config
-
- - mkdir -p linuxbrew/Library/Taps/homebrew
-
- # Tap homebrew/python
- - brew tap homebrew/python
-
- - mv homebrew-science linuxbrew/Library/Taps/homebrew/
- - cd linuxbrew/Library/Taps/homebrew/homebrew-science
- - brew tap --repair
-
- # Incorrect file permissions: chmod 644
- - chmod 644 *.rb
 script:
- - bash travisCI/travis.sh
+  - brew test-bot
+
 notifications:
- email: false
+  email:
+    on_success: never
+    on_failure: always

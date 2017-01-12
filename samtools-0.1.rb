@@ -11,10 +11,13 @@ class Samtools01 < Formula
     sha256 "acd7f43c7c12af030a02831aaead36711a41a4bda60fe4a406020b72e77cec3a" => :yosemite
     sha256 "fffd6868c552e316ae0055d9a695aea5107a5303e88f313360c34ef11ef40097" => :mavericks
     sha256 "8238ae7e31e946ac98c259fccdecdcd929368257f4c174e8b17938a9f6e9d7a9" => :mountain_lion
+    sha256 "f23f37c4afe69f7516cd3d1630ec50478e651bdc29ef5cefe1ee910d3575e308" => :x86_64_linux
   end
 
   option "with-dwgsim", "Build with 'Whole Genome Simulation'"
   option "without-bcftools", "Do not install BCFtools"
+
+  depends_on "homebrew/dupes/ncurses" unless OS.mac?
 
   conflicts_with "samtools"
   conflicts_with "bcftools"
@@ -22,7 +25,7 @@ class Samtools01 < Formula
   resource "dwgsim" do
     # http://sourceforge.net/apps/mediawiki/dnaa/index.php?title=Whole_Genome_Simulation
     url "https://downloads.sourceforge.net/project/dnaa/dwgsim/dwgsim-0.1.11.tar.gz"
-    sha1 "e0275122618fa38dae815d2b43c4da87614c67dd"
+    sha256 "6ffc8a4f7d20bc7c8b3efa1d2b3ae6cbf9609a93db976d4e7ccd2a209a2305b5"
   end
 
   def install

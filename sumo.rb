@@ -1,13 +1,14 @@
 class Sumo < Formula
+  desc "Simulation of Urban Mobility"
   homepage "https://sourceforge.net/projects/sumo/"
-  url "https://downloads.sourceforge.net/project/sumo/sumo/version%200.23.0/sumo-all-0.23.0.tar.gz"
-  sha256 "8a6354a11717cdff2f3f247239fb55472ea57268b392e5e442777a1c05d92299"
+  url "https://downloads.sourceforge.net/project/sumo/sumo/version%200.25.0/sumo-all-0.25.0.tar.gz"
+  sha256 "e56552e4cd997ccab59b5c6828ca1e044e71e3ffe8c780831bf5aa18c5fdd18a"
 
   bottle do
     cellar :any
-    sha256 "fc42a513a71d13b54d230ac0bc26cbc96a0aa2323ee434c4313ef28e4e1f3217" => :yosemite
-    sha256 "13ab2b7e6d904ee4009162a7a8a3c6038d3aec2a48c4407a5093b5aa729ab9e4" => :mavericks
-    sha256 "4b2e04b94e1a95cc5759d422402b34c9534cbc8873911038fe41a2ee0fbc271d" => :mountain_lion
+    sha256 "60e40e20adc9983d0ddf124b256ac5c1fd50ad7fccc1b27c703edc56d469231f" => :el_capitan
+    sha256 "1d68c7d7c1955bd548c2e02b70607798e644a073568069121d0d6946c927be60" => :yosemite
+    sha256 "ead5586821fcf6e32a1d8bbfe040b1f6349973f7963559fb0d44321f3ed84af1" => :mavericks
   end
 
   option "with-check", "Enable additional build-time checking"
@@ -19,7 +20,7 @@ class Sumo < Formula
   depends_on "libtiff"
   depends_on "proj"
   depends_on "gdal"
-  depends_on "fox"
+  depends_on "homebrew/x11/fox"
   depends_on :python
 
   resource "gtest" do
@@ -28,8 +29,8 @@ class Sumo < Formula
   end
 
   resource "TextTest" do
-    url "https://pypi.python.org/packages/source/T/TextTest/TextTest-3.28.tar.gz"
-    sha256 "700e9648c193fd29796af7df6074a306224f99d1837966433d612abce08ca47a"
+    url "https://pypi.python.org/packages/source/T/TextTest/TextTest-3.28.2.zip"
+    sha256 "2343b59425da2f24e3f9bea896e212e4caa370786c0a71312a4d9bd90ce1033b"
   end
 
   def install
@@ -39,7 +40,7 @@ class Sumo < Formula
       buildpath.install "../gtest-1.7.0"
     end
 
-    ENV["LDFLAGS"] = "-lpython"  # My compilation fails without this flag, despite :python dependency.
+    ENV["LDFLAGS"] = "-lpython" # My compilation fails without this flag, despite :python dependency.
     ENV.append_to_cflags "-I#{buildpath}/gtest-1.7.0/include"
 
     system "./configure", "--disable-debug",
@@ -50,6 +51,9 @@ class Sumo < Formula
                           "--with-gtest-config=gtest-1.7.0/scripts/gtest-config"
 
     system "make", "install"
+
+    # Copy tools/ to cellar. These contain some Python modules that have no setup.py.
+    prefix.install "tools"
 
     # Basic tests, they are fast, so execute them always.
     system "unittest/src/sumo-unittest"

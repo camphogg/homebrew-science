@@ -1,15 +1,19 @@
 class Repeatmodeler < Formula
+  desc "De-novo repeat family identification and modeling package"
   homepage "http://www.repeatmasker.org/RepeatModeler.html"
   # tag "bioinformatics"
 
-  version "1.0.8"
   url "http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz"
+  version "1.0.8"
   sha256 "3ac87af3fd3da0c9a2ca8e7b8885496abdf3383e413575548c1d234c15f27ecc"
+  revision 1
 
   bottle do
-    sha256 "a9554c56b1727320b1b5048ff89884941af6ee6a64a2afc7f3c621172264d522" => :yosemite
-    sha256 "fce72ab593a100187d325b9789387e39e91dc3779de763556fb6aa516b1aaf18" => :mavericks
-    sha256 "c2088c839d630afdc8e89a44f48ad3912cc86cb5ff52b041e58c7b4328cface8" => :mountain_lion
+    cellar :any_skip_relocation
+    sha256 "d3856db1196dd29a84120ac14461d64c5c3a9d10432830dcb6be94ecd2478ba1" => :el_capitan
+    sha256 "e3be3d6078936510c6b79ed62c155ac876e61f7de9d5ed6ac1409ecbbc562f19" => :yosemite
+    sha256 "ef4c93df7fbcca97851ad7e3de571c0c6a1b94843384eaea32a53c27cfde11ab" => :mavericks
+    sha256 "0495628e44f390035e2b0ad596016e156e22b2be448cae26fdca317bdad88cc5" => :x86_64_linux
   end
 
   option "without-configure", "Do not run configure"
@@ -65,6 +69,6 @@ class Repeatmodeler < Formula
   end
 
   test do
-    system "#{bin}/RepeatModeler"
+    assert_match version.to_s, shell_output("/usr/bin/perl #{bin}/RepeatModeler -v")
   end
 end

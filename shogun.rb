@@ -1,12 +1,15 @@
 class Shogun < Formula
+  desc "Large scale machine learning toolbox"
   homepage "http://www.shogun-toolbox.org"
-  url "http://shogun-toolbox.org/archives/shogun/releases/4.0/sources/shogun-4.0.0.tar.bz2"
-  sha256 "ab39d3cc27fc1ddf6128f6e3fc60217e73a843b51c20f5d3ceb69e6565a43695"
+  url "http://shogun-toolbox.org/archives/shogun/releases/4.1/sources/shogun-4.1.0.tar.bz2"
+  sha256 "0eb313a95606edee046768a4577d63f32f7ccce340bed7bf0ff0d69225567185"
+  revision 2
 
   bottle do
-    sha256 "6461a6713a96489af53058a979380afb251dad96c8255642b42e7062040217aa" => :yosemite
-    sha256 "750fe0d9f604e80cfaa0b55f8e2e9f063af32a5ef0fc5ffcdbc61daa10c3454e" => :mavericks
-    sha256 "53bcba5b939225b7d852bfe9e5663fed71f9609b9700417e2e01b0c218e42f31" => :mountain_lion
+    sha256 "bb97d16ea75d013d2b28cb37810d8f751aa886dc38612a4c2daeca5b993655fc" => :sierra
+    sha256 "bc30027747a6fb55159eb8735f2027ad29f973aae3f8a64002b6ed1d28b191b3" => :el_capitan
+    sha256 "06fcb649132cdc07bf234c4c6e05ad9e46a525aad7219cf091a38f7050117732" => :yosemite
+    sha256 "9cb6d91f22eb9343bac860031b7e3fad5d119d0435136371d78ffadc61d55ed4" => :x86_64_linux
   end
 
   depends_on "pkg-config" => :build
@@ -19,7 +22,7 @@ class Shogun < Formula
   depends_on "json-c"
   depends_on "readline"
   depends_on "nlopt"
-  depends_on "eigen"
+  depends_on "homebrew/versions/eigen32"
   depends_on "arpack"
   depends_on "colpack"
   depends_on "glpk"
@@ -40,6 +43,13 @@ class Shogun < Formula
 
   def cmake_use(opt, arg)
     "-D#{arg}=#{build.with?(opt) ? "ON" : "OFF"}"
+  end
+
+  # fix error downloading gmock; remove for > 4.1.0
+  # upstream commit from 26 Aug 2016 "Googlecode is dead for good"
+  patch do
+    url "https://github.com/shogun-toolbox/shogun/commit/4dd6193.patch"
+    sha256 "f8bc03d603e7a43d38e36568fc82652290069efc4e70f5cef7a17429480ab881"
   end
 
   def install
@@ -69,6 +79,7 @@ class Shogun < Formula
 
     mkdir "build" do
       system "cmake", "..", *args
+      system "make", "GoogleMock"
       system "make"
       system "make", "install"
     end

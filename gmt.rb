@@ -1,14 +1,16 @@
 class Gmt < Formula
+  desc "Tools for processing and displaying xy and xyz datasets"
   homepage "http://gmt.soest.hawaii.edu/"
-  url "ftp://ftp.soest.hawaii.edu/gmt/gmt-5.1.2-src.tar.bz2"
-  mirror "ftp://ftp.star.nesdis.noaa.gov/pub/sod/lsa/gmt/gmt-5.1.2-src.tar.bz2"
-  mirror "ftp://gd.tuwien.ac.at/pub/gmt/gmt-5.1.2-src.tar.bz2"
-  sha1 "aed2d79f83717c158adae1f634e6c3d8e5a09515"
+  url "ftp://ftp.soest.hawaii.edu/gmt/gmt-5.3.1-src.tar.xz"
+  mirror "ftp://ftp.star.nesdis.noaa.gov/pub/sod/lsa/gmt/gmt-5.3.1-src.tar.xz"
+  mirror "ftp://gd.tuwien.ac.at/pub/gmt/gmt-5.3.1-src.tar.xz"
+  mirror "ftp://ftp.iris.washington.edu/pub/gmt/gmt-5.3.1-src.tar.xz"
+  sha256 "e46934c356561b15e81f6b766723a577f0c476b685a307d2a351b8569ac350a2"
 
   bottle do
-    sha256 "920a2fd1af474714c5c7b6789ea9546ecb77bb40ebf4ec922611736705f01eaf" => :yosemite
-    sha256 "54e047ddb2fb0510613945baa928fe5dabf519cde349f6a51b5bf06b98154802" => :mavericks
-    sha256 "3a73d3ae439b24d594d6001df57b5cc9a39d517cb794e6fec972ceeca163cf2c" => :mountain_lion
+    sha256 "fdbfe5d4426f29021d297416d8d54e1c5fa869a46423d9594d98c932392f4ce1" => :sierra
+    sha256 "d5d5d57a42096d22582ea8a3eadd997c0c372e9df4ce6e2f90b6dbc42f0da124" => :el_capitan
+    sha256 "9bd429e628d70322e92b47ded6a8dbd60c7184638f4642f776a50cd9f81acbc7" => :yosemite
   end
 
   depends_on "cmake" => :build
@@ -20,17 +22,19 @@ class Gmt < Formula
   conflicts_with "gmt4", :because => "both versions install the same binaries"
 
   resource "gshhg" do
-    url "ftp://ftp.soest.hawaii.edu/gmt/gshhg-gmt-2.3.4.tar.gz"
-    mirror "ftp://ftp.star.nesdis.noaa.gov/pub/sod/lsa/gmt/gshhg-gmt-2.3.4.tar.gz"
-    mirror "ftp://gd.tuwien.ac.at/pub/gmt/gshhg-gmt-2.3.4.tar.gz"
-    sha1 "dc989e96a88533e7d44b788d1be8e0d7620f56d4"
+    url "ftp://ftp.soest.hawaii.edu/gmt/gshhg-gmt-2.3.6.tar.gz"
+    mirror "ftp://ftp.star.nesdis.noaa.gov/pub/sod/lsa/gmt/gshhg-gmt-2.3.6.tar.gz"
+    mirror "ftp://gd.tuwien.ac.at/pub/gmt/gshhg-gmt-2.3.6.tar.gz"
+    mirror "ftp://ftp.iris.washington.edu/pub/gmt/gshhg-gmt-2.3.6.tar.gz"
+    sha256 "ccffff9d96fd6c9cc4f9fbc897d7420c5fc3862fb98d1fd1b03dc4a15c95124e"
   end
 
   resource "dcw" do
-    url "ftp://ftp.soest.hawaii.edu/gmt/dcw-gmt-1.1.1.tar.gz"
-    mirror "ftp://ftp.star.nesdis.noaa.gov/pub/sod/lsa/gmt/dcw-gmt-1.1.1.tar.gz"
-    mirror "ftp://gd.tuwien.ac.at/pub/gmt/dcw-gmt-1.1.1.tar.gz"
-    sha1 "deca85f21426604c8574a18d16c931a1fd9ae27b"
+    url "ftp://ftp.soest.hawaii.edu/gmt/dcw-gmt-1.1.2.tar.gz"
+    mirror "ftp://ftp.star.nesdis.noaa.gov/pub/sod/lsa/gmt/dcw-gmt-1.1.2.tar.gz"
+    mirror "ftp://gd.tuwien.ac.at/pub/gmt/dcw-gmt-1.1.2.tar.gz"
+    mirror "ftp://ftp.iris.washington.edu/pub/gmt/dcw-gmt-1.1.2.tar.gz"
+    sha256 "f719054f8d657e7b10b5182d4c15bc7f38ef7483ed05cdaa9f94ab1a0008bfb6"
   end
 
   def install
@@ -75,5 +79,13 @@ class Gmt < Formula
       (http://www.cs.cmu.edu/~quake/triangle.html) for you.
       If this is unacceptable you should uninstall.
     EOS
+  end
+
+  test do
+    # Test command sourced from Purdue University
+    # Prof. Eric Calais, 'Graphs and Maps with GMT'
+    # http://web.ics.purdue.edu/~ecalais/teaching/gmt/GMT_1.pdf
+    system "#{bin}/pscoast -R0/360/-70/70 -Jm1.2e-2i -Ba60f30/a30f15 -Dc -G240 -W1/0 -P > GMT_mercator.ps"
+    assert File.exist? "GMT_mercator.ps"
   end
 end

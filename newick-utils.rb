@@ -1,18 +1,19 @@
 class NewickUtils < Formula
   homepage "http://cegg.unige.ch/newick_utils"
-  #doi "10.1093/bioinformatics/btq243"
-  #tag "bioinformatics"
+  # doi "10.1093/bioinformatics/btq243"
+  # tag "bioinformatics"
 
   url "http://cegg.unige.ch/pub/newick-utils-1.6.tar.gz"
-  sha1 "a9779054dcbf957618458ebfed07991fabeb3e19"
+  sha256 "2c142a2806f6e1598585c8be5afba6d448c572ad21c142e70d6fd61877fee798"
 
   head "https://github.com/tjunier/newick_utils.git"
 
   bottle do
     cellar :any
-    sha1 "84c2a07c1dc11ad92a926b74cf59cb437e86329e" => :yosemite
-    sha1 "3b1d80495a15915b62e084ae130209c065d73048" => :mavericks
-    sha1 "df6cb19ff8832c504efb4b8a7ab7286185fc637b" => :mountain_lion
+    sha256 "a1c00e6e80e01e69488e0e196b92b705fe681333f883277840dac6e9b66575b9" => :yosemite
+    sha256 "e35ac43b26d9092805d47eff1ca9a3bf7273c591b4f3baba8ce13627a7c16da3" => :mavericks
+    sha256 "217a0404d3254b8285ec7dba16e77a6b614f60eb7f7cdc602b6f05dd666c6270" => :mountain_lion
+    sha256 "f3bb48411ea8b82b0c851a78d834f32c214d1662d8387c79cd462aeb99e6683a" => :x86_64_linux
   end
 
   # Don't bother testing nw_gen, it's known to fail on MacOSX.

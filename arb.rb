@@ -1,35 +1,29 @@
 class Arb < Formula
+  desc "C library for arbitrary-precision floating-point ball arithmetic"
   homepage "http://fredrikj.net/arb/index.html"
-  url "https://github.com/fredrik-johansson/arb/archive/2.5.0.tar.gz"
-  sha256 "1c741b3d7c7a350c01572fb9cdd8218049c669409dff21c1a569a163942e4803"
+  url "https://github.com/fredrik-johansson/arb/archive/2.8.1.tar.gz"
+  sha256 "f4f4ec2d59b348c5e89eaf0b33734bce83a2ef85ab4748b24b984d07f5651012"
   head "https://github.com/fredrik-johansson/arb.git"
 
   bottle do
     cellar :any
-    sha256 "f197f70e77fef5508015282639034df17e14f99e76c9d3e80376982529fce302" => :yosemite
-    sha256 "a25d7f83620b4e73410e578c40a436ec9113045ebcfecea337a8416b87cd81de" => :mavericks
-    sha256 "6e199a91de0f513d08c90370032f946057256cec12306b4db6ff05fabd42b31d" => :mountain_lion
+    sha256 "ab5f1dbe1bf3cd50a4e7aef3c46f17db65505fa023288c09f055ca8039bda431" => :sierra
+    sha256 "30eaaca98a509db97c7122e312da4ec05ee1a83645e79d02d21944b5194cd649" => :el_capitan
+    sha256 "1284efa410c2b3c2159c25e53b6f2e60affe92e2e624d81ed29474c6d4b193eb" => :yosemite
   end
+
+  option "without-test", "Disable build-time checking (not recommended)"
 
   depends_on "gmp"
   depends_on "mpfr"
   depends_on "flint"
 
-  # Will be enabled once the new stable (with patched tests) is released
-  # some of the tests in 2.5.0 are broken because they call not yet implemented
-  # methods
-  # option "with-check", "Enable build-time checking (not recommended)"
-
   def install
+    ENV.prepend "CFLAGS", "-I#{Formula["flint"].opt_include}/flint"
     system "./configure", "--prefix=#{prefix}"
-    # We need to remove this line to have 2.5.0 compiled on OSX
-    # it is fixed in the new version, this line will disappear then
-    inreplace "Makefile", "$(QUIET_AR) $(AR) rcs libarb.a $(OBJS);", ""
     system "make"
-    # Will be enabled once the new stable (with patched tests) is released
-    # see above
-    # system "make", "check" if build.with? "check"
     system "make", "install"
+    system "make", "check" if build.with? "test"
   end
 
   test do

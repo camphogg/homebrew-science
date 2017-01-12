@@ -1,13 +1,16 @@
 class Statismo < Formula
+  desc "Framework for building statistical image And shape models"
   homepage "https://github.com/statismo/statismo"
   url "https://github.com/statismo/statismo/archive/v0.11.0.tar.gz"
   sha256 "f9b7109996d9e42e48b07923ea6edacca57b8ac7c573de1c905dbba921385c4c"
+  revision 9
   head "https://github.com/statismo/statismo.git"
 
   bottle do
-    sha256 "97cd9accdb47d8187b9da59ff50df6ce9be04b0079429fd836f5eedc9264077f" => :yosemite
-    sha256 "bde700f313bf3deae9f65fffc2e29851e5cac4adbec51278255f78a1a1b810e9" => :mavericks
-    sha256 "1a628acd7e8df42a9fe9c109fa604ac51630d027a8e60cbd04144392334c4863" => :mountain_lion
+    cellar :any
+    sha256 "92f331ebd906cb56d9700186535953f98698ac56f9e4191e1e0041b74964779c" => :sierra
+    sha256 "ec217deceeacfc0862b8449990236cc33227e3f54bd9114c62ced299ec1f4f41" => :el_capitan
+    sha256 "9528a26235e72bc31187882b56c8c0bea51856279f335fd6b97ce1a6a5da0df6" => :yosemite
   end
 
   depends_on "cmake" => :build
